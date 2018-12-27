@@ -7,6 +7,7 @@ from originlog.blueprints.auth import auth_bp
 from originlog.blueprints.blog import blog_bp
 from originlog.extensions import db
 from originlog.settings import config
+from originlog.commands import register_command
 
 
 def create_app():
@@ -17,6 +18,8 @@ def create_app():
     register_blueprints(app)
 
     register_extensions(app)
+
+    register_command(app)
 
     return app
 
