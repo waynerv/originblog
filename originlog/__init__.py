@@ -8,6 +8,7 @@ from originlog.blueprints.blog import blog_bp
 from originlog.extensions import db
 from originlog.settings import config
 from originlog.commands import register_command
+from originlog.models import Admin, Category
 
 
 def create_app():
@@ -21,6 +22,8 @@ def create_app():
 
     register_command(app)
 
+    register_template_context(app)
+
     return app
 
 
@@ -32,3 +35,11 @@ def register_blueprints(app):
 
 def register_extensions(app):
     db.init_app(app)
+
+
+def register_template_context(app):
+    @app.context_processor
+    def make_template_context():
+        admin = Admin.query.first()
+        categories = Category.query.order_by(Category.name).all()
+        return dict(admin=admin, categories=categories)

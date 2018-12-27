@@ -20,8 +20,10 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
+        {% from 'macros.html' import nav_link %}
         <div class="collapse navbar-collapse" id="navbarColor01">
             <ul class="navbar-nav mr-auto">
+                {{ nav_link('blog.index', 'Home') }}
                 <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
                 </li>
@@ -32,6 +34,12 @@
 {% endblock nav %}
 
 <main class="container">
+    {% for message in get_flashed_messages(with_categories=True) %}
+    <div class="alert alert-{{ message[0] }}" role="alert">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message[1] }}
+    </div>
+    {% endfor %}
 
     {% block content %}{% endblock content %}
     {% block footer %}
