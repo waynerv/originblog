@@ -26,3 +26,14 @@ def register_command(app):
         fake_comment(comment)
 
         click.echo('Done.')
+
+
+    @app.cli.command()
+    @click.option('--drop', is_flag=True)
+    def initdb(drop):
+        if drop:
+            click.confirm('This operation will delete the database, do you want to continue?', abort=True)
+            db.drop_all()
+            click.echo('Drop tables.')
+        db.create_all()
+        click.echo('Initialized Database.')
