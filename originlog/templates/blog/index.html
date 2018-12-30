@@ -11,12 +11,14 @@
         <small>
             Comments: <a href="{{ url_for('blog.show_post', post_id=post.id) }}#commments">{{ post.comments|length }}</a>&nbsp;&nbsp;
             Category: <a href="{{ url_for('blog.show_category', category_id=post.category.id) }}">{{ post.category.name }}</a>
-            <span>{{ moment(post.timestamp).format('LL') }}</span>
+            <span class="float-right">{{ moment(post.timestamp).format('LL') }}</span>
         </small>
         {% if not loop.last %}
             <hr>
         {% endif %}
     {% endfor %}
+    {% from 'bootstrap/pagination.html' import render_pagination %}
+    <div class="page-footer">{{ render_pagination(pagination) }}</div>
 {% else %}
     <div class="tip">
         <h5>No posts yet.</h5>

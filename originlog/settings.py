@@ -17,6 +17,8 @@ class BaseConfig(object):
     MAIL_DEFAULT_SENDER = ('kaka', os.getenv('MAIL_USERNAME'))
     ORIGINLOG_ADMIN_EMAIL = os.getenv('ORIGINLOG_ADMIN_EMAIL')
 
+    ORIGINLOG_POST_PER_PAGE = 10
+
 
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')

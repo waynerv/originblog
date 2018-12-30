@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }}{% endblock title %}
+{% block content %}
+<div class="page-header">
+    <h1>{{ post.title }}</h1>
+    <small>
+        Category: <a href="{{ url_for('blog.show_category', category_id=post.category.id) }}">{{ post.category.name }}</a>
+        Date: {{ moment(post.timestamp).format('LL') }}
+    </small>
+</div>
+<div class="row">
+    <div class="col-sm-8">
+        {{ post.body|safe }}
+    </div>
+    <div class="comments" id="comments">
+        ...
+    </div>
+    <div class="col-sm-4 sidebar">
+        {% include "blog/_sidebar.html" %}
+    </div>
+</div>
+{% endblock content %}
