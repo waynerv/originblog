@@ -1,8 +1,12 @@
+import re
 from datetime import datetime
 
+from unidecode import unidecode
 from werkzeug.security import generate_password_hash
 
 from originlog.extensions import db
+
+_punct_re = re.compile(r'[\t !"#$%&\-/<=>?@\[\\\]^_`{|},.]+')
 
 
 class Admin(db.Model):
@@ -14,7 +18,7 @@ class Admin(db.Model):
     blog_sub_title = db.Column(db.String(100))
     about = db.Column(db.Text)
 
-    def set_password(self,password):
+    def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
 
@@ -26,6 +30,10 @@ class Post(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('Category', back_populates='posts')
     comments = db.relationship('Comment', back_populates='post', cascade='all, delete-orphan')
+    slug = db.Column(db.Text)
+
+    def set_slug(self, title):
+        self.slug = slugify(title)
 
 
 class Category(db.Model):
@@ -48,3 +56,11 @@ class Comment(db.Model):
     replied_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
     replied = db.relationship('Comment', back_populates='replies', remote_side=[id])
     replies = db.relationship('Comment', back_populates='replied', cascade='all, delete-orphan')
+
+
+def slugify(text, delim=u'-'):
+    """Generates ab ASCII-only slug"""
+    result = []
+    for word in _punct_re.split(text.lower()):
+        result.extend(unidecode(word).lower().split())
+    return unidecode(delim.join(result))
