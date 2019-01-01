@@ -6,7 +6,7 @@ from originlog.blueprints.admin import admin_bp
 from originlog.blueprints.auth import auth_bp
 from originlog.blueprints.blog import blog_bp
 from originlog.commands import register_command
-from originlog.extensions import db, ckeditor, mail, moment, bootstrap
+from originlog.extensions import db, ckeditor, mail, moment, bootstrap, login_manager
 from originlog.models import Admin, Category
 from originlog.settings import config
 
@@ -41,6 +41,7 @@ def register_extensions(app):
     mail.init_app(app)
     moment.init_app(app)
     bootstrap.init_app(app)
+    login_manager.init_app(app)
 
 
 def register_template_context(app):
