@@ -19,6 +19,9 @@ class BaseConfig(object):
 
     ORIGINLOG_POST_PER_PAGE = 10
 
+    # ('theme name', 'display name')
+    ORIGINLOG_THEMES = {'literal': 'Literal', 'flatly':'Flatly'}
+
 
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
