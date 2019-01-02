@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
+{% from 'macros.html' import nav_link %}
+{% from 'bootstrap/nav.html' import render_nav_item %}
 <head>
     {% block head %}
         <meta charset="UTF-8">
@@ -22,7 +24,6 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            {% from 'macros.html' import nav_link %}
             <div class="collapse navbar-collapse" id="navbarColor01">
                 <ul class="navbar-nav mr-auto">
                     {{ nav_link('blog.index', 'Home') }}
@@ -30,6 +31,40 @@
                 </ul>
             </div>
         </div>
+        <ul class="nav navbar-nav navbar-right">
+            {% if current_user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        New <span class="caret"></span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ url_for('admin.new_post') }}">Post</a>
+                        <a class="dropdown-item" href="{{ url_for('admin.new_category') }}">Category</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        Manage <span class="caret"></span>
+                        {% if unread_comments %}
+                        <span class="badge badge-success">new</span>
+                        {% endif %}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{ url_for('admin.manage_post') }}">Post</a>
+                        <a class="dropdown-item" href="{{ url_for('admin.manage_category') }}">Category</a>
+                        <a class="dropdown-item" href="{{ url_for('admin.manage_comment') }}">
+                            Comment
+                            {% if unread_comments %}
+                                <span class="badge badge-success">{{ unread_comments }}</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </li>
+                {{ render_nav_item('admin.settings', 'Setting') }}
+            {% endif %}
+        </ul>
     </nav>
 {% endblock nav %}
 
@@ -46,9 +81,9 @@
         <footer>
             <small>
                 {% if current_user.is_authenticated %}
-                <a href="{{ url_for('auth.logout', next=request.full_path) }}">Logout</a>
+                    <a href="{{ url_for('auth.logout', next=request.full_path) }}">Logout</a>
                 {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}">Login</a>
+                    <a href="{{ url_for('auth.login', next=request.full_path) }}">Login</a>
                 {% endif %}
             </small>
         </footer>

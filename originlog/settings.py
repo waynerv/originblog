@@ -18,6 +18,7 @@ class BaseConfig(object):
     ORIGINLOG_ADMIN_EMAIL = os.getenv('ORIGINLOG_ADMIN_EMAIL')
 
     ORIGINLOG_POST_PER_PAGE = 10
+    ORIGINLOG_MANAGE_POST_PER_PAGE = 20
 
     # ('theme name', 'display name')
     ORIGINLOG_THEMES = {'literal': 'Literal', 'flatly':'Flatly'}
