@@ -2,8 +2,8 @@ from flask import Blueprint, request, current_app, render_template, flash, redir
 from flask_login import login_required
 
 from originlog.extensions import db
-from originlog.forms import PostForm, CategoryForm
-from originlog.models import Post, Comment, Category
+from originlog.forms import PostForm, CategoryForm, AboutForm
+from originlog.models import Post, Comment, Category, Admin
 from originlog.utils import redirect_back
 
 admin_bp = Blueprint('admin', __name__)
@@ -178,7 +178,22 @@ def delete_category(category_id):
     return redirect_back()
 
 
-@admin_bp.route('/settings')
+@admin_bp.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
-    pass
+    form = AboutForm()
+    admin = Admin.query.first_or_404()
+
+    if form.validate_on_submit():
+        admin.blog_title = form.blog_title.data
+        admin.blog_sub_title = form.blog_sub_title.data
+        admin.about = form.about.data
+        db.session.commit()
+        flash('Settings updated.', 'success')
+        return redirect(url_for('blog.index'))
+
+    form.blog_title.data = admin.blog_title
+    form.blog_sub_title.data = admin.blog_sub_title
+    form.about.data = admin.about
+    return render_template('admin/edit_about.html', form=form)
+

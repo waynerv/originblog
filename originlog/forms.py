@@ -53,3 +53,4 @@ class AboutForm(FlaskForm):
     blog_title = StringField('Blog title', validators=[DataRequired(), Length(1, 60)])
     blog_sub_title = StringField('Subtitle', validators=[DataRequired(), Length(1, 100)])
     about = TextAreaField('About', validators=[DataRequired()])
+    submit = SubmitField('Submit')
