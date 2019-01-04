@@ -34,6 +34,7 @@ class Post(db.Model):
     category = db.relationship('Category', back_populates='posts')
     comments = db.relationship('Comment', back_populates='post', cascade='all, delete-orphan')
     slug = db.Column(db.Text)
+    can_comment = db.Column(db.Boolean, default=True)
 
     def set_slug(self, title):
         self.slug = slugify(title)

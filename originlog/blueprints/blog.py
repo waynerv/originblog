@@ -70,8 +70,12 @@ def about():
 @blog_bp.route('/reply/comment/<int:comment_id>')
 def reply_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
-    return redirect(
-        url_for('blog.show_post', post_id=comment.post.id, reply=comment_id, author=comment.author) + '#comment-form')
+    if comment.post.can_comment:
+        return redirect(
+            url_for('blog.show_post', post_id=comment.post.id, reply=comment_id, author=comment.author) + '#comment-form')
+    else:
+        flash('This post is comment disabled.', 'warning')
+        return redirect_back()
 
 
 @blog_bp.route('/change-theme/<theme_name>')

@@ -3,7 +3,7 @@ from flask_login import login_required
 
 from originlog.extensions import db
 from originlog.forms import PostForm
-from originlog.models import Post
+from originlog.models import Post, Comment, Category
 from originlog.utils import redirect_back
 
 admin_bp = Blueprint('admin', __name__)
@@ -17,18 +17,6 @@ def manage_post():
     pagination = Post.query.order_by(Post.timestamp.desc()).paginate(page, per_page)
     posts = pagination.items
     return render_template('admin/manage_post.html', posts=posts, pagination=pagination)
-
-
-@admin_bp.route('/category/manage')
-@login_required
-def manage_category():
-    pass
-
-
-@admin_bp.route('/comment/manage')
-@login_required
-def manage_comment():
-    pass
 
 
 @admin_bp.route('/post/new', methods=['GET', 'POST'])
@@ -78,6 +66,65 @@ def delete_post(post_id):
     db.session.delete(post)
     db.session.commit()
     flash('Post deleted.', 'success')
+    return redirect_back()
+
+
+@admin_bp.route('/post/set-comment/<int:post_id>', methods=['POST'])
+@login_required
+def set_comment(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.can_comment:
+        post.can_comment = False
+        flash('Comment disabled.', 'success')
+    else:
+        post.can_comment = True
+        flash('Comment enabled.', 'success')
+    db.session.commit()
+    return redirect_back()
+
+
+@admin_bp.route('/category/manage')
+@login_required
+def manage_category():
+    pass
+
+
+@admin_bp.route('/comment/manage')
+@login_required
+def manage_comment():
+    filter_rule = request.args.get('filter', 'all')
+    page = request.args.get('page', default=1, type=int)
+    per_page = current_app.config['ORIGINLOG_MANAGE_COMMENT_PER_PAGE']
+
+    if filter_rule == 'all':
+        filter_comments = Comment.query
+    elif filter_rule == 'unread':
+        filter_comments = Comment.query.filter(Comment.reviewed == False)
+    elif filter_rule == 'admin':
+        filter_comments = Comment.query.filter(Comment.from_admin == True)
+
+    pagination = filter_comments.order_by(Comment.timestamp.desc()).paginate(page, per_page)
+    comments = pagination.items
+    return render_template('admin/manage_comment.html', comments=comments, pagination=pagination)
+
+
+@admin_bp.route('/comment/delete/<int:comment_id>', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    db.session.delete(comment)
+    db.session.commit()
+    flash('Comment deleted.', 'success')
+    return redirect_back()
+
+
+@admin_bp.route('/comment/approve/<int:comment_id>', methods=['POST'])
+@login_required
+def approve_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    comment.reviewed = True
+    db.session.commit()
+    flash('Comment approved.', 'success')
     return redirect_back()
 
 
