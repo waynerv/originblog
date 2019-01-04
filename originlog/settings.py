@@ -23,7 +23,7 @@ class BaseConfig(object):
     ORIGINLOG_MANAGE_CATEGORY_PER_PAGE = 10
 
     # ('theme name', 'display name')
-    ORIGINLOG_THEMES = {'literal': 'Literal', 'flatly':'Flatly'}
+    ORIGINLOG_THEMES = {'flatly':'Flatly', 'united': 'United'}
 
 
 class DevelopmentConfig(BaseConfig):

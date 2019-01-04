@@ -9,7 +9,7 @@
         <title>{% block title %}{% endblock title %} - Originlog</title>
         <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
         <link rel="stylesheet"
-              href="{{ url_for('static', filename='css/%s.min.css'|format(request.cookies.get('theme', 'literal'))) }}"
+              href="{{ url_for('static', filename='css/%s.min.css'|format(request.cookies.get('theme', 'flatly'))) }}"
               type="text/css">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
     {% endblock head %}
