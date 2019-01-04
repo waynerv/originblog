@@ -45,6 +45,14 @@ class Category(db.Model):
     name = db.Column(db.String(20), unique=True)
     posts = db.relationship('Post', back_populates='category')
 
+    def delete(self):
+        default_category = Category.query.filter(Category.name == 'default').first_or_404()
+        posts = self.posts[:]
+        for post in posts:
+            post.category = default_category
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)

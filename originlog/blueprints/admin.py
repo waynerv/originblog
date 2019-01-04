@@ -2,7 +2,7 @@ from flask import Blueprint, request, current_app, render_template, flash, redir
 from flask_login import login_required
 
 from originlog.extensions import db
-from originlog.forms import PostForm
+from originlog.forms import PostForm, CategoryForm
 from originlog.models import Post, Comment, Category
 from originlog.utils import redirect_back
 
@@ -83,12 +83,6 @@ def set_comment(post_id):
     return redirect_back()
 
 
-@admin_bp.route('/category/manage')
-@login_required
-def manage_category():
-    pass
-
-
 @admin_bp.route('/comment/manage')
 @login_required
 def manage_comment():
@@ -128,10 +122,60 @@ def approve_comment(comment_id):
     return redirect_back()
 
 
-@admin_bp.route('/category/new')
+@admin_bp.route('/category/manage')
+@login_required
+def manage_category():
+    page = request.args.get('page', default=1, type=int)
+    per_page = current_app.config['ORIGINLOG_MANAGE_CATEGORY_PER_PAGE']
+    pagination = Category.query.order_by(Category.id).paginate(page, per_page)
+    categories = pagination.items
+    return render_template('admin/manage_category.html', categories=categories, pagination=pagination)
+
+
+@admin_bp.route('/category/new', methods=['GET', 'POST'])
 @login_required
 def new_category():
-    pass
+    form = CategoryForm()
+
+    if form.validate_on_submit():
+        name = form.name.data
+        category = Category(name=name)
+        db.session.add(category)
+        db.session.commit()
+        flash('Category created.', 'success')
+        return redirect(url_for('admin.manage_category'))
+    return render_template('admin/new_category.html', form=form)
+
+
+@admin_bp.route('/category/edit/<int:category_id>', methods=['GET', 'POST'])
+@login_required
+def edit_category(category_id):
+    form = CategoryForm()
+    category = Category.query.get_or_404(category_id)
+
+    if category.name == 'default':
+        flash('You can not edit the default category.', 'warning')
+        return redirect(url_for('blog.index'))
+
+    if form.validate_on_submit():
+        category.name = form.name.data
+        db.session.commit()
+        flash('Category updated.', 'success')
+        return redirect(url_for('admin.manage_category'))
+    form.name.data = category.name
+    return render_template('admin/edit_category.html', form=form)
+
+
+@admin_bp.route('/category/delete/<int:category_id>', methods=['POST'])
+@login_required
+def delete_category(category_id):
+    category = Category.query.get_or_404(category_id)
+    if category.name == 'default':
+        flash('Sorry, you can not delete default category', 'warning')
+        return redirect(url_for('blog.index'))
+    category.delete()
+    flash('Category deleted.', 'success')
+    return redirect_back()
 
 
 @admin_bp.route('/settings')
