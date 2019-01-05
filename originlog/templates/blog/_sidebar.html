@@ -13,11 +13,11 @@
 {% endif %}
 
 <div class="dropdown">
-    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenubutton"
+    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Change Theme
     </button>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenubutton">
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         {% for theme_name, display_theme in config.ORIGINLOG_THEMES.items() %}
         <a class="dropdown-item"
            href="{{ url_for('blog.change_theme', theme_name=theme_name, next=request.full_path) }}">
