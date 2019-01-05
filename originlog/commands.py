@@ -8,8 +8,9 @@ def register_command(app):
     @click.option('--post', default=50, help='Quantity of posts, default is 50')
     @click.option('--category', default=10, help='Quantity of categories, default is 10')
     @click.option('--comment', default=500, help='Quantity of comments, default is 500')
-    def forge(post, category, comment):
-        from originlog.fake import fake_admin, fake_category, fake_comment, fake_post
+    @click.option('--link', default=4, help='Quantity of links, default is 4')
+    def forge(post, category, comment, link):
+        from originlog.fake import fake_admin, fake_category, fake_comment, fake_post, fake_link
 
         db.drop_all()
         db.create_all()
@@ -19,6 +20,9 @@ def register_command(app):
 
         click.echo(f'Generating {category} categories...')
         fake_category(category)
+
+        click.echo(f'Generating {link} links...')
+        fake_link(link)
 
         click.echo(f'Generating {post} posts...')
         fake_post(post)

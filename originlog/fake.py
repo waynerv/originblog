@@ -1,5 +1,5 @@
 import random
-from originlog.models import Admin, Post, Category, Comment
+from originlog.models import Admin, Post, Category, Comment, Link
 from originlog.extensions import db
 from faker import Faker
 
@@ -41,8 +41,15 @@ def fake_category(count=10):
         db.session.add(category)
         try:
             db.session.commit()
-        except IntegrityError:
+        except:
             db.session.rollback()
+
+
+def fake_link(count=4):
+    for i in range(count):
+        link = Link(name=fake.domain_name(), url=fake.url())
+        db.session.add(link)
+        db.session.commit()
 
 
 def fake_comment(count=500):

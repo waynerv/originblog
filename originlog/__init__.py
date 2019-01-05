@@ -9,7 +9,7 @@ from originlog.blueprints.auth import auth_bp
 from originlog.blueprints.blog import blog_bp
 from originlog.commands import register_command
 from originlog.extensions import db, ckeditor, mail, moment, bootstrap, login_manager, csrf
-from originlog.models import Admin, Category, Comment
+from originlog.models import Admin, Category, Comment, Link
 from originlog.settings import config
 
 
@@ -52,11 +52,12 @@ def register_template_context(app):
     def make_template_context():
         admin = Admin.query.first()
         categories = Category.query.order_by(Category.name).all()
+        links = Link.query.order_by(Link.id).all()
         if current_user.is_authenticated:
             unread_comments = Comment.query.filter(Comment.reviewed == False).count()
         else:
             unread_comments = None
-        return dict(admin=admin, categories=categories, unread_comments=unread_comments)
+        return dict(admin=admin, categories=categories, unread_comments=unread_comments, links=links)
 
 
 def register_error_handler(app):

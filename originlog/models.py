@@ -70,6 +70,12 @@ class Comment(db.Model):
     replies = db.relationship('Comment', back_populates='replied', cascade='all, delete-orphan')
 
 
+class Link(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20))
+    url = db.Column(db.String(255))
+
+
 def slugify(text, delim=u'-'):
     """Generates ab ASCII-only slug"""
     result = []

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+
+{% block title %}
+    Manage Links
+{% endblock title %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>
+            Links
+            <small class="text-muted">{{ pagination.total }}</small>
+            <span class="float-right"><a class="btn btn-primary btn-sm"
+                                         href="{{ url_for('admin.new_link') }}">New Link</a></span>
+        </h1>
+    </div>
+    {% if links %}
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>No.</th>
+                <th>Name</th>
+                <th>URL</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            {% for link in links %}
+                <tr>
+                    <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINLOG_MANAGE_LINK_PER_PAGE) }}</td>
+                    <td><h5>{{ link.name }}</h5></td>
+                    <td>
+                        <a href="{{ link.url }}">{{ link.url }}</a>
+                    </td>
+                    <td>
+                        <a class="btn btn-info btn-sm" href="{{ url_for('admin.edit_link', link_id=link.id) }}">Edit</a>
+                        <form class="inline" method="post"
+                              action="{{ url_for('admin.delete_link', link_id=link.id, next=request.full_path) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Are you sure?')">Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div class="page-footer">
+            {{ render_pagination(pagination) }}
+        </div>
+    {% else %}
+        <div class="tip">
+        <h5>No links</h5>
+        </div>
+    {% endif %}
+{% endblock content %}

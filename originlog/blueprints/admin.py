@@ -2,8 +2,8 @@ from flask import Blueprint, request, current_app, render_template, flash, redir
 from flask_login import login_required
 
 from originlog.extensions import db
-from originlog.forms import PostForm, CategoryForm, AboutForm
-from originlog.models import Post, Comment, Category, Admin
+from originlog.forms import PostForm, CategoryForm, AboutForm, LinkForm
+from originlog.models import Post, Comment, Category, Admin, Link
 from originlog.utils import redirect_back
 
 admin_bp = Blueprint('admin', __name__)
@@ -175,6 +175,58 @@ def delete_category(category_id):
         return redirect(url_for('blog.index'))
     category.delete()
     flash('Category deleted.', 'success')
+    return redirect_back()
+
+
+@admin_bp.route('/link/manage')
+@login_required
+def manage_link():
+    page = request.args.get('page', default=1, type=int)
+    per_page = current_app.config['ORIGINLOG_MANAGE_LINK_PER_PAGE']
+    pagination = Link.query.order_by(Link.id).paginate(page, per_page)
+    links = pagination.items
+    return render_template('admin/manage_link.html', links=links, pagination=pagination)
+
+
+@admin_bp.route('/link/new', methods=['GET', 'POST'])
+@login_required
+def new_link():
+    form = LinkForm()
+
+    if form.validate_on_submit():
+        name = form.name.data
+        url = form.url.data
+        link = Link(name=name, url=url)
+        db.session.add(link)
+        db.session.commit()
+        flash('Link created.', 'success')
+        return redirect(url_for('admin.manage_link'))
+    return render_template('admin/new_link.html', form=form)
+
+
+@admin_bp.route('/link/edit/<int:link_id>', methods=['GET', 'POST'])
+@login_required
+def edit_link(link_id):
+    form = LinkForm()
+    link = Link.query.get_or_404(link_id)
+
+    if form.validate_on_submit():
+        link.name = form.name.data
+        link.url = form.url.data
+        db.session.commit()
+        flash('Link updated.', 'success')
+        return redirect(url_for('admin.manage_link'))
+    form.name.data = link.name
+    form.url.data = link.url
+    return render_template('admin/edit_link.html', form=form)
+
+
+@admin_bp.route('/link/delete/<int:link_id>', methods=['POST'])
+@login_required
+def delete_link(link_id):
+    link = Link.query.get_or_404(link_id)
+    db.session.delete(link)
+    flash('Link deleted.', 'success')
     return redirect_back()
 
 

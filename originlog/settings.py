@@ -22,6 +22,7 @@ class BaseConfig(object):
     ORIGINLOG_MANAGE_POST_PER_PAGE = 20
     ORIGINLOG_MANAGE_COMMENT_PER_PAGE = 20
     ORIGINLOG_MANAGE_CATEGORY_PER_PAGE = 10
+    ORIGINLOG_MANAGE_LINK_PER_PAGE = 10
 
     # ('theme name', 'display name')
     ORIGINLOG_THEMES = {'flatly':'Flatly', 'united': 'United'}
