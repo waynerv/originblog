@@ -2,9 +2,10 @@ from flask import Blueprint, render_template, request, current_app, redirect, ur
 
 from originlog.emails import send_new_comment_email
 from originlog.extensions import db
-from originlog.forms import CommentForm
+from originlog.forms import CommentForm, AdminCommentForm
 from originlog.models import Post, Category, Comment
 from originlog.utils import redirect_back
+from flask_login import current_user
 
 blog_bp = Blueprint('blog', __name__)
 
@@ -21,22 +22,32 @@ def index():
 @blog_bp.route('/post/<int:post_id>', methods=['GET', 'Post'])
 def show_post(post_id):
     post = Post.query.get_or_404(post_id)
-    form = CommentForm()
-    from_admin = False
-    reviewed = False
+
+    if current_user.is_authenticated:
+        form = AdminCommentForm()
+        form.author.data = current_user.name
+        form.email.data = current_app.config['ORIGINLOG_ADMIN_EMAIL']
+        form.site.data = url_for('blog.index')
+        from_admin = True
+        reviewed = True
+    else:
+        form = CommentForm()
+        from_admin = False
+        reviewed = False
 
     if form.validate_on_submit():
         author = form.author.data
         email = form.email.data
         site = form.site.data
         body = form.body.data
+        comment = Comment(author=author, email=email, site=site, body=body, from_admin=from_admin, reviewed=reviewed,
+                          post=post)
         replied_id = request.args.get('reply')
         if replied_id:
             replied_comment = Comment.query.get_or_404(replied_id)
-            replied = replied_comment
+            comment.replied = replied_comment
             send_new_comment_email(replied_comment)  # 是否审核通过后再通知被回复用户比较合适？
-        comment = Comment(author=author, email=email, site=site, body=body, from_admin=from_admin, reviewed=reviewed,
-                          post=post, replied=replied)
+
         db.session.add(comment)
         db.session.commit()
         flash('Thanks, your comment will be published after reviewed.', 'info')
