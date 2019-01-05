@@ -6,10 +6,8 @@ verify_ssl = true
 [dev-packages]
 watchdog = "*"
 python-dotenv = "*"
-<<<<<<< HEAD
 faker = "*"
-=======
->>>>>>> c6b15b90cdfe71e8302ffd72ff76662b5bb1ecff
+
 
 [packages]
 flask = "*"
@@ -17,14 +15,12 @@ flask-wtf = "*"
 flask-sqlalchemy = "*"
 flask-login = "*"
 pymysql = "*"
-<<<<<<< HEAD
 flask-ckeditor = "*"
 flask-mail = "*"
 flask-moment = "*"
 bootstrap-flask = "*"
 unidecode = "*"
-=======
->>>>>>> c6b15b90cdfe71e8302ffd72ff76662b5bb1ecff
+
 
 [requires]
 python_version = "3.6"
