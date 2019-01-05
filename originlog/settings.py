@@ -25,7 +25,9 @@ class BaseConfig(object):
     ORIGINLOG_MANAGE_LINK_PER_PAGE = 10
 
     # ('theme name', 'display name')
-    ORIGINLOG_THEMES = {'flatly':'Flatly', 'united': 'United'}
+    ORIGINLOG_THEMES = {'flatly': 'Flatly', 'united': 'United'}
+
+    SSL_DISABLED = True
 
 
 class DevelopmentConfig(BaseConfig):
@@ -37,7 +39,8 @@ class TestingConfig(BaseConfig):
 
 
 class ProductionConfig(BaseConfig):
-    pass
+    SSL_DISABLED = True
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 
 
 config = {

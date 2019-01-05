@@ -270,4 +270,7 @@ fabric.properties
 ### Python Patch ###
 .venv/
 
+###logfile
+*.log
+
 # End of https://www.gitignore.io/api/linux,flask,python,pycharm

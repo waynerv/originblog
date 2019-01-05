@@ -1,4 +1,6 @@
+import logging
 import os
+from logging.handlers import RotatingFileHandler
 
 from flask import Flask, render_template
 from flask_login import current_user
@@ -8,7 +10,7 @@ from originlog.blueprints.admin import admin_bp
 from originlog.blueprints.auth import auth_bp
 from originlog.blueprints.blog import blog_bp
 from originlog.commands import register_command
-from originlog.extensions import db, ckeditor, mail, moment, bootstrap, login_manager, csrf
+from originlog.extensions import db, ckeditor, mail, moment, bootstrap, login_manager, csrf, migrate, sslify
 from originlog.models import Admin, Category, Comment, Link
 from originlog.settings import config
 
@@ -30,6 +32,8 @@ def create_app(config_name=None):
 
     register_error_handler(app)
 
+    register_logger(app)
+
     return app
 
 
@@ -47,6 +51,8 @@ def register_extensions(app):
     bootstrap.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app)
+    migrate.init_app(app, db)
+    sslify.init_app(app)
 
 
 def register_template_context(app):
@@ -78,3 +84,16 @@ def register_error_handler(app):
     @app.errorhandler(500)
     def bad_request(e):
         return render_template('errors/500.html'), 500
+
+
+def register_logger(app):
+    app.logger.setLevel(logging.INFO)
+
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    file_handler = RotatingFileHandler('log/originlog.log', maxBytes=10 * 1024 * 1024, backupCount=10)
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(logging.INFO)
+
+    if not app.debug:
+        app.logger.addHandler(file_handler)

@@ -8,7 +8,6 @@ watchdog = "*"
 python-dotenv = "*"
 faker = "*"
 
-
 [packages]
 flask = "*"
 flask-wtf = "*"
@@ -20,7 +19,8 @@ flask-mail = "*"
 flask-moment = "*"
 bootstrap-flask = "*"
 unidecode = "*"
-
+flask-migrate = "*"
+flask-sslify = "*"
 
 [requires]
 python_version = "3.6"
