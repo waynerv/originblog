@@ -8,10 +8,12 @@
     <div class="row">
         <div class="col-sm-8">
             {% include 'blog/_post.html' %}
+            {% if posts %}
             {% from 'bootstrap/pagination.html' import render_pagination %}
             <div class="page-footer">
                 {{ render_pagination(pagination) }}
             </div>
+            {% endif %}
         </div>
         <div class="col-sm-4 sidebar">
             {% include 'blog/_sidebar.html' %}
