@@ -20,7 +20,6 @@ flask-moment = "*"
 bootstrap-flask = "*"
 unidecode = "*"
 flask-migrate = "*"
-flask-sslify = "*"
 
 [requires]
 python_version = "3.6"

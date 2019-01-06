@@ -10,7 +10,7 @@ from originlog.blueprints.admin import admin_bp
 from originlog.blueprints.auth import auth_bp
 from originlog.blueprints.blog import blog_bp
 from originlog.commands import register_command
-from originlog.extensions import db, ckeditor, mail, moment, bootstrap, login_manager, csrf, migrate, sslify
+from originlog.extensions import db, ckeditor, mail, moment, bootstrap, login_manager, csrf, migrate
 from originlog.models import Admin, Category, Comment, Link
 from originlog.settings import config
 
@@ -52,7 +52,6 @@ def register_extensions(app):
     login_manager.init_app(app)
     csrf.init_app(app)
     migrate.init_app(app, db)
-    sslify.init_app(app)
 
 
 def register_template_context(app):

@@ -27,8 +27,6 @@ class BaseConfig(object):
     # ('theme name', 'display name')
     ORIGINLOG_THEMES = {'flatly': 'Flatly', 'united': 'United'}
 
-    SSL_DISABLED = True
-
 
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
@@ -39,7 +37,6 @@ class TestingConfig(BaseConfig):
 
 
 class ProductionConfig(BaseConfig):
-    SSL_DISABLED = True
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 
 

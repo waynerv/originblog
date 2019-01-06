@@ -6,7 +6,6 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
 from flask_migrate import Migrate
-from flask_sslify import SSLify
 
 db = SQLAlchemy()
 ckeditor = CKEditor()
@@ -16,7 +15,6 @@ bootstrap = Bootstrap()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 migrate = Migrate()
-sslify = SSLify()
 
 login_manager.login_view = 'auth.login'
 login_manager.login_message_category = 'warning'
