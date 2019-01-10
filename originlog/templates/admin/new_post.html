@@ -1,19 +1,46 @@
 {% extends 'base.html' %}
-{% from 'bootstrap/form.html' import render_form %}
+{% from 'bootstrap/form.html' import render_field %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='editormd/css/editormd.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='editormd/css/editormd.preview.min.css') }}"/>
+{% endblock head %}
 
 {% block title %}
     New Post
-{% endblock %}
+{% endblock title %}
 
 {% block content %}
     <div class="page-header">
         <h1>New Post</h1>
     </div>
-    {{ render_form(form) }}
+    {{ form.csrf_token() }}
+    {{ render_field(form.title) }}
+    {{ render_field(form.category) }}
+    <div id="fancy-editormd" class="editormd">
+    {{ form.body(style="display:none;") }}
+    </div>
+    {% if form.body.errors %}
+        {% for message in form.body.errors %}
+        <small class="error">{{ message }}</small><br>
+        {% endfor %}
+    {% endif %}
+    {{ render_field(form.submit) }}
 {% endblock %}
 
 {% block scripts %}
     {{ super() }}
-    <script type="text/javascript" src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
-    {{ ckeditor.config(name='body') }}
+    <script src="{{ url_for('static',filename='editormd/editormd.min.js') }}"></script>
+    <script type="text/javascript">
+        $(function () {
+            editormd("fancy-editormd", {
+                // width: "100%", 请不要添加
+                height: 640,
+                syncScrolling: "single",
+                path: "{{ url_for('static',filename='editormd/lib/') }}",
+                saveHTMLToTextarea : true
+            });
+        });
+    </script>
 {% endblock %}
