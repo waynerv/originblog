@@ -5,23 +5,27 @@
 {% block title %}{{ post.title }}{% endblock title %}
 {% block content %}
     <div class="page-header">
-        <h1>{{ post.title }}</h1>
+        <h1>{{ post.title }}
+            <span class="float-right">
+            {% if current_user.is_authenticated %}
+                <a class="btn btn-info btn-sm" href="{{ url_for('admin.edit_post', post_id=post.id) }}">Edit</a>
+                <form class="inline" method="post"
+                      action="{{ url_for('admin.delete_post', post_id=post.id, next=url_for('blog.index')) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Are you sure?')">Delete
+                    </button>
+                </form>
+            {% endif %}
+            </span>
+        </h1>
         <small>
             Category: <a
                 href="{{ url_for('blog.show_category', category_id=post.category.id) }}">{{ post.category.name }}</a>
             Date: {{ moment(post.timestamp).format('LL') }}
         </small>
     </div>
-    {% if current_user.is_authenticated %}
-        <a class="btn btn-info btn-sm" href="{{ url_for('admin.edit_post', post_id=post.id) }}">Edit</a>
-        <form class="inline" method="post"
-              action="{{ url_for('admin.delete_post', post_id=post.id, next=url_for('blog.index')) }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn btn-danger btn-sm"
-                    onclick="return confirm('Are you sure?')">Delete
-            </button>
-        </form>
-    {% endif %}
+
     <div class="row">
         <div class="col-sm-8">
             {{ post.body|safe }}

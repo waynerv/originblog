@@ -24,8 +24,16 @@ img {
     margin-top: 10px;
 }
 
-.sidebar {
-    padding-left: 30px;
+@media only screen and (min-width: 576px) {
+    .sidebar {
+        padding-left: 30px;
+    }
+}
+
+@media only screen and (max-width: 575px) {
+    .sidebar {
+        padding-top: 15px;
+    }
 }
 
 footer {
