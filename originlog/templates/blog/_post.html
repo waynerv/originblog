@@ -6,7 +6,7 @@
             <small><a href="{{ url_for('blog.show_post', post_id=post.id) }}">Read More</a> </small>
         </p>
         <small>
-            Comments: <a href="{{ url_for('blog.show_post', post_id=post.id) }}#comments">{{ post.comments|length }}</a>&nbsp;&nbsp;
+            Comments: <a href="{{ url_for('blog.show_post', post_id=post.id) }}#comments">{{ post.reviewed_comments()|length }}</a>&nbsp;&nbsp;
             Category: <a href="{{ url_for('blog.show_category', category_id=post.category.id) }}">{{ post.category.name }}</a>
             <span class="float-right">{{ moment(post.timestamp).format('LL') }}</span>
         </small>

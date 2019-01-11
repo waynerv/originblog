@@ -52,7 +52,7 @@
                 </div>
             </div>
             <div class="comments" id="comments">
-                <h3>{{ comments|length }} Comments
+                <h3>{{ pagination.total }} Comments
                     <small>
                         <a href="{{ url_for('blog.show_post', post_id=post.id, pagination=pagination.pages or 1) }}#comments">
                             latest

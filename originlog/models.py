@@ -39,6 +39,9 @@ class Post(db.Model):
     def set_slug(self, title):
         self.slug = slugify(title)
 
+    def reviewed_comments(self):
+        return [comment for comment in self.comments if comment.reviewed is True ]
+
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
