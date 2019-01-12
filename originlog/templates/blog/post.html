@@ -2,7 +2,15 @@
 {% from 'bootstrap/pagination.html' import render_pagination %}
 {% from 'bootstrap/form.html' import render_form %}
 
+{% block head %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='editormd/css/editormd.preview.min.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='editormd/css/editormd.min.css') }}" rel="stylesheet" />
+    <style>#editor-content {padding: 0}</style>
+{% endblock head %}
+
 {% block title %}{{ post.title }}{% endblock title %}
+
 {% block content %}
     <div class="page-header">
         <h1>{{ post.title }}
@@ -28,7 +36,9 @@
 
     <div class="row">
         <div class="col-sm-8">
-            {{ post.body|safe }}
+            <article id="editor-content">
+            {{ post.body_html|safe }}
+            </article>
             <hr>
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target=".postLinkModal">Share
             </button>
@@ -149,3 +159,13 @@
         </div>
     </div>
 {% endblock content %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static',filename='editormd/lib/marked.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='editormd/lib/prettify.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='editormd/editormd.min.js') }}"></script>
+    <script type="text/javascript">
+        editormd.markdownToHTML("editor-content");
+    </script>
+{% endblock %}

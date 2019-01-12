@@ -23,7 +23,8 @@ def fake_post(count=50):
     for i in range(count):
         post = Post(
             title=fake.sentence(),
-            body=fake.text(2000),
+            body_md=fake.text(2000),
+            body_html=fake.text(2000),
             timestamp=fake.date_time_this_year(),
             category_id=random.randint(1, Category.query.count())
         )

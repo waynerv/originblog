@@ -32,7 +32,7 @@
 
 {% block scripts %}
     {{ super() }}
-    <script src="{{ url_for('static',filename='editormd/editormd.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='editormd/editormd.min.js') }}"></script>
     <script type="text/javascript">
         $(function () {
             editormd("flask-editormd", {

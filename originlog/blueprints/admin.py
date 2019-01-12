@@ -26,10 +26,11 @@ def new_post():
 
     if form.validate_on_submit():
         title = form.title.data
-        body = form.body.data
+        body_md = form.body.data
+        body_html = request.form.get('flask-editormd-html-code')
         category_id = form.category.data
         # category = Category.query.get(form.category.data)
-        post = Post(title=title, body=body, category_id=category_id)
+        post = Post(title=title, body_md=body_md,body_html=body_html, category_id=category_id)
         post.set_slug(title)
         db.session.add(post)
         db.session.commit()
@@ -46,7 +47,8 @@ def edit_post(post_id):
 
     if form.validate_on_submit():
         post.title = form.title.data
-        post.body = form.body.data
+        post.body_md = form.body.data
+        post.body_html = request.form.get('flask-editormd-html-code')
         post.category_id = form.category.data
         # category = Category.query.get(form.category.data)
         post.set_slug(form.title.data)
@@ -54,7 +56,7 @@ def edit_post(post_id):
         flash('Post updated.', 'success')
         return redirect(url_for('blog.show_post', post_id=post.id))
     form.title.data = post.title
-    form.body.data = post.body
+    form.body.data = post.body_md
     form.category.data = post.category_id
     return render_template('admin/edit_post.html', form=form)
 
