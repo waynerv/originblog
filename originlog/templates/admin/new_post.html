@@ -3,8 +3,7 @@
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='editormd/css/editormd.css') }}"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='editormd/css/editormd.preview.min.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='editormd/css/editormd.min.css') }}"/>
 {% endblock head %}
 
 {% block title %}
@@ -15,18 +14,20 @@
     <div class="page-header">
         <h1>New Post</h1>
     </div>
-    {{ form.csrf_token() }}
-    {{ render_field(form.title) }}
-    {{ render_field(form.category) }}
-    <div id="fancy-editormd" class="editormd">
-    {{ form.body(style="display:none;") }}
-    </div>
-    {% if form.body.errors %}
-        {% for message in form.body.errors %}
-        <small class="error">{{ message }}</small><br>
-        {% endfor %}
-    {% endif %}
-    {{ render_field(form.submit) }}
+    <form method="post">
+        {{ form.csrf_token }}
+        {{ render_field(form.title) }}
+        {{ render_field(form.category) }}
+        <div id="flask-editormd" class="editormd">
+        {{ form.body(style="display:none;") }}
+        </div>
+        {% if form.body.errors %}
+            {% for message in form.body.errors %}
+            <small class="error">{{ message }}</small><br>
+            {% endfor %}
+        {% endif %}
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
 {% endblock %}
 
 {% block scripts %}
@@ -34,8 +35,8 @@
     <script src="{{ url_for('static',filename='editormd/editormd.min.js') }}"></script>
     <script type="text/javascript">
         $(function () {
-            editormd("fancy-editormd", {
-                // width: "100%", 请不要添加
+            editormd("flask-editormd", {
+                // width: "100%", 该配置不起作用，可能与Bootstrap4冲突
                 height: 640,
                 syncScrolling: "single",
                 path: "{{ url_for('static',filename='editormd/lib/') }}",

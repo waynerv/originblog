@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from flask_login import UserMixin
 from unidecode import unidecode
-from werkzeug.security import generate_password_hash,check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from originlog.extensions import db
 
@@ -40,7 +40,7 @@ class Post(db.Model):
         self.slug = slugify(title)
 
     def reviewed_comments(self):
-        return [comment for comment in self.comments if comment.reviewed is True ]
+        return [comment for comment in self.comments if comment.reviewed is True]
 
 
 class Category(db.Model):
