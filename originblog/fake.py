@@ -1,6 +1,6 @@
 import random
-from originlog.models import Admin, Post, Category, Comment, Link
-from originlog.extensions import db
+from originblog.models import Admin, Post, Category, Comment, Link
+from originblog.extensions import db
 from faker import Faker
 
 fake = Faker('zh_CN')

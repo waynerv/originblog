@@ -6,20 +6,20 @@ from flask import Flask, render_template
 from flask_login import current_user
 from flask_wtf.csrf import CSRFError
 
-from originlog.blueprints.admin import admin_bp
-from originlog.blueprints.auth import auth_bp
-from originlog.blueprints.blog import blog_bp
-from originlog.commands import register_command
-from originlog.extensions import db, mail, moment, bootstrap, login_manager, csrf, migrate
-from originlog.models import Admin, Category, Comment, Link
-from originlog.settings import config
+from originblog.blueprints.admin import admin_bp
+from originblog.blueprints.auth import auth_bp
+from originblog.blueprints.blog import blog_bp
+from originblog.commands import register_command
+from originblog.extensions import db, mail, moment, bootstrap, login_manager, csrf, migrate
+from originblog.models import Admin, Category, Comment, Link
+from originblog.settings import config
 
 
 def create_app(config_name=None):
     if config_name is None:
         config_name = os.getenv('FLASK_CONFIG', 'development')
 
-    app = Flask('originlog')
+    app = Flask('originblog')
     app.config.from_object(config[config_name])
 
     register_blueprints(app)
@@ -89,7 +89,7 @@ def register_logger(app):
 
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-    file_handler = RotatingFileHandler('log/originlog.log', maxBytes=10 * 1024 * 1024, backupCount=10)
+    file_handler = RotatingFileHandler('log/originblog.log', maxBytes=10 * 1024 * 1024, backupCount=10)
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
 

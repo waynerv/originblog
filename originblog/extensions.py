@@ -21,6 +21,6 @@ login_manager.login_message = '请先登录！'
 
 @login_manager.user_loader
 def load_user(user_id):
-    from originlog.models import Admin
+    from originblog.models import Admin
     user = Admin.query.get(int(user_id))
     return user

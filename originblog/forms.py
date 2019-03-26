@@ -3,7 +3,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Selec
     HiddenField
 from wtforms.validators import DataRequired, Length, Email, URL, Optional
 
-from originlog.models import Category
+from originblog.models import Category
 
 
 class LoginForm(FlaskForm):

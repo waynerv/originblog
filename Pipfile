@@ -19,6 +19,9 @@ flask-moment = "*"
 bootstrap-flask = "*"
 unidecode = "*"
 flask-migrate = "*"
+cryptography = "*"
+faker = "==1.0.4"
+pyyaml = "==5.1"
 
 [requires]
 python_version = "3.6"

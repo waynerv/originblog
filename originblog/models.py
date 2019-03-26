@@ -4,7 +4,7 @@ from flask_login import UserMixin
 from unidecode import unidecode
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from originlog.extensions import db
+from originblog.extensions import db
 
 _punct_re = re.compile(r'[\t !"#$%&\-/<=>?@\[\\\]^_`{|},.]+')
 

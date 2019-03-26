@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, request, current_app, redirect, url_for, flash, abort, make_response
 
-from originlog.emails import send_new_comment_email
-from originlog.extensions import db
-from originlog.forms import CommentForm, AdminCommentForm
-from originlog.models import Post, Category, Comment
-from originlog.utils import redirect_back
+from originblog.emails import send_new_comment_email
+from originblog.extensions import db
+from originblog.forms import CommentForm, AdminCommentForm
+from originblog.models import Post, Category, Comment
+from originblog.utils import redirect_back
 from flask_login import current_user
 
 blog_bp = Blueprint('blog', __name__)

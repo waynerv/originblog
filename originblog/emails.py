@@ -3,7 +3,7 @@ from threading import Thread
 from flask import url_for, current_app
 from flask_mail import Message
 
-from originlog.extensions import mail
+from originblog.extensions import mail
 
 
 # def send_mail(subject, to, html):

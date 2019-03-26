@@ -1,2 +1,2 @@
-FLASK_APP=originlog
+FLASK_APP=originblog
 FLASK_ENV=development

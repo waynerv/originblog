@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import login_user, current_user, login_required, logout_user
 
-from originlog.forms import LoginForm
-from originlog.models import Admin
-from originlog.utils import redirect_back
+from originblog.forms import LoginForm
+from originblog.models import Admin
+from originblog.utils import redirect_back
 
 auth_bp = Blueprint('auth', __name__)
 
