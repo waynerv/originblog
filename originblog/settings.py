@@ -1,10 +1,17 @@
 import os
 
+blog_settings = {
+    'gavatar_cdn_base': 'pending',
+    'gavatar_default_image':'pending'
+}
+
+class Operations:
+    CONFIRM = 'confirm'
+    RESET_PASSWORD = 'reset-password'
+    CHANGE_EMAIL = 'change-email'
 
 class BaseConfig(object):
     SECRET_KEY = os.getenv('SECRET_KEY', 'secret_key_default')
-
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     CKEDITOR_SERVE_LOCAL = True
     CKEDITOR_LANGUAGE = 'zh-cn'
@@ -29,7 +36,7 @@ class BaseConfig(object):
 
 
 class DevelopmentConfig(BaseConfig):
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    MONGODB_SETTINGS = os.getenv('MONGODB_SETTINGS')
 
 
 class TestingConfig(BaseConfig):

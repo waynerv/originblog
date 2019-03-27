@@ -11,7 +11,7 @@ from originblog.blueprints.auth import auth_bp
 from originblog.blueprints.blog import blog_bp
 from originblog.commands import register_command
 from originblog.extensions import db, mail, moment, bootstrap, login_manager, csrf, migrate
-from originblog.models import Admin, Category, Comment, Link
+from originblog.models import User, Category, Comment, Link
 from originblog.settings import config
 
 
