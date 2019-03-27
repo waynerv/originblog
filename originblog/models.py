@@ -47,6 +47,7 @@ def slugify(text, delim=u'-'):
 
 
 class User(db.Document, UserMixin):
+    """定义用户数据模型"""
     username = db.StringField(max_length=20, required=True)
     password_hash = db.StringField(max_length=128, required=True)
     name = db.StringField(max_length=20, default=username)
@@ -169,6 +170,7 @@ class Draft(db.Document):
 
 
 class Comment(db.Document):
+    """定义评论的数据模型"""
     author = db.StringField(max_length=20, required=True)
     email = db.EmailField(max_length=255, required=True)
     homepage = db.URLField(max_length=255)
@@ -200,6 +202,14 @@ class Comment(db.Document):
         return super(Comment, self).save(*args, **kwargs)
 
     def get_avatar_url(self, base_url=GAVATAR_CDN_BASE, img_size=0, default_img_url=None):
+        """通过 gavatar_id 从cdn 获取头像图片的链接
+
+        获取时可传入大小和默认图片参数
+        :param base_url: cdn地址
+        :param img_size: 需要的图片大小
+        :param default_img_url:  默认图片
+        :return: 图片url
+        """
         gavatar_url = base_url + self.gavatar_id
         params = {}
         if img_size:
@@ -216,12 +226,14 @@ class Comment(db.Document):
 
 
 class PostStatistics(db.Document):
+    """统计每篇文章的阅读次数等统计信息"""
     post = db.ReferenceField(Post)
     visit_count = db.IntField(default=0)
     verbose_count_base = db.IntField(default=0)
 
 
 class Widget(db.Document):
+    """在主页显示文本内容的小组件"""
     title = db.StringField(default='widget')
     raw_content = db.StringField()
     html_content = db.StringField()
@@ -229,6 +241,7 @@ class Widget(db.Document):
     pub_time = db.DateTimeField()
 
     def save(self, *args, **kwargs):
+        """保存到数据库前更新时间戳,生成头像id，并将markdown文本转换为html"""
         if self.raw_content:
             self.html_content = markdown2.markdown(self.raw_content,
                                                    extras=['code-friendly', 'fenced-code-blocks', 'tables'])

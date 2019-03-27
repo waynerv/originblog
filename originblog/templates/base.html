@@ -1,111 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
-{% from 'macros.html' import nav_link %}
-{% from 'bootstrap/nav.html' import render_nav_item %}
-<head>
-    {% block head %}
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>{% block title %}{% endblock title %} - {{ admin.blog_title|default('Originlog') }}</title>
-        <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
-        <link rel="stylesheet"
-              href="{{ url_for('static', filename='css/%s.min.css'|format(request.cookies.get('theme', 'flatly'))) }}"
-              type="text/css">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
-    {% endblock head %}
-</head>
-<body>
-{% block nav %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="/">Originlog</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
-                    aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
 
-            <div class="collapse navbar-collapse" id="navbarColor01">
-                <ul class="navbar-nav mr-auto">
-                    {{ nav_link('blog.index', 'Home') }}
-                    {{ nav_link('blog.about', 'About') }}
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- SEO optimize -->
+    {% if post %}
+    <meta name="title" content="{{ post.title }}">
+    <meta name="description" content="{{ post.abstract }}">
+    <meta name="author" content="{{ post.author.username }}">
+    <meta name="keywords" content="{{ post.tags|join(',') }}">
+    {% else %}
+    <meta name="title" content="{{ blog_mata.name }}">
+    <meta name="description" content="{{ blog_meta.description }}">
+    <meta name="author" content="{{ blog_meta.owner }}">
+    <meta name="keywords" content="{{ blog_meta.keywords }}">
+    {% endif %}
+
+    <meta name="google-site-verification" content="{{ blog_meta.google_site_verification }}">
+    <meta name="baidu-site-verification" content="{{ blog_meta.baidu_site_verification }}">
+    <meta name="sogou_site_verification" content="{{ blog_meta.sogou_site_verification }}"/>
+    <meta name="qihu-site-verification" content="{{ blog_meta.qihu_site_verification }}"/>
+
+    <title>Origin Blog - {% block title %}{% endblock %}</title>
+
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='img/favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicon-16x16.png') }}">
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="{{ url_for('static', filename='fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet'
+          type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800'
+          rel='stylesheet' type='text/css'>
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='css/clean-blog.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/highlight.js/9.15.6/styles/darcula.min.css" rel="stylesheet">
+
+    {% block custom_head %}{% endblock %}
+
+    <style> html{display : none ; } </style>
+    <script>
+    if( self == top ) {
+              document.documentElement.style.display = 'block' ;
+       } else {
+           top.location = self.location ;
+       }
+    </script>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Origin Blog</a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+                    data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                Menu
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="post.html">Sample Post</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contact.html">Contact</a>
+                    </li>
                     {% if current_user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                               aria-expanded="false">
-                                New <span class="caret"></span>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ url_for('admin.new_post') }}">Post</a>
-                                <a class="dropdown-item" href="{{ url_for('admin.new_category') }}">Category</a>
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                               aria-expanded="false">
-                                Manage <span class="caret"></span>
-                                {% if unread_comments %}
-                                <span class="badge badge-success">new</span>
-                                {% endif %}
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ url_for('admin.manage_post') }}">Post</a>
-                                <a class="dropdown-item" href="{{ url_for('admin.manage_category') }}">Category</a>
-                                <a class="dropdown-item" href="{{ url_for('admin.manage_comment') }}">
-                                    Comment
-                                    {% if unread_comments %}
-                                        <span class="badge badge-success">{{ unread_comments }}</span>
-                                    {% endif %}
-                                </a>
-                                <a class="dropdown-item" href="{{ url_for('admin.manage_link') }}">Link</a>
-                            </div>
-                        </li>
-                        {{ render_nav_item('admin.settings', 'Setting') }}
+                    <li>
+                        <a href="{{ url_for('admin_bp.index') }}">{{ current_user.username }}</i></a>
+                    </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
-
     </nav>
-{% endblock nav %}
 
-<main class="container">
-    {% for message in get_flashed_messages(with_categories=True) %}
-        <div class="alert alert-{{ message[0] }}" role="alert">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            {{ message[1] }}
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    {% block header %}
+    <header class="masthead" style="background-image: url('img/home-bg.jpg')">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <div class="site-heading">
+                        <h1>Origin Blog</h1>
+                        <span class="subheading">Where everything begins.</span>
+                    </div>
+                </div>
+            </div>
         </div>
-    {% endfor %}
+    </header>
+    {% endblock %}
 
-    {% block content %}{% endblock content %}
-    {% block footer %}
-        <footer>
-            <p class="float-left">
-                <small> &copy; 2019 <a href="#" title="Written by Waynerv">Waynerv</a> -
-                    <a href="https://github.com/waynerv/originlog" title="Fork me on GitHub">GitHub</a> -
-                    <a href="#" title="A HelloFlask project">Originlog</a>
-                </small>
-            </p>
-            <p class="float-right">
-                <small>
-                    {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('auth.logout', next=request.full_path) }}">Logout</a>
-                    {% else %}
-                        <a href="{{ url_for('auth.login', next=request.full_path) }}">Login</a>
-                    {% endif %}
-                </small>
-            </p>
-        </footer>
-    {% endblock footer %}
-</main>
+    <!-- Main Content -->
 
-{% block scripts %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <ul class="list-inline text-center">
+                        <li class="list-inline-item">
+                            <a href="#">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                    <i class="fab fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="#">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                    <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="#">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                    <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; Your Website 2019</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="https://cdn.bootcss.com/highlight.js/9.15.6/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- Custom scripts for this template -->
     {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
-{% endblock scripts %}
+    <script src="{{ url_for('static', filename='js/clean-blog.min.js') }}"></script>
+
+    {% block js %}{% endblock %}
 </body>
+
 </html>
