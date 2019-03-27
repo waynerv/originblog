@@ -50,7 +50,7 @@ class User(db.Document, UserMixin):
     """定义用户数据模型"""
     username = db.StringField(max_length=20, required=True)
     password_hash = db.StringField(max_length=128, required=True)
-    name = db.StringField(max_length=20, default=username)
+    name = db.StringField(max_length=30, default=username)
     email = db.EmailField(max_length=255)
     create_time = db.DateTimeField(default=datetime.utcnow, required=True)
     last_login = db.DateTimeField(default=datetime.utcnow, required=True)
@@ -171,7 +171,7 @@ class Draft(db.Document):
 
 class Comment(db.Document):
     """定义评论的数据模型"""
-    author = db.StringField(max_length=20, required=True)
+    author = db.StringField(max_length=30, required=True)
     email = db.EmailField(max_length=255, required=True)
     homepage = db.URLField(max_length=255)
     post_slug = db.StringField(required=True)
