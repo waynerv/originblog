@@ -153,7 +153,7 @@ class Post(db.Document):
         """返回已审核通过的评论列表"""
         return [comment for comment in self.comments if comment.reviewed is True]
 
-    def save(self, *args, **kwargs):
+    def clean(self):
         """保存到数据库前更新时间戳并将markdown文本转换为html"""
         now = datetime.utcnow()
         if not self.sub_time:
@@ -163,7 +163,6 @@ class Post(db.Document):
         self.html_content = markdown2.markdown(self.raw_content,
                                                extras=['code-friendly', 'fenced-code-blocks', 'tables'])
         self.html_content = get_clean_html_content(self.html_content)
-        return super(Post, self).save(*args, **kwargs)
 
     # 把类的对象转化为 dict 类型的数据，将对象序列化
     def to_dict(self):
@@ -199,7 +198,7 @@ class Draft(db.Document):
         """根据标题自动生成标题别名"""
         self.slug = slugify(title)
 
-    def save(self, *args, **kwargs):
+    def clean(self):
         """保存到数据库前更新时间戳并将markdown文本转换为html"""
         now = datetime.utcnow()
         if not self.sub_time:
@@ -208,7 +207,6 @@ class Draft(db.Document):
         self.html_content = markdown2.markdown(self.raw_content,
                                                extras=['code-friendly', 'fenced-code-blocks', 'tables'])
         self.html_content = get_clean_html_content(self.html_content)
-        return super(Draft, self).save(*args, **kwargs)
 
     meta = {
         'indexes': ['slug'],
@@ -231,7 +229,7 @@ class Comment(db.Document):
     status = db.StringField(choices=COMMENT_STATUS, default='pending')
     gavatar_id = db.StringField(default='00000000000')
 
-    def save(self, *args, **kwargs):
+    def clean(self):
         """保存到数据库前更新时间戳,生成头像id，并将markdown文本转换为html"""
         if self.md_content:
             html_content = markdown2.markdown(self.raw_content,
@@ -245,8 +243,6 @@ class Comment(db.Document):
         # 根据邮箱签名生成头像，若无邮箱则使用默认头像
         if self.email:
             self.gavatar_id = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
-
-        return super(Comment, self).save(*args, **kwargs)
 
     def get_avatar_url(self, base_url=GAVATAR_CDN_BASE, img_size=0, default_img_url=None):
         """通过 gavatar_id 从cdn 获取头像图片的链接
@@ -287,7 +283,7 @@ class Widget(db.Document):
     priority = db.IntField(default=10000)
     pub_time = db.DateTimeField()
 
-    def save(self, *args, **kwargs):
+    def clean(self):
         """保存到数据库前更新时间戳,生成头像id，并将markdown文本转换为html"""
         if self.raw_content:
             self.html_content = markdown2.markdown(self.raw_content,
@@ -296,8 +292,6 @@ class Widget(db.Document):
 
         if not self.pub_time:
             self.pub_time = datetime.utcnow()
-
-        return super(Widget, self).save(*args, **kwargs)
 
     meta = {
         'ordering': ['priority']
