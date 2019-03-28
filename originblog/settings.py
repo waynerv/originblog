@@ -1,14 +1,17 @@
 import os
 
-blog_settings = {
-    'gavatar_cdn_base': 'pending',
-    'gavatar_default_image':'pending'
-}
+
+class BlogSettings:
+    GAVATAR_CDN_BASE = 'pending'
+    GAVATAR_DEFAULT_IMAGE = 'pending'
+    COMMENT_STATUS = ('approved', 'pending', 'spam', 'deleted')
+
 
 class Operations:
     CONFIRM = 'confirm'
     RESET_PASSWORD = 'reset-password'
     CHANGE_EMAIL = 'change-email'
+
 
 class BaseConfig(object):
     SECRET_KEY = os.getenv('SECRET_KEY', 'secret_key_default')

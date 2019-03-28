@@ -1,5 +1,5 @@
 import random
-from originblog.models import Admin, Post, Category, Comment, Link
+from originblog.models import User, Post, Comment, Widget
 from originblog.extensions import db
 from faker import Faker
 
@@ -7,50 +7,32 @@ fake = Faker('zh_CN')
 
 
 def fake_admin():
-    admin = Admin(
+    user = User(
         username='admin',
         name='kaka4nerv',
-        blog_title='Originlog',
-        blog_sub_title='Where everything begins...',
-        about='Hello guys.'
+        role='admin',
+        bio='Hello guys.'
     )
-    admin.set_password('123456789')
-    db.session.add(admin)
-    db.session.commit()
+    user.set_password('123456789')
+    user.save()
 
 
 def fake_post(count=50):
     for i in range(count):
         post = Post(
             title=fake.sentence(),
-            body_md=fake.text(2000),
-            body_html=fake.text(2000),
-            timestamp=fake.date_time_this_year(),
-            category_id=random.randint(1, Category.query.count())
+            abstract=fake.sentence(),
+            raw_content=fake.text(2000),
+            pub_time=fake.date_time_this_year(),
+            tags = fake.word()
         )
-        db.session.add(post)
-    db.session.commit()
+        post.save()
 
 
-def fake_category(count=10):
-
-    category = Category(name='default')
-    db.session.add(category)
-
+def fake_widget(count=4):
     for i in range(count):
-        category = Category(name=fake.word())
-        db.session.add(category)
-        try:
-            db.session.commit()
-        except:
-            db.session.rollback()
-
-
-def fake_link(count=4):
-    for i in range(count):
-        link = Link(name=fake.domain_name(), url=fake.url())
-        db.session.add(link)
-        db.session.commit()
+        widget = Widget(title=fake.word(), raw_content=fake.sentence())
+        widget.save()
 
 
 def fake_comment(count=500):
@@ -66,7 +48,7 @@ def fake_comment(count=500):
         )
         db.session.add(comment)
 
-    salt = int(count*0.1)
+    salt = int(count * 0.1)
     for i in range(salt):
         comment = Comment(
             author=fake.name(),

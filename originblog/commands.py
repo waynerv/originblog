@@ -1,6 +1,6 @@
 import click
 from originblog.extensions import db
-from originblog.models import Admin, Category
+from originblog.models import User
 
 
 def register_command(app):
@@ -70,23 +70,23 @@ def register_command(app):
         click.echo('Initializing the database...')
         db.create_all()
 
-        admin = Admin.query.first()
+        admin = User.query.first()
         if admin:
             click.echo('The administrator is already exists, updating...')
             admin.username = username
             admin.set_password(password)
         else:
             click.echo('Creating new Administrator...')
-            admin = Admin(username=username, name='kaka4nerv', blog_title='Originlog',
+            admin = User(username=username, name='kaka4nerv', blog_title='Originlog',
                           blog_sub_title='Where everything begins...', about='Anything about you.')
             admin.set_password(password)
             db.session.add(admin)
 
-        category = Category.query.first()
-        if category is None:
-            click.echo('Creating the default category...')
-            category = Category(name='Default')
-            db.session.add(category)
+        # category = Category.query.first()
+        # if category is None:
+        #     click.echo('Creating the default category...')
+        #     category = Category(name='Default')
+        #     db.session.add(category)
 
         db.session.commit()
         click.echo('Done.')

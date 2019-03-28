@@ -1,20 +1,24 @@
 import hashlib
 import re
-import urllib
 from datetime import datetime
+from urllib.parse import urlencode
 
 import bleach
 import markdown2
+from flask import current_app
 from flask_login import UserMixin
+from itsdangerous import BadTimeSignature, SignatureExpired
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from unidecode import unidecode
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from originblog.extensions import db
-from originblog.settings import blog_settings
+from originblog.settings import BlogSettings
+from originblog.settings import Operations
 
-COMMENT_STATUS = ('approved', 'pending', 'spam', 'deleted')
-GAVATAR_CDN_BASE = blog_settings['GAVATAR_CDN_BASE']
-GAVATAR_DEFAULT_IMAGE = blog_settings['gavatar_default_image']
+COMMENT_STATUS = BlogSettings.COMMENT_STATUS
+GAVATAR_CDN_BASE = BlogSettings.GAVATAR_CDN_BASE
+GAVATAR_DEFAULT_IMAGE = BlogSettings.GAVATAR_DEFAULT_IMAGE
 
 ROLES = ('admin', 'editor', 'writer', 'reader')
 
@@ -72,6 +76,58 @@ class User(db.Document, UserMixin):
         except AttributeError:
             raise NotImplementedError('No `username` attribute - override `get_id`')
 
+    def generate_token(self, operation, expire_in=None, **kwargs):
+        """生成私密操作所需要的验证token
+
+        使用itsdangerous提供的jws序列化器将用户信息、操作类型等序列化成token
+        :param self: 用户对象
+        :param operation: 操作类型 Operations 类属性
+        :param expire_in: 过期时间（秒），默认值None时为一个小时
+        :param kwargs: 其他需要序列化的关键字参数（如新的邮箱地址）
+        :return: 序列化生成的token
+        """
+        s = Serializer(current_app.config['SECRET_KEY'], expire_in)  # 接收密钥和过期时间（秒）参数实例化一个JWS序列化器对象
+        data = {
+            'username': self.username,
+            'operation': operation
+        }
+        data.update(**kwargs)
+        return s.dumps(data)
+
+    def validate_token(self, token, operation, new_password=None):
+        """验证token，并根据token携带的数据执行相应操作
+
+        :param self: 用户对象
+        :param token: token字符串
+        :param operation: 要验证的操作类型（确认邮箱、重置密码或修改邮箱）
+        :param new_password: 若操作类型为重置密码可将新密码作为参数传入
+        :return: 布尔值
+        """
+        s = Serializer(current_app.config['SECRET_KEY'])
+
+        # 尝试获取token中被序列化的信息，token不一定合法，应使用try...except语句
+        try:
+            data = s.loads(token)
+        except (BadTimeSignature, SignatureExpired):
+            return False
+
+        # 验证token携带的用户名和操作类型是否相符
+        if operation != data.get('operation') or self.username != data.get('username'):
+            return False
+
+        # 根据不同的操作类型执行对应操作
+        if operation == Operations.CONFIRM:
+            self.email_confirmed = True
+        elif operation == Operations.RESET_PASSWORD:
+            self.set_password(new_password)
+        elif operation == Operations.CHANGE_EMAIL:
+            self.email = data.get('new_email')
+        else:
+            return False
+
+        self.save()
+        return True
+
 
 class Post(db.Document):
     """定义文章数据模型"""
@@ -103,6 +159,7 @@ class Post(db.Document):
         if not self.sub_time:
             self.pub_time = now
         self.update_time = now
+        self.slug = self.set_slug(self.title)
         self.html_content = markdown2.markdown(self.raw_content,
                                                extras=['code-friendly', 'fenced-code-blocks', 'tables'])
         self.html_content = get_clean_html_content(self.html_content)
@@ -110,20 +167,10 @@ class Post(db.Document):
 
     # 把类的对象转化为 dict 类型的数据，将对象序列化
     def to_dict(self):
-        post_dict = {}
-
-        post_dict['title'] = self.title
-        post_dict['slug'] = self.slug
-        post_dict['abstract'] = self.abstarct
-        post_dict['author'] = self.author
-        post_dict['content_html'] = self.content
-        post_dict['content_raw'] = self.raw_content
-        post_dict['pub_time'] = self.pub_time
-        post_dict['update_time'] = self.update_time
-        post_dict['category'] = self.category
-        post_dict['tags'] = self.tags
-        post_dict['comments'] = self.comments
-        post_dict['can_comment'] = self.can_comment
+        post_dict = {'title': self.title, 'slug': self.slug, 'abstract': self.abstarct, 'author': self.author,
+                     'content_html': self.content, 'content_raw': self.raw_content, 'pub_time': self.pub_time,
+                     'update_time': self.update_time, 'category': self.category, 'tags': self.tags,
+                     'comments': self.comments, 'can_comment': self.can_comment}
 
         return post_dict
 
@@ -217,7 +264,7 @@ class Comment(db.Document):
         if default_img_url:
             params['d'] = default_img_url
         if params:
-            gavatar_url = '{0}?{1}'.format(gavatar_url, urllib.urlencode(params))
+            gavatar_url = '{0}?{1}'.format(gavatar_url, urlencode(params))
         return gavatar_url
 
     meta = {

@@ -1,5 +1,5 @@
-from flask_wtf import FlaskForm
 from flask_mongoengine.wtf import model_form
+from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, \
     HiddenField, IntegerField, RadioField, SelectField
 from wtforms.validators import DataRequired, Length, Email, URL, Optional, Regexp, EqualTo
@@ -15,10 +15,10 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Log in')
 
 
-class ReigisterForm(FlaskForm):
+class RegisterForm(FlaskForm):
     """定义注册表单"""
     name = StringField('Name', validators=[DataRequired(), Length(1, 30)])
-    usename = StringField('Username', validators=[
+    username = StringField('Username', validators=[
         DataRequired(), Length(1, 20),
         Regexp('^[a-zA-Z0-9]*$', message='The username should contain only a-z, A-Z, 0-9.')])
     email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
@@ -27,12 +27,14 @@ class ReigisterForm(FlaskForm):
     password2 = PasswordField('Confirm Password', validators=[DataRequired()])
     submit = SubmitField('Register')
 
-    def validate_username(self, field):
+    @staticmethod
+    def validate_username(field):
         """验证用户名是否已注册"""
         if User.objects.filter(User.username == field.data).first():
             raise ValidationError('The username is already in use.')
 
-    def validate_email(self, field):
+    @staticmethod
+    def validate_email(field):
         """验证email是否已注册"""
         if User.objects.filter(User.email == field.data.lower()).first():
             raise ValidationError('The email is already in use.')
@@ -61,12 +63,14 @@ class ProfileForm(FlaskForm):
     weixin = StringField('Weixin', validators=[Optional(), URL()])
     github = StringField('github', validators=[Optional(), URL()])
 
-    def validate_username(self, field):
+    @staticmethod
+    def validate_username(field):
         """验证用户名是否已注册"""
         if User.objects.filter(User.username == field.data).first():
             raise ValidationError('The username is already in use.')
 
-    def validate_email(self, field):
+    @staticmethod
+    def validate_email(field):
         """验证email是否已注册"""
         if User.objects.filter(User.email == field.data.lower()).first():
             raise ValidationError('The email is already in use.')

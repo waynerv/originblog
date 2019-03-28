@@ -10,8 +10,8 @@ from originblog.blueprints.admin import admin_bp
 from originblog.blueprints.auth import auth_bp
 from originblog.blueprints.blog import blog_bp
 from originblog.commands import register_command
-from originblog.extensions import db, mail, moment, bootstrap, login_manager, csrf, migrate
-from originblog.models import User, Category, Comment, Link
+from originblog.extensions import db, mail, moment, bootstrap, login_manager, csrf
+from originblog.models import User, Comment
 from originblog.settings import config
 
 
@@ -50,20 +50,17 @@ def register_extensions(app):
     bootstrap.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app)
-    migrate.init_app(app, db)
 
 
 def register_template_context(app):
     @app.context_processor
     def make_template_context():
-        admin = Admin.query.first()
-        categories = Category.query.order_by(Category.name).all()
-        links = Link.query.order_by(Link.id).all()
+        admin = User.query.first()
         if current_user.is_authenticated:
             unread_comments = Comment.query.filter(Comment.reviewed == False).count()
         else:
             unread_comments = None
-        return dict(admin=admin, categories=categories, unread_comments=unread_comments, links=links)
+        return dict(admin=admin, unread_comments=unread_comments)
 
 
 def register_error_handler(app):
