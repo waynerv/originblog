@@ -34,9 +34,6 @@ def index():
     if keywords:
         posts = posts.filter(Q(raw_content__icontains=keywords) | Q(title_icontains=keywords))
 
-    # 获取所有文章的标签列表
-    tags = posts.ditinct('tags')
-
     # 获取首页所有组件对象
     widgets = Widget.objects
 

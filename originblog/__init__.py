@@ -11,7 +11,7 @@ from originblog.blueprints.auth import auth_bp
 from originblog.blueprints.blog import blog_bp
 from originblog.commands import register_command
 from originblog.extensions import db, mail, moment, bootstrap, login_manager, csrf
-from originblog.models import User, Comment
+from originblog.models import User, Comment, Post
 from originblog.settings import config
 
 
@@ -55,12 +55,22 @@ def register_extensions(app):
 def register_template_context(app):
     @app.context_processor
     def make_template_context():
-        admin = User.query.first()
         if current_user.is_authenticated:
             unread_comments = Comment.query.filter(Comment.reviewed == False).count()
         else:
             unread_comments = None
-        return dict(admin=admin, unread_comments=unread_comments)
+
+        # 获取所有文章的标签列表
+        tags = Post.objects.ditinct('tags')
+        # 通过聚集查询获取所有文章的分类以及对应的文章数量
+        categories = Post.objects.aggregate([
+            {'$group':{
+                '_id':{'category': '$category'},
+                'name':{'$first': '$category'},
+                'count':{'$sum': 1}
+            }}
+        ])
+        return dict(unread_comments=unread_comments, tags=tags, categories=categories)
 
 
 def register_error_handler(app):
