@@ -41,7 +41,7 @@ def index():
     page = request.args.get('page', default=1, type=int)  # 从查询字符串获取当前页数
     per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']  # 每页数量
     pagination = posts.paginate(page, per_page=per_page)  # 分页对象
-    return render_template('blog/index.html', pagination=pagination, tags=tags, widgets=widgets)
+    return render_template('blog/index.html', pagination=pagination, widgets=widgets)
 
 
 @blog_bp.route('/post/<int:post_id>', methods=['GET', 'Post'])
