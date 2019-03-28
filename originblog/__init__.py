@@ -73,7 +73,7 @@ def register_error_handler(app):
         return render_template('errors/400.html', description=e.description), 400
 
     @app.errorhandler(404)
-    def bad_request(e):
+    def page_not_find(e):
         return render_template('errors/404.html'), 404
 
     @app.errorhandler(500)
