@@ -5,6 +5,11 @@ class BlogSettings:
     GAVATAR_CDN_BASE = 'pending'
     GAVATAR_DEFAULT_IMAGE = 'pending'
     COMMENT_STATUS = ('approved', 'pending', 'spam', 'deleted')
+    BLOG_META = {
+        'name': 'Origin Blog',
+        'subtitle': 'Where everthing begins.',
+        'bg_home': 'static/img/home_bg.jpg'
+    }
 
 
 class Operations:

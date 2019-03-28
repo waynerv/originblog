@@ -12,7 +12,7 @@ from originblog.blueprints.blog import blog_bp
 from originblog.commands import register_command
 from originblog.extensions import db, mail, moment, bootstrap, login_manager, csrf
 from originblog.models import User, Comment, Post
-from originblog.settings import config
+from originblog.settings import config, BlogSettings
 
 
 def create_app(config_name=None):
@@ -60,6 +60,7 @@ def register_template_context(app):
         else:
             unread_comments = None
 
+        blog_meta = BlogSettings.BLOG_META
         # 获取所有文章的标签列表
         tags = Post.objects.ditinct('tags')
         # 通过聚集查询获取所有文章的分类以及对应的文章数量
@@ -70,7 +71,7 @@ def register_template_context(app):
                 'count':{'$sum': 1}
             }}
         ])
-        return dict(unread_comments=unread_comments, tags=tags, categories=categories)
+        return dict(unread_comments=unread_comments, tags=tags, categories=categories, blog_meta=blog_meta)
 
 
 def register_error_handler(app):

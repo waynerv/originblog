@@ -1,48 +1,79 @@
 {% extends 'base.html' %}
-{% from 'bootstrap/pagination.html' import render_pagination %}
+{% from 'macros.html' import render_pagination %}
 
 {% block title %}Home{% endblock %}
 
 {% block header %}
-<header class="masthead" style="background-image: url('img/home-bg.jpg')">
-    <div class="overlay"></div>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <div class="site-heading">
-                    <h1>Origin Blog</h1>
-                    <span class="subheading">Where everything begins.</span>
+    <header class="masthead" style="background-image: url({{ blog_meta.bg_home }})">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <div class="site-heading">
+                        <h1>{{ blog_meta.name }}</h1>
+                        <span class="subheading">{{ blog_meta.subtitle }}</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</header>
+    </header>
 {% endblock %}
 
 {% block main %}
-<div class="container">
-    <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-            <div class="post-preview">
-                <a href="post.html">
-                    <h2 class="post-title">
-                        Man must explore, and this is exploration at its greatest
-                    </h2>
-                    <h3 class="post-subtitle">
-                        Problems look mighty small from 150 miles up
-                    </h3>
-                </a>
-                <p class="post-meta">Posted by
-                    <a href="#">Start Bootstrap</a>
-                    on September 24, 2019</p>
-            </div>
-            <hr>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                {% for post in pagination.items() %}
+                    {% if post %}
+                        <div class="post-preview">
+                            <a href="{{ url_for('blog_bp.show_post', slug=post.slug) }}">
+                                <h2 class="post-title">
+                                    {{ post.title }}
+                                </h2>
+                            </a>
+                            <p class="post-subtitle">
+                                {{ post.abstract }}
+                            </p>
+                            <p class="post-meta">Posted by
+                                <a href="{{ url_for('blog_bp.about', username=post.author.username) }}">{{ post.author.name }}</a>
+                                on {{ moment(post.pub_time).format('YYYY/MM/DD, h:mm a') }}</p>
+                            <p class="post-meta">category: <a
+                                    href="{{ url_for('blog_bp.index', category=post.category) }}">{{ post.category }}</a>
+                            </p>
+                            <p class="post-meta">Tags:
+                                {% for tag in tags %}
+                                    <a href="{{ url_for('blog_bp.index', tag=tag) }}">{{ tag }}</a>{% endfor %}
+                            </p>
+                        </div>
+                        {% if not loop.last %}
+                            <hr>
+                        {% endif %}
+                    {% else %}
+                        <P class="post-subtitle">
+                            No articles found here
+                        </P>
+                    {% endif %}
+                {% endfor %}
 
-            <!-- Pager -->
-            <div class="clearfix">
-                <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
+                <!-- Pager -->
+                {{ render_pagination(pagination, 'blog_bp.index', category=cur_category if cur_category, tag=cur_tag if cur_tag) }}
             </div>
+
+            <!--include sidebar template -->
+            {% include 'blog/index_sidebar.html' %}
+
         </div>
     </div>
-</div>
+
+    <hr>
 {% endblock main %}
+
+{% block js %}
+<script type="text/javascript">
+$('.rm-filter').on('click', function (event) {
+
+    location.href = "/";
+    return false;
+  });
+</script>
+{% endblock %}

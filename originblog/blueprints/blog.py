@@ -41,18 +41,19 @@ def index():
     page = request.args.get('page', default=1, type=int)  # 从查询字符串获取当前页数
     per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']  # 每页数量
     pagination = posts.paginate(page, per_page=per_page)  # 分页对象
-    return render_template('blog/index.html', pagination=pagination, widgets=widgets)
+    return render_template('blog/index.html', pagination=pagination, widgets=widgets, cur_category=category, cur_tag=tag,
+                           cur_keywords=keywords)
 
 
-@blog_bp.route('/post/<int:post_id>', methods=['GET', 'Post'])
-def show_post(post_id):
-    post = Post.query.get_or_404(post_id)
+@blog_bp.route('/post/<string:slug>', methods=['GET', 'Post'])
+def show_post(slug):
+    post = Post.objects.get_or_404(slug=slug)
 
     if current_user.is_authenticated:
-        form = AdminCommentForm()
+        form = CommentForm()
         form.author.data = current_user.name
         form.email.data = current_app.config['ORIGINLOG_ADMIN_EMAIL']
-        form.site.data = url_for('blog.index')
+        form.homepage.data = url_for('blog.index')
         from_admin = True
         reviewed = True
     else:
@@ -77,11 +78,11 @@ def show_post(post_id):
         db.session.commit()
         flash('Thanks, your comment will be published after reviewed.', 'info')
         send_new_comment_email(post)
-        return redirect(url_for('blog.show_post', post_id=post_id))
+        return redirect(url_for('blog.show_post', post_id=slug))
 
     page = request.args.get('page', default=1, type=int)
     per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']
-    pagination = Comment.query.filter(Comment.post_id == post_id).filter(Comment.reviewed == True).order_by(
+    pagination = Comment.query.filter(Comment.post_id == slug).filter(Comment.reviewed == True).order_by(
         Comment.timestamp.desc()).paginate(page, per_page=per_page)
     comments = pagination.items
     return render_template('blog/post.html', post=post, pagination=pagination, comments=comments, form=form)
@@ -108,7 +109,8 @@ def reply_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
     if comment.post.can_comment:
         return redirect(
-            url_for('blog.show_post', post_id=comment.post.id, reply=comment_id, author=comment.author) + '#comment-form')
+            url_for('blog.show_post', post_id=comment.post.id, reply=comment_id,
+                    author=comment.author) + '#comment-form')
     else:
         flash('This post is comment disabled.', 'warning')
         return redirect_back()
