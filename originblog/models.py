@@ -27,7 +27,7 @@ _punct_re = re.compile(r'[\t !"#$%&\-/<=>?@\[\\\]^_`{|},.]+')
 
 
 def get_clean_html_content(html_content):
-    """对转换成HTML的markdown文本进行清洗"""
+    """对转换成HTML的markdown文本进行消毒"""
     allowed_tags = ['a', 'abbr', 'acronym', 'b', 'br', 'blockquote', 'code',
                     'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
                     'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'hr', 'img',
@@ -134,7 +134,7 @@ class Post(db.Document):
     title = db.StringField(max_length=255, required=True)
     slug = db.StringField(max_length=255, required=True, unique=True)
     abstract = db.StringField(max_length=255)
-    author = db.ReferenceField(User)
+    author = db.ReferenceField('User', reverse_delete_rule=db.CASCADE) # 用户被删除时，关联的文章也会被删除
     html_content = db.StringField(required=True)
     raw_content = db.StringField(required=True)
     pub_time = db.DateTimeField()

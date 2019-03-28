@@ -1,22 +1,50 @@
 from flask import Blueprint, render_template, request, current_app, redirect, url_for, flash, abort, make_response
+from flask_login import current_user
+from mongoengine.queryset.visitor import Q
 
 from originblog.emails import send_new_comment_email
 from originblog.extensions import db
-from originblog.forms import CommentForm, AdminCommentForm
-from originblog.models import Post, Category, Comment
+from originblog.forms import CommentForm
+from originblog.models import Post, Comment, Widget
 from originblog.utils import redirect_back
-from flask_login import current_user
 
 blog_bp = Blueprint('blog', __name__)
 
 
 @blog_bp.route('/')
 def index():
+    """查询所有已发表的文章，根据特定查询参数进行筛选分页，传入到首页模板"""
+
+    # 获取已发表并且权重值大于0的文章的QuerySet，按权重和发表时间排序
+    pub_posts = Post.objects.filter(is_draft=False).order_by('-weight', '-pub_time')
+    posts = pub_posts.filter(Q(weight_gt=0) | Q(weight=None))
+
+    # 根据查询参数获取特定分类的文章QuerySet
+    category = request.args.get('categorty')
+    if category:
+        posts = posts.filter(category=category)
+
+    # 根据查询参数获取特定标签的文章QuerySet
+    tag = request.args.get('tag')
+    if tag:
+        posts = posts.filter(tags=tag)
+
+    # 根据查询参数获取特定文本关键词的搜索结果
+    keywords = request.args.get('keywords')
+    if keywords:
+        posts = posts.filter(Q(raw_content__icontains=keywords) | Q(title_icontains=keywords))
+
+    # 获取所有文章的标签列表
+    tags = posts.ditinct('tags')
+
+    # 获取首页所有组件对象
+    widgets = Widget.objects
+
+    # 从查询参数获取当前页数并对QuerySet分页，页数默认值为1
     page = request.args.get('page', default=1, type=int)  # 从查询字符串获取当前页数
     per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']  # 每页数量
-    pagination = Post.query.order_by(Post.timestamp.desc()).paginate(page, per_page=per_page)  # 分页对象
-    posts = pagination.items  # 当前页数的记录列表
-    return render_template('blog/index.html', posts=posts, pagination=pagination)
+    pagination = posts.paginate(page, per_page=per_page)  # 分页对象
+    return render_template('blog/index.html', pagination=pagination, tags=tags, widgets=widgets)
 
 
 @blog_bp.route('/post/<int:post_id>', methods=['GET', 'Post'])
