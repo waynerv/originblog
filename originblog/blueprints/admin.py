@@ -2,8 +2,8 @@ from flask import Blueprint, request, current_app, render_template, flash, redir
 from flask_login import login_required
 
 from originblog.extensions import db
-from originblog.forms import PostForm, CategoryForm, AboutForm, LinkForm
-from originblog.models import Post, Comment, Category, Admin, Link
+from originblog.forms import PostForm, AboutForm
+from originblog.models import Post, Comment
 from originblog.utils import redirect_back
 
 admin_bp = Blueprint('admin', __name__)

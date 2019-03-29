@@ -62,15 +62,15 @@ def register_template_context(app):
 
         blog_meta = BlogSettings.BLOG_META
         # 获取所有文章的标签列表
-        tags = Post.objects.ditinct('tags')
+        tags = Post.objects.distinct('tags')
         # 通过聚集查询获取所有文章的分类以及对应的文章数量
-        categories = Post.objects.aggregate([
+        categories = Post.objects.aggregate(
             {'$group':{
                 '_id':{'category': '$category'},
                 'name':{'$first': '$category'},
                 'count':{'$sum': 1}
             }}
-        ])
+        )
         return dict(unread_comments=unread_comments, tags=tags, categories=categories, blog_meta=blog_meta)
 
 

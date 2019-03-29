@@ -15,7 +15,7 @@ def index():
 
     # 获取已发表并且权重值大于0的文章的QuerySet，按权重和发表时间排序
     pub_posts = Post.objects.filter(is_draft=False).order_by('-weight', '-pub_time')
-    posts = pub_posts.filter(Q(weight_gt=0) | Q(weight=None))
+    posts = pub_posts.filter(Q(weight__gt=0) | Q(weight=None))
 
     # 根据查询参数获取特定分类的文章QuerySet
     category = request.args.get('categorty')
@@ -85,13 +85,20 @@ def show_post(slug):
 
     page = request.args.get('page', default=1, type=int)
     per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']
-    comment_pagination = Comment.objects.filter(post_slug=post.slug, reviewed=True).paginate(page, per_page=per_page)
+    comment_pagination = Comment.objects.filter(post_slug=post.slug, status='approved').paginate(page, per_page=per_page)
 
     return render_template('blog/post.html', post=post, comment_pagination=comment_pagination, form=form)
 
 
-@blog_bp.route('/reply/comment/<string:comment_id>')  # TODO:id类型的验证
+@blog_bp.route('/reply/comment/<string:comment_id>')  # TODO:id类型的验证，直接从回复按钮跳转
 def reply_comment(comment_id):
+    """实现评论的回复功能
+
+    以该视图作为中转传递被回复的评论的id。
+    在show_post视图中获取查询参数并进行相应处理。
+    :param comment_id: 被回复的comment id
+    :return: 跳转到表单填写页面或返回
+    """
     comment = Comment.objects.get_or_404(id=comment_id)
     post = Post.objects.get_or_404(slug=comment.post_slug)
     if post.can_comment:
@@ -105,6 +112,7 @@ def reply_comment(comment_id):
 
 @blog_bp.route('/author-detail/<string:username>')
 def author_detail(username):
+    """"""
     author = User.objects.get_or_404(username=username)
     posts = Post.objects.filter(author=author, is_draft=False).order_by('-pub_time')
 
@@ -112,6 +120,7 @@ def author_detail(username):
     per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']
     pagination = posts.paginate(page, per_page=per_page)
     return render_template('blog/author.html', user=author, pagination=pagination)
+
 
 @blog_bp.route('/achive')
 def archive():

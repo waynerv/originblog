@@ -1,18 +1,16 @@
 import random
 from originblog.models import User, Post, Comment, Widget
-from originblog.extensions import db
 from faker import Faker
 
 fake = Faker('zh_CN')
 
 
 def fake_admin():
-    user = User(
-        username='admin',
-        name='kaka4nerv',
-        role='admin',
-        bio='Hello guys.'
-    )
+    user = User(username='admin',
+                name='kaka4nerv',
+                email='testmail@gmail.com',
+                role='admin',
+                bio='Hello guys.')
     user.set_password('123456789')
     user.save()
 
@@ -21,10 +19,11 @@ def fake_post(count=50):
     for i in range(count):
         post = Post(
             title=fake.sentence(),
-            abstract=fake.sentence(),
+            abstract=fake.sentence(30),
+            author=User.objects.first(),
             raw_content=fake.text(2000),
             pub_time=fake.date_time_this_year(),
-            tags = fake.word()
+            tags=fake.words()
         )
         post.save()
 
@@ -40,51 +39,49 @@ def fake_comment(count=500):
         comment = Comment(
             author=fake.name(),
             email=fake.email(),
-            site=fake.url(),
-            body=fake.sentence(),
-            reviewed=True,
-            timestamp=fake.date_time_this_year(),
-            post_id=random.randint(1, Post.query.count())
+            homepage=fake.url(),
+            md_content=fake.sentence(),
+            status='approved',
+            pub_time=fake.date_time_this_year(),
+            post_slug=random.choice(Post.objects.distinct('slug'))
         )
-        db.session.add(comment)
+        comment.save()
 
     salt = int(count * 0.1)
     for i in range(salt):
         comment = Comment(
             author=fake.name(),
             email=fake.email(),
-            site=fake.url(),
-            body=fake.sentence(),
-            reviewed=False,
-            timestamp=fake.date_time_this_year(),
-            post_id=random.randint(1, Post.query.count())
+            homepage=fake.url(),
+            md_content=fake.sentence(),
+            status='pending',
+            pub_time=fake.date_time_this_year(),
+            post_slug=random.choice(Post.objects.distinct('slug'))
         )
-        db.session.add(comment)
-
-    for i in range(salt):
-        comment = Comment(
-            author='kaka4nerv',
-            email='ampedee@163.com',
-            site='shallwecode.top',
-            body=fake.sentence(),
-            from_admin=True,
-            reviewed=True,
-            timestamp=fake.date_time_this_year(),
-            post_id=random.randint(1, Post.query.count())
-        )
-        db.session.add(comment)
-    db.session.commit()
+        comment.save()
 
     for i in range(salt):
         comment = Comment(
             author=fake.name(),
             email=fake.email(),
-            site=fake.url(),
-            body=fake.sentence(),
-            reviewed=True,
-            timestamp=fake.date_time_this_year(),
-            post_id=random.randint(1, Post.query.count()),
-            replied=Comment.query.get(random.randint(1, Comment.query.count()))
+            homepage=fake.url(),
+            md_content=fake.sentence(),
+            status='approved',
+            from_post_author=True,
+            pub_time=fake.date_time_this_year(),
+            post_slug=random.choice(Post.objects.distinct('slug'))
         )
-        db.session.add(comment)
-    db.session.commit()
+        comment.save()
+
+    for i in range(salt):
+        comment = Comment(
+            author=fake.name(),
+            email=fake.email(),
+            homepage=fake.url(),
+            md_content=fake.sentence(),
+            status='approved',
+            pub_time=fake.date_time_this_year(),
+            post_slug=random.choice(Post.objects.distinct('slug')),
+            reply_to=random.choice(Comment.objects)
+        )
+        comment.save()

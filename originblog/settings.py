@@ -8,9 +8,9 @@ class BlogSettings:
     BLOG_META = {
         'name': 'Origin Blog',
         'subtitle': 'Where everthing begins.',
-        'bg_home': 'static/img/home_bg.jpg',
-        'bg_post': 'static/img/post_bg.jpg',
-        'bg_about': 'static/img/about_bg.jpg',
+        'bg_home': 'static/img/home-bg.jpg',
+        'bg_post': 'static/img/post-bg.jpg',
+        'bg_about': 'static/img/about-bg.jpg',
         'display_copyright': True,
         'copyright_message': 'pending',
         'allow_share': True,
@@ -64,7 +64,7 @@ class BaseConfig(object):
 
 class DevelopmentConfig(BaseConfig):
     MONGODB_SETTINGS = {
-        'db': 'oringinblog',
+        'db': 'originblog',
     }
 
 

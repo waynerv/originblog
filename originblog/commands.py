@@ -1,15 +1,15 @@
 import click
 from originblog.extensions import db
 from originblog.models import User
+from mongoengine import connect
 
 
 def register_command(app):
     @app.cli.command()
     @click.option('--post', default=50, help='Quantity of posts, default is 50')
-    @click.option('--category', default=10, help='Quantity of categories, default is 10')
     @click.option('--comment', default=500, help='Quantity of comments, default is 500')
-    @click.option('--link', default=4, help='Quantity of links, default is 4')
-    def forge(post, category, comment, link):
+    @click.option('--widget', default=4, help='Quantity of widgets, default is 4')
+    def forge(post, widget, comment):
         """生成测试用的管理员账户、文章、分类、评论、以及链接。
 
         生成测试数据时将删除所有并重新创建数据库中的表
@@ -19,19 +19,16 @@ def register_command(app):
         :param link: 将要生成链接的数量
         :return: None
         """
-        from originblog.fake import fake_admin, fake_category, fake_comment, fake_post, fake_link
+        from originblog.fake import fake_admin, fake_comment, fake_post, fake_widget
 
-        db.drop_all()
-        db.create_all()
+        db = connect('originblog')
+        db.drop_database('originblog')
 
         click.echo('Generating the administrator...')
         fake_admin()
 
-        click.echo(f'Generating {category} categories...')
-        fake_category(category)
-
-        click.echo(f'Generating {link} links...')
-        fake_link(link)
+        click.echo(f'Generating {widget} links...')
+        fake_widget(widget)
 
         click.echo(f'Generating {post} posts...')
         fake_post(post)
@@ -42,19 +39,16 @@ def register_command(app):
         click.echo('Done.')
 
     @app.cli.command()
-    @click.option('--drop', is_flag=True)
-    def initdb(drop):
+    def initdb():
         """重置数据库，删除所有表并重新创建
 
         :param drop: 是否删除表
         :return: None
         """
-        if drop:
-            click.confirm('This operation will delete the database, do you want to continue?', abort=True)
-            db.drop_all()
-            click.echo('Drop tables.')
-        db.create_all()
-        click.echo('Initialized Database.')
+        click.confirm('This operation will delete the database, do you want to continue?', abort=True)
+        db = connect('originblog')
+        db.drop_database('originblog')
+        click.echo('Drop database.')
 
     @app.cli.command()
     @click.option('--username', prompt=True, help='The username used to login.')

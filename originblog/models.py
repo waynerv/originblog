@@ -56,7 +56,7 @@ class User(db.Document, UserMixin):
     username = db.StringField(max_length=20, required=True)
     password_hash = db.StringField(max_length=128, required=True)
     name = db.StringField(max_length=30, default=username)
-    email = db.EmailField(max_length=255)
+    email = db.EmailField(max_length=255, required=True)
     create_time = db.DateTimeField(default=datetime.utcnow, required=True)
     last_login = db.DateTimeField(default=datetime.utcnow, required=True)
     email_confirmed = db.BooleanField(default=False)
@@ -141,8 +141,8 @@ class Post(db.Document):
     slug = db.StringField(max_length=255, required=True, unique=True)
     abstract = db.StringField(max_length=255)
     author = db.ReferenceField('User', reverse_delete_rule=db.CASCADE) # 用户被删除时，关联的文章也会被删除
-    html_content = db.StringField(required=True)
     raw_content = db.StringField(required=True)
+    html_content = db.StringField(required=True)
     pub_time = db.DateTimeField()
     update_time = db.DateTimeField()
     category = db.StringField(max_length=64, default='default')
@@ -162,10 +162,10 @@ class Post(db.Document):
     def clean(self):
         """保存到数据库前更新时间戳并将markdown文本转换为html"""
         now = datetime.utcnow()
-        if not self.sub_time:
+        if not self.pub_time:
             self.pub_time = now
         self.update_time = now
-        self.slug = self.set_slug(self.title)
+        self.set_slug(self.title)
         self.html_content = markdown2.markdown(self.raw_content,
                                                extras=['code-friendly', 'fenced-code-blocks', 'tables'])
         self.html_content = get_clean_html_content(self.html_content)
@@ -239,7 +239,7 @@ class Comment(db.Document):
     def clean(self):
         """保存到数据库前更新时间戳,生成头像id，并将markdown文本转换为html"""
         if self.md_content:
-            html_content = markdown2.markdown(self.raw_content,
+            html_content = markdown2.markdown(self.md_content,
                                               extras=['code-friendly', 'fenced-code-blocks', 'tables', 'nofollow'])
             self.html_content = get_clean_html_content(html_content)
 

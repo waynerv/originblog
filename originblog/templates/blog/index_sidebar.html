@@ -15,7 +15,7 @@
     <h3>Tags</h3>
     <hr>
     {% for tag in tags %}
-        <a href="{{ url_for('blog_bp', tag=tag) }}" class="post-tag">
+        <a href="{{ url_for('blog.index', tag=tag) }}" class="post-tag">
             {% if tag == cur_tag %}
                 <span class="label label-primary">
                 {{ tag }}
@@ -36,12 +36,12 @@
         {% for category in categories %}
             {% if category and category.name %}
                 {% if category.name == cur_category %}
-                    <a href="{{ url_for('blog_bp.index', category=category.name) }}"
+                    <a href="{{ url_for('blog.index', category=category.name) }}"
                        class="list-group-item category-list active">{{ category.name }}
                         <small><span class="glyphicon glyphicon-remove small rm-filter" aria-hidden="true"></span></small>
                         <span class="badge">&nbsp;{{ category.count }}&nbsp;</span></a>
                 {% else %}
-                    <a href="{{ url_for('blog_bp.index', category=category.name) }}"
+                    <a href="{{ url_for('blog.index', category=category.name) }}"
                        class="list-group-item category-list">{{ category.name }}
                         <span class="badge">&nbsp;{{ category.count }}&nbsp;</span></a>
                 {% endif %}
