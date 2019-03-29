@@ -17,14 +17,14 @@
                     <div class="post-heading">
                         <h1>{{ post.title }}</h1>
                         <span class="post-meta">Posted by
-                            <a href="{{ url_for('blog_bp.about', username=post.author.username) }}">{{ post.author.name }}</a>
+                            <a href="{{ url_for('blog.about', username=post.author.username) }}">{{ post.author.name }}</a>
                             on {{ moment(post.pub_time).format('YYYY/MM/DD, h:mm a') }}</span>
                         <p class="post-meta">category: <a
-                                href="{{ url_for('blog_bp.index', category=post.category) }}">{{ post.category }}</a>
+                                href="{{ url_for('blog.index', category=post.category) }}">{{ post.category }}</a>
                         </p>
                         <p class="post-meta">Tags:
                             {% for tag in tags %}
-                                <a href="{{ url_for('blog_bp.index', tag=tag) }}">{{ tag }}</a>{% endfor %}
+                                <a href="{{ url_for('blog.index', tag=tag) }}">{{ tag }}</a>{% endfor %}
                         </p>
                     </div>
                 </div>

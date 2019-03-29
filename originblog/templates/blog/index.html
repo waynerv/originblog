@@ -26,7 +26,7 @@
                 {% for post in pagination.items() %}
                     {% if post %}
                         <div class="post-preview">
-                            <a href="{{ url_for('blog_bp.show_post', slug=post.slug) }}">
+                            <a href="{{ url_for('blog.show_post', slug=post.slug) }}">
                                 <h2 class="post-title">
                                     {{ post.title }}
                                 </h2>
@@ -35,14 +35,14 @@
                                 {{ post.abstract }}
                             </p>
                             <p class="post-meta">Posted by
-                                <a href="{{ url_for('blog_bp.about', username=post.author.username) }}">{{ post.author.name }}</a>
+                                <a href="{{ url_for('blog.about', username=post.author.username) }}">{{ post.author.name }}</a>
                                 on {{ moment(post.pub_time).format('YYYY/MM/DD, h:mm a') }}</p>
                             <p class="post-meta">category: <a
-                                    href="{{ url_for('blog_bp.index', category=post.category) }}">{{ post.category }}</a>
+                                    href="{{ url_for('blog.index', category=post.category) }}">{{ post.category }}</a>
                             </p>
                             <p class="post-meta">Tags:
                                 {% for tag in tags %}
-                                    <a href="{{ url_for('blog_bp.index', tag=tag) }}">{{ tag }}</a>{% endfor %}
+                                    <a href="{{ url_for('blog.index', tag=tag) }}">{{ tag }}</a>{% endfor %}
                             </p>
                         </div>
                         {% if not loop.last %}
@@ -56,7 +56,7 @@
                 {% endfor %}
 
                 <!-- Pager -->
-                {{ render_pagination(pagination, 'blog_bp.index', category=cur_category if cur_category, tag=cur_tag if cur_tag) }}
+                {{ render_pagination(pagination, 'blog.index', category=cur_category if cur_category, tag=cur_tag if cur_tag) }}
             </div>
 
             <!--include sidebar template -->
