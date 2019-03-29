@@ -20,3 +20,63 @@
         {% endfor %}
     </div>
 {% endmacro %}
+
+{% macro render_entire_pagination(pagination, endpoint) %}
+  <nav>
+    <ul class="pagination">
+      {% if not pagination.has_prev %}
+        <li class="disabled">
+            <span aria-hidden="true">&laquo;</span>
+        </li>
+      {% else %}
+        <li>
+        <a href="{{ url_for(endpoint, page=pagination.prev_num, **kwargs) }}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+        </li>
+      {% endif %}
+
+      {%- for page in pagination.iter_pages() %}
+        {% if page %}
+          {% if page != pagination.page %}
+            <li><a href="{{ url_for(endpoint, page=page, **kwargs) }}">{{ page }}</a></li>
+          {% else %}
+            <li class="disabled"><a href="{{ url_for(endpoint, page=page, **kwargs) }}"><strong>{{ page }}</strong></a></li>
+          {% endif %}
+        {% else %}
+          <!-- <span class=ellipsis>…</span> -->
+          <li><a href="#">...</a></li>
+        {% endif %}
+      {%- endfor %}
+
+      {% if not pagination.has_next %}
+        <li class="disabled">
+          <span aria-hidden="true">&raquo;</span>
+        </li>
+      {% else %}
+        <li>
+          <a href="{{ url_for(endpoint, page=pagination.next_num, **kwargs) }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endmacro %}
+
+{% macro render_short_pagination(pagination, endpoint) %}
+<nav>
+    <ul class="pagination">
+        {% if pagination.has_next %}
+        <li class="next">
+            <a href="{{ url_for(endpoint, page=pagination.next_num, **kwargs) }}">Next</a>
+        </li>
+        {% endif %}
+        {% if pagination.has_prev %}
+        <li class="next">
+            <a href="{{ url_for(endpoint, page=pagination.prev_num, **kwargs) }}">Previous</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endmacro %}

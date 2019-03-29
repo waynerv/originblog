@@ -20,100 +20,103 @@
 {% endblock %}
 
 {% block main %}
-<div class="container">
-    <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-            <h3>About {{ user.name }}</h3>
-            <hr>
-            <dl class="dl-horizontal">
-                <dt>Username:</dt>
-                <dd>{{ user.username }}</dd>
-            </dl>
-            <dl class="dl-horizontal">
-                <dt>Bio:</dt>
-                <dd>{{ user.bio }}</dd>
-            </dl>
-            <dl class="dl-horizontal">
-                <dt>Social Network</dt>
-                <dd>
-                    {% if user.social_networks['github']['url'] %}
-                        <a href='{{ user.social_networks["github"]["url"] }}'><i class="fa fa-github fa-lg"></i></a>
-                    {% endif %}
-                    {% if user.social_networks['twitter']['url'] %}
-                        <a href='{{ user.social_networks["twitter"]["url"] }}'><i class="fa fa-twitter fa-lg"></i></a>
-                    {% endif %}
-                    {% if user.social_networks['weibo']['url'] %}
-                        <a href='{{ user.social_networks["weibo"]["url"] }}'><i class="fa fa-weibo fa-lg"></i></a>
-                    {% endif %}
-                    {% if user.social_networks['facebook']['url'] %}
-                        <a href='{{ user.social_networks["facebook"]["url"] }}'><i class="fa fa-facebook fa-lg"></i></a>
-                    {% endif %}
-                    {% if user.social_networks['linkedin']['url'] %}
-                        <a href='{{ user.social_networks["linkedin"]["url"] }}'><i class="fa fa-linkedin fa-lg"></i></a>
-                    {% endif %}
-                    {% if user.social_networks['weixin']['url'] %}
-                        <a id="btn_weixin" href='{{ user.social_networks["weixin"]["url"] }}'><i
-                                class="fa fa-weixin fa-lg"></i></a>
-                        <!-- display weixin qrcode -->
-                        <div id="weixin" class="hidden">
-                            <br>
-                            <img src="{{ user.social_networks["weixin"]["url"] }}?imageView/2/w/150" title="weixin"
-                                 alt="weixin qrcode">
-                        </div>
-                    {% endif %}
-                </dd>
-            </dl>
-            <dl class="dl-horizontal">
-                <dt>Homepage:</dt>
-                <dd>
-                    {% if user.homepage %}
-                    <a href="{{ user.homepage }}"><i class="fa fa-home fa-lg"></i>{{ user.homepage }}</a>
-                    {% else %}
-                    Not provided.
-                    {% endif %}
-                </dd>
-            </dl>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <h3>About {{ user.name }}</h3>
+                <hr>
+                <dl class="dl-horizontal">
+                    <dt>Username:</dt>
+                    <dd>{{ user.username }}</dd>
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt>Bio:</dt>
+                    <dd>{{ user.bio }}</dd>
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt>Social Network</dt>
+                    <dd>
+                        {% if user.social_networks['github']['url'] %}
+                            <a href='{{ user.social_networks["github"]["url"] }}'><i class="fa fa-github fa-lg"></i></a>
+                        {% endif %}
+                        {% if user.social_networks['twitter']['url'] %}
+                            <a href='{{ user.social_networks["twitter"]["url"] }}'><i
+                                    class="fa fa-twitter fa-lg"></i></a>
+                        {% endif %}
+                        {% if user.social_networks['weibo']['url'] %}
+                            <a href='{{ user.social_networks["weibo"]["url"] }}'><i class="fa fa-weibo fa-lg"></i></a>
+                        {% endif %}
+                        {% if user.social_networks['facebook']['url'] %}
+                            <a href='{{ user.social_networks["facebook"]["url"] }}'><i class="fa fa-facebook fa-lg"></i></a>
+                        {% endif %}
+                        {% if user.social_networks['linkedin']['url'] %}
+                            <a href='{{ user.social_networks["linkedin"]["url"] }}'><i class="fa fa-linkedin fa-lg"></i></a>
+                        {% endif %}
+                        {% if user.social_networks['weixin']['url'] %}
+                            <a id="btn_weixin" href='{{ user.social_networks["weixin"]["url"] }}'><i
+                                    class="fa fa-weixin fa-lg"></i></a>
+                            <!-- display weixin qrcode -->
+                            <div id="weixin" class="hidden">
+                                <br>
+                                <img src="{{ user.social_networks["weixin"]["url"] }}?imageView/2/w/150" title="weixin"
+                                     alt="weixin qrcode">
+                            </div>
+                        {% endif %}
+                    </dd>
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt>Homepage:</dt>
+                    <dd>
+                        {% if user.homepage %}
+                            <a href="{{ user.homepage }}"><i class="fa fa-home fa-lg"></i>{{ user.homepage }}</a>
+                        {% else %}
+                            Not provided.
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-            <h3>Articles</h3>
-            <ul>
-                {% for post in pagination.items() %}
-                    {% if post %}
-                    <li><a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></li>
-                    {% else %}
-                    <p class="post-subtitle">No articles found here</p>
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <h3>Articles</h3>
+                <ul>
+                    {% for post in pagination.items() %}
+                        {% if post %}
+                            <li><a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></li>
+                        {% else %}
+                            <p class="post-subtitle">No articles found here</p>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <!-- pagination -->
+                <ul class="pagination">
+                    {% if pagination.has_next %}
+                        <li class="next">
+                            <a href="{{ url_for('blog.author_detail', username=user.username, page=pagination.next_num) }}">Older
+                                Posts</a>
+                        </li>
                     {% endif %}
-                {% endfor %}
-            </ul>
-            <!-- pagination -->
-            <ul class="pagination">
-                {% if pagination.has_next %}
-                <li class="next">
-                    <a href="{{ url_for('blog.author_detail', username=user.username, page=pagination.next_num) }}"></a>
-                </li>
-                {% endif %}
-                {% if pagination.has_prev %}
-                <li class="next">
-                    <a href="{{ url_for('blog.author_detail', username=user.username, page=pagination.prev_num) }}"></a>
-                </li>
-                {% endif %}
-            </ul>
+                    {% if pagination.has_prev %}
+                        <li class="next">
+                            <a href="{{ url_for('blog.author_detail', username=user.username, page=pagination.prev_num) }}">Previous
+                                Posts</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript">
-    $('#btn_weixin').on('click', function(event){
-        if($('#weixin').hasClass('hidden'))
-            $('#weixin').removeClass('hidden');
-        else
-            $('#weixin').addClass('hidden');
-        return false
-    })
-</script>
+    <script type="text/javascript">
+        $('#btn_weixin').on('click', function (event) {
+            if ($('#weixin').hasClass('hidden'))
+                $('#weixin').removeClass('hidden');
+            else
+                $('#weixin').addClass('hidden');
+            return false
+        })
+    </script>
 {% endblock %}
