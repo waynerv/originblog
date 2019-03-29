@@ -10,6 +10,7 @@ class BlogSettings:
         'subtitle': 'Where everthing begins.',
         'bg_home': 'static/img/home_bg.jpg',
         'bg_post': 'static/img/post_bg.jpg',
+        'bg_about': 'static/img/about_bg.jpg',
         'display_copyright': True,
         'copyright_message': 'pending',
         'allow_share': True,
@@ -19,6 +20,14 @@ class BlogSettings:
         'dispaly_wechat':True,
         'wechat_message': 'pending',
         'wechat_img_url': 'pending,'
+    }
+    SOCIAL_NETWORKS = {
+        'weibo': {'fa_icon': 'fa fa-weibo', 'url': None},
+        'weixin': {'fa_icon': 'fa fa-weixin', 'url': None},
+        'twitter': {'fa_icon': 'fa fa fa-twitter', 'url': None},
+        'github': {'fa_icon': 'fa fa-github', 'url': None},
+        'facebook': {'fa_icon': 'fa fa-facebook', 'url': None},
+        'linkedin': {'fa_icon': 'fa fa-linkedin', 'url': None},
     }
 
 

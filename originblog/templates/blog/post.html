@@ -51,7 +51,7 @@
     </div>
     <article>
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-lg-8 col-md-10 mx-auto">
                 <!-- main content -->
                 <article>
                 {{ post.html_content|safe }}
@@ -70,7 +70,7 @@
         {% endif %}
         {% if blog_meta.allow_share %}
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-lg-8 col-md-10 mx-auto">
                 <div class="share-component" data-sites="weibo,wechat,douban,qq,facebook"></div>
             </div>
         </div>
@@ -78,7 +78,7 @@
         <br>
         {% if blog_meta.allow_donate %}
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-lg-8 col-md-10 mx-auto">
                 <p>{{ blog_meta.donate_message }}</p>
                 <i class="fa fa-jpy"></i> | <i class="fa fa-usd"></i><br>
                 <div>
@@ -89,7 +89,7 @@
         {% endif %}
         {% if blog_meta.dispaly_wechat %}
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-lg-8 col-md-10 mx-auto">
                 <p>{{ blog_meta.wechat_message }}<i class="fa fa-weixin" aria-hidden="true"></i></p>
                 <img src="{{ blog_meta.wechat_img_url }}" title="wechat" alt="wechat qrcode">
             </div>
@@ -103,7 +103,7 @@
     <div class="comments" id="comments">
         <!-- comment header -->
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-lg-8 col-md-10 mx-auto">
                 <h3>{{ pagination.total }} Comments
                     <small>
                         <a href="{{ url_for('blog.show_post', slug=post.slug, page=pagination.pages or 1) }}#comments">
@@ -124,7 +124,7 @@
         </div>
         <!-- comment form -->
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-lg-8 col-md-10 mx-auto">
                 {% if post.can_comment %}
                     {% if request.args.get('reply') %}
                     <div class="alert alert-dark">
@@ -145,7 +145,7 @@
 
         <!-- comment list -->
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-lg-8 col-md-10 mx-auto">
                 {% if comments %}
                 <ul class="list-group">
                     {% for comment in comments %}

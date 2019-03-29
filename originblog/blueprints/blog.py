@@ -3,7 +3,7 @@ from flask_login import current_user
 from mongoengine.queryset.visitor import Q
 
 from originblog.forms import CommentForm, UserCommentForm
-from originblog.models import Post, Comment, Widget
+from originblog.models import Post, Comment, Widget, User
 from originblog.utils import redirect_back
 
 blog_bp = Blueprint('blog', __name__)
@@ -74,7 +74,7 @@ def show_post(slug):
         homepage = form.homepage.data
         content = form.content.data
         comment = Comment(author=author, email=email, homepage=homepage, content=content, status=comment_status,
-                          from_post_author=from_post_author, post=post)
+                          from_post_author=from_post_author, post_slug=post.slug, post_title=post.title)
         reply_to = request.args.get('replyto')
         if reply_to:
             comment.reply_to = Comment.objects.get_or_404(id=reply_to)
@@ -103,6 +103,12 @@ def reply_comment(comment_id):
         return redirect_back()
 
 
-@blog_bp.route('/about')
-def about():
-    return render_template('blog/about.html')
+@blog_bp.route('/author-detail/<string:username>')
+def author_detail(username):
+    author = User.objects.get_or_404(username=username)
+    posts = Post.objects.filter(author=author, is_draft=False).order_by('-pub_time')
+
+    page = request.args.get('page', default=1, type=int)
+    per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']
+    pagination = posts.paginate(page, per_page=per_page)
+    return render_template('blog/author.html', user=author, pagination=pagination)

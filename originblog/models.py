@@ -19,6 +19,7 @@ from originblog.settings import Operations
 COMMENT_STATUS = BlogSettings.COMMENT_STATUS
 GAVATAR_CDN_BASE = BlogSettings.GAVATAR_CDN_BASE
 GAVATAR_DEFAULT_IMAGE = BlogSettings.GAVATAR_DEFAULT_IMAGE
+SOCIAL_NETWORKS = BlogSettings.SOCIAL_NETWORKS
 
 ROLES = ('admin', 'editor', 'writer', 'reader')
 
@@ -63,6 +64,7 @@ class User(db.Document, UserMixin):
     role = db.StringField(default='reader', choices=ROLES)
     bio = db.StringField(max_length=200)
     homepage = db.URLField(max_length=255)
+    social_networks = db.DictField(default=SOCIAL_NETWORKS)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -127,6 +129,10 @@ class User(db.Document, UserMixin):
 
         self.save()
         return True
+
+    meta = {
+        'indexes': ['username'],
+    }
 
 
 class Post(db.Document):
