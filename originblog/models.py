@@ -77,7 +77,7 @@ class User(db.Document, UserMixin):
             raise NotImplementedError('No `username` attribute - override `get_id`')
 
     def generate_token(self, operation, expire_in=None, **kwargs):
-        """生成私密操作所需要的验证token
+        """生成私密操作所需要的验证token。
 
         使用itsdangerous提供的jws序列化器将用户信息、操作类型等序列化成token
         :param self: 用户对象
@@ -95,7 +95,7 @@ class User(db.Document, UserMixin):
         return s.dumps(data)
 
     def validate_token(self, token, operation, new_password=None):
-        """验证token，并根据token携带的数据执行相应操作
+        """验证token，并根据token携带的数据执行相应操作。
 
         :param self: 用户对象
         :param token: token字符串
@@ -164,8 +164,8 @@ class Post(db.Document):
                                                extras=['code-friendly', 'fenced-code-blocks', 'tables'])
         self.html_content = get_clean_html_content(self.html_content)
 
-    # 把类的对象转化为 dict 类型的数据，将对象序列化
     def to_dict(self):
+        """把类的对象转化为 dict 类型的数据，将对象序列化"""
         post_dict = {'title': self.title, 'slug': self.slug, 'abstract': self.abstarct, 'author': self.author,
                      'content_html': self.content, 'content_raw': self.raw_content, 'pub_time': self.pub_time,
                      'update_time': self.update_time, 'category': self.category, 'tags': self.tags,
@@ -227,6 +227,7 @@ class Comment(db.Document):
     update_time = db.DateTimeField()
     reply_to = db.ReferenceField('self')
     status = db.StringField(choices=COMMENT_STATUS, default='pending')
+    from_post_author = db.BooleanField(default=False)
     gavatar_id = db.StringField(default='00000000000')
 
     def clean(self):
@@ -245,7 +246,7 @@ class Comment(db.Document):
             self.gavatar_id = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
 
     def get_avatar_url(self, base_url=GAVATAR_CDN_BASE, img_size=0, default_img_url=None):
-        """通过 gavatar_id 从cdn 获取头像图片的链接
+        """通过 gavatar_id 从cdn 获取头像图片的链接。
 
         获取时可传入大小和默认图片参数
         :param base_url: cdn地址

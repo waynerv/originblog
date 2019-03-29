@@ -6,8 +6,8 @@ from flask import Flask, render_template
 from flask_login import current_user
 from flask_wtf.csrf import CSRFError
 
-from originblog.blueprints.admin import admin_bp
-from originblog.blueprints.auth import auth_bp
+# from originblog.blueprints.admin import admin_bp
+# from originblog.blueprints.auth import auth_bp
 from originblog.blueprints.blog import blog_bp
 from originblog.commands import register_command
 from originblog.extensions import db, mail, moment, bootstrap, login_manager, csrf
@@ -39,8 +39,8 @@ def create_app(config_name=None):
 
 def register_blueprints(app):
     app.register_blueprint(blog_bp)
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(admin_bp, url_prefix='/admin')
+    # app.register_blueprint(auth_bp, url_prefix='/auth')
+    # app.register_blueprint(admin_bp, url_prefix='/admin')
 
 
 def register_extensions(app):

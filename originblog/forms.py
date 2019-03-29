@@ -141,6 +141,17 @@ class CommentForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class UserCommentForm(FlaskForm):
+    """定义已登录用户的评论表单"""
+    author = HiddenField('* Name', validators=[DataRequired(), Length(1, 30)])
+    email = HiddenField('* Email', validators=[DataRequired(), Email(), Length(1, 254)])
+    homepage = HiddenField('Homepage', validators=[Optional(), URL(), Length(0, 255)])
+    content = TextAreaField('* Comment <small><span class="label label-info">markdown</span></small>',
+                            validators=[DataRequired()])
+    comment_id = HiddenField('comment_id')
+    submit = SubmitField('Submit')
+
+
 class SessionCommentForm(FlaskForm):
     email = HiddenField('* Email')
     author = HiddenField('* Name')

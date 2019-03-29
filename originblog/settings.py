@@ -8,7 +8,17 @@ class BlogSettings:
     BLOG_META = {
         'name': 'Origin Blog',
         'subtitle': 'Where everthing begins.',
-        'bg_home': 'static/img/home_bg.jpg'
+        'bg_home': 'static/img/home_bg.jpg',
+        'bg_post': 'static/img/post_bg.jpg',
+        'display_copyright': True,
+        'copyright_message': 'pending',
+        'allow_share': True,
+        'allow_donate': True,
+        'donate_message': 'pending',
+        'donate_img_url': 'pending',
+        'dispaly_wechat':True,
+        'wechat_message': 'pending',
+        'wechat_img_url': 'pending,'
     }
 
 
@@ -44,7 +54,9 @@ class BaseConfig(object):
 
 
 class DevelopmentConfig(BaseConfig):
-    MONGODB_SETTINGS = os.getenv('MONGODB_SETTINGS')
+    MONGODB_SETTINGS = {
+        'db': 'oringinblog',
+    }
 
 
 class TestingConfig(BaseConfig):

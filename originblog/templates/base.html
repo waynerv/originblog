@@ -165,7 +165,7 @@
     {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
     <script src="{{ url_for('static', filename='js/clean-blog.min.js') }}"></script>
 
-    {% block js %}{% endblock %}
+    {% block scripts %}{% endblock %}
 </body>
 
 </html>
