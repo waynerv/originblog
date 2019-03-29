@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import render_entire_pagination %}
+
+{% block title %} Author | {{ user.name }} {% endblock %}
+
+{% block header %}
+    <header class="intro-head" style="background-image: url({{ blog_meta.bg_about }})">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <div class="site-heading">
+                        <h1>About Author</h1>
+                        <hr class="small">
+                        <span class="subheading">{{ blog_meta.subtitle }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div class="row">
+        {% for post in pagination.items() %}
+        <div class="col-sm-6 col-md-4">
+            <div class="img-thumbnail">
+                <div class="caption">
+                    <h3><a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></h3>
+                    <hr>
+                    <p><strong>Abstract: </strong>{{ post.abstract }}</p>
+                    <p><strong>Author:</strong>{{ post.author }}</p>
+                    <p><strong>Date:</strong>{{ moment(post.pub_time).format('LL') }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="row">
+        {{ render_entire_pagination(pagination, 'blog.archive') }}
+    </div>
+</div>
+{% endblock %}

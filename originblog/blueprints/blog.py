@@ -112,3 +112,12 @@ def author_detail(username):
     per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']
     pagination = posts.paginate(page, per_page=per_page)
     return render_template('blog/author.html', user=author, pagination=pagination)
+
+@blog_bp.route('/achive')
+def archive():
+    posts = Post.objects.filter(is_draft=False).order_by('-pub_time')
+
+    page = request.args.get('page', default=1, type=int)
+    per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']
+    pagination = posts.paginate(page, per_page=per_page)
+    return render_template('blog/archive.html', pagination=pagination)
