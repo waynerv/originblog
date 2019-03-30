@@ -4,7 +4,7 @@
     <form id="search-form">
         <div class="form-group">
             <div class="input-group">
-                <div class="input-group-append"><i class="fa fa-search"></i></div>
+                <div class="input-group-prepend"><i class="fa fa-search"></i></div>
                 <input type="text" class="form-control" id="search" name="keywords" placeholder="search"
                        value="{% if keywords %}{{ keywords }}{% endif %}">
             </div>
@@ -15,7 +15,7 @@
     <h3>Tags</h3>
     <hr>
     {% for tag in tags %}
-        <a href="{{ url_for('blog.index', tag=tag) }}" class="post-tag">
+        <a href="{{ url_for('blog.index', tag=tag) }}" class="fa fa-tag">
             {% if tag == cur_tag %}
                 <span class="label label-primary">
                 {{ tag }}

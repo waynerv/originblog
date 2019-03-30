@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, current_app, redirect, url_for, flash
+from flask import Blueprint, render_template, request, current_app, redirect, url_for, flash, make_response
 from flask_login import current_user
 from mongoengine.queryset.visitor import Q
 
@@ -30,7 +30,7 @@ def index():
     # 根据查询参数获取特定文本关键词的搜索结果
     keywords = request.args.get('keywords')
     if keywords:
-        posts = posts.filter(Q(raw_content__icontains=keywords) | Q(title_icontains=keywords))
+        posts = posts.filter(Q(raw_content__icontains=keywords) | Q(title__icontains=keywords))
 
     # 获取首页所有组件对象
     widgets = Widget.objects
@@ -41,8 +41,7 @@ def index():
     pagination = posts.paginate(page, per_page=per_page)  # 分页对象
 
     return render_template('blog/index.html', pagination=pagination, widgets=widgets, cur_category=category,
-                           cur_tag=tag,
-                           cur_keywords=keywords)
+                           cur_tag=tag, cur_keywords=keywords)
 
 
 @blog_bp.route('/post/<string:slug>', methods=['GET', 'Post'])
@@ -85,7 +84,8 @@ def show_post(slug):
 
     page = request.args.get('page', default=1, type=int)
     per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']
-    comment_pagination = Comment.objects.filter(post_slug=post.slug, status='approved').paginate(page, per_page=per_page)
+    comment_pagination = Comment.objects.filter(post_slug=post.slug, status='approved').paginate(page,
+                                                                                                 per_page=per_page)
 
     return render_template('blog/post.html', post=post, comment_pagination=comment_pagination, form=form)
 
@@ -130,3 +130,20 @@ def archive():
     per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']
     pagination = posts.paginate(page, per_page=per_page)
     return render_template('blog/archive.html', pagination=pagination)
+
+
+@blog_bp.route('/site-map')
+def sitemap():
+    """Generate sitemap.xml. Makes a list of urls and date modified."""
+    pages = []
+
+    posts = Post.objects.filter(is_draft=False)
+    for post in posts:
+        pages.append((url_for('blog.show_post', slug=post.slug, _external=True),
+                      post.update_time.datetime().data().isoformat(), 'weekly', '0.8'))
+
+    sitemap_xml = render_template('blog/sitemap.xml', pages=pages)
+    response = make_response(sitemap_xml)
+    response.header['Content-Type'] = 'application/xml'
+
+    return response
