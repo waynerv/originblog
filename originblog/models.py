@@ -53,7 +53,7 @@ def slugify(text, delim=u'-'):
 
 class User(db.Document, UserMixin):
     """定义用户数据模型"""
-    username = db.StringField(max_length=20, required=True)
+    username = db.StringField(max_length=20, required=True, unique=True)
     password_hash = db.StringField(max_length=128, required=True)
     name = db.StringField(max_length=30, default=username)
     email = db.EmailField(max_length=255, required=True)
@@ -73,6 +73,7 @@ class User(db.Document, UserMixin):
         return check_password_hash(self.password_hash, password)
 
     def get_id(self):
+        """Flask Login所需要实现的取得有效ID的方法"""
         try:
             return self.username
         except AttributeError:

@@ -1,0 +1,7 @@
+Hello, {{ comment.reply_to.author }},
+
+New reply for the comment you left in post {{ comment.post_title }}, click the link below to check:
+
+{{ url_for('blog.show_post', slug=comment.post_slug) }}
+
+Do not reply this email.

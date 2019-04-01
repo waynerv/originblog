@@ -1,0 +1,7 @@
+Hello, {{ post.author.name }},
+
+New comment in post <i>{{ post.title }}</i>, click the link below to check:
+
+{{ url_for('blog.show_post', slug=post.slug) }}
+
+Do not reply this email.

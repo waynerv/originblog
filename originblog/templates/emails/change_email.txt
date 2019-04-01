@@ -1,0 +1,7 @@
+Hello {{ user.username }},
+
+Here is your change email link:
+
+    {{ url_for('auth.change_email', token=token, _external=True) }}
+
+(Please do not reply to this notification, this inbox is not monitored.)

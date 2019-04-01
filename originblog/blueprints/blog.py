@@ -132,7 +132,7 @@ def archive():
     return render_template('blog/archive.html', pagination=pagination)
 
 
-@blog_bp.route('/site-map')
+@blog_bp.route('/sitemap.xml/')
 def sitemap():
     """Generate sitemap.xml. Makes a list of urls and date modified."""
     pages = []

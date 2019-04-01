@@ -1,0 +1,4 @@
+<p>Hello, {{ post.author.name }},</p>
+<p>New comment in post <i>{{ post.title }}</i>, click the link below to check:</p>
+<p><a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ url_for('blog.show_post', slug=post.slug) }}</a></p>
+<p><small style="color:#868e96">Do not reply this email.</small></p>
