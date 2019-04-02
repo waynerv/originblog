@@ -76,13 +76,13 @@ class ProfileForm(FlaskForm):
             raise ValidationError('The email is already in use.')
 
 
-class ForgetPassword(FlaskForm):
+class ForgetPasswordForm(FlaskForm):
     """定义忘记密码表单"""
     email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
     submit = SubmitField()
 
 
-class ResetPasswordField(FlaskForm):
+class ResetPasswordForm(FlaskForm):
     """定义忘记密码后重设密码表单"""
     email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(6, 128), EqualTo('password2')])
