@@ -4,7 +4,10 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Valid
     HiddenField, IntegerField, RadioField, SelectField
 from wtforms.validators import DataRequired, Length, Email, URL, Optional, Regexp, EqualTo
 
-from originblog.models import Draft, Post, User, ROLES
+from originblog.models import Draft, Post, User
+from originblog.settings import BlogSettings
+
+ROLES = [(i, i) for i in BlogSettings.ROLE_PERMISSION_MAP]
 
 
 class LoginForm(FlaskForm):

@@ -1,6 +1,6 @@
 import click
 from originblog.extensions import db
-from originblog.models import User
+from originblog.models import User, Role
 from mongoengine import connect
 
 
@@ -23,6 +23,9 @@ def register_command(app):
 
         db = connect('originblog')
         db.drop_database('originblog')
+
+        click.echo('Initializing roles and permissions.')
+        Role.init()
 
         click.echo('Generating the administrator...')
         fake_admin()

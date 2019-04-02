@@ -59,16 +59,16 @@
                 <!-- Pagination -->
                 <div class="clearfix">
                     {% if pagination.has_next %}
-                    <a class="btn btn-primary float-right" href="?page={{ pagination.next_num }}
+                    <a class="btn btn-primary float-right" href="{{ url_for('blog.index', page=pagination.next_num) }}
                         {%- if cur_category %}&category={{ cur_category }}{% endif %}
-                        {%- if keywords %}&keywords={{ keywords }}{% endif %}
+                        {%- if cur_keywords %}&keywords={{ cur_keywords }}{% endif %}
                         {%- if cur_tag %}&tag={{ cur_tag }}{% endif %}">Older Posts &rarr;
                     </a>
                     {% endif %}
                     {% if pagination.has_prev %}
-                    <a class="btn btn-primary float-right" href="?page={{ pagination.prev_num }}
+                    <a class="btn btn-primary float-right" href="{{ url_for('blog.index', page=pagination.prev_num) }}
                         {%- if cur_category %}&category={{ cur_category }}{% endif %}
-                        {%- if keywords %}&keywords={{ keywords }}{% endif %}
+                        {%- if cur_keywords %}&keywords={{ cur_keywords }}{% endif %}
                         {%- if cur_tag %}&tag={{ cur_tag }}{% endif %}">Previous Posts
                     </a>
                     {% endif %}

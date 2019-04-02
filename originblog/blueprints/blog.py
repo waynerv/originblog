@@ -18,7 +18,7 @@ def index():
     posts = pub_posts.filter(Q(weight__gt=0) | Q(weight=None))
 
     # 根据查询参数获取特定分类的文章QuerySet
-    category = request.args.get('categorty')
+    category = request.args.get('category')
     if category:
         posts = posts.filter(category=category)
 
@@ -37,7 +37,7 @@ def index():
 
     # 从查询参数获取当前页数并对QuerySet分页，页数默认值为1
     page = request.args.get('page', default=1, type=int)  # 从查询字符串获取当前页数
-    per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']  # 每页数量
+    per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']  # 每页数量
     pagination = posts.paginate(page, per_page=per_page)  # 分页对象
 
     return render_template('blog/index.html', pagination=pagination, widgets=widgets, cur_category=category,
@@ -59,7 +59,7 @@ def show_post(slug):
     if current_user.is_authenticated:
         form = UserCommentForm()
         form.author.data = current_user.name
-        form.email.data = current_app.config['ORIGINLOG_ADMIN_EMAIL']
+        form.email.data = current_app.config['ORIGINBLOG_ADMIN_EMAIL']
         form.homepage.data = url_for('blog.index')
         if current_user.username == post.author.username:
             from_post_author = True
@@ -83,7 +83,7 @@ def show_post(slug):
         return redirect(url_for('blog.show_post', slug=slug))
 
     page = request.args.get('page', default=1, type=int)
-    per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']
+    per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
     comment_pagination = Comment.objects.filter(post_slug=post.slug, status='approved').paginate(page,
                                                                                                  per_page=per_page)
 
@@ -117,7 +117,7 @@ def author_detail(username):
     posts = Post.objects.filter(author=author, is_draft=False).order_by('-pub_time')
 
     page = request.args.get('page', default=1, type=int)
-    per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']
+    per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
     pagination = posts.paginate(page, per_page=per_page)
     return render_template('blog/author.html', user=author, pagination=pagination)
 
@@ -127,7 +127,7 @@ def archive():
     posts = Post.objects.filter(is_draft=False).order_by('-pub_time')
 
     page = request.args.get('page', default=1, type=int)
-    per_page = current_app.config['ORIGINLOG_POST_PER_PAGE']
+    per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
     pagination = posts.paginate(page, per_page=per_page)
     return render_template('blog/archive.html', pagination=pagination)
 

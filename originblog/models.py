@@ -20,8 +20,7 @@ COMMENT_STATUS = BlogSettings.COMMENT_STATUS
 GAVATAR_CDN_BASE = BlogSettings.GAVATAR_CDN_BASE
 GAVATAR_DEFAULT_IMAGE = BlogSettings.GAVATAR_DEFAULT_IMAGE
 SOCIAL_NETWORKS = BlogSettings.SOCIAL_NETWORKS
-
-ROLES = ('admin', 'editor', 'writer', 'reader')
+ROLE_PERMISSION_MAP = BlogSettings.ROLE_PERMISSION_MAP
 
 # 编译分割标题获取别名的正则表达式
 _punct_re = re.compile(r'[\t !"#$%&\-/<=>?@\[\\\]^_`{|},.]+')
@@ -51,6 +50,24 @@ def slugify(text, delim=u'-'):
     return unidecode(delim.join(result))
 
 
+class Role(db.Document):
+    """定义角色与权限模型"""
+    role_name = db.StringField(default='reader')
+    permissions = db.ListField(db.StringField(unique=True))
+
+    @classmethod
+    def init(cls):
+        """初始化角色与对应的权限，支持角色的增加和更新"""
+        for role_name in ROLE_PERMISSION_MAP:
+            role = cls.objects.filter(role_name=role_name).first()
+            if role is None:
+                role = cls(role_name=role_name)
+            role.permissions = []  # 每次初始化都清空角色权限
+            for permission in ROLE_PERMISSION_MAP[role_name]:
+                role.permissions.append(permission)
+            role.save()
+
+
 class User(db.Document, UserMixin):
     """定义用户数据模型"""
     username = db.StringField(max_length=20, required=True, unique=True)
@@ -61,7 +78,7 @@ class User(db.Document, UserMixin):
     last_login = db.DateTimeField(default=datetime.utcnow, required=True)
     email_confirmed = db.BooleanField(default=False)
     is_superuser = db.BooleanField(default=False)
-    role = db.StringField(default='reader', choices=ROLES)
+    role = db.ReferenceField('Role')
     bio = db.StringField(max_length=200)
     homepage = db.URLField(max_length=255)
     social_networks = db.DictField(default=SOCIAL_NETWORKS)
@@ -131,6 +148,26 @@ class User(db.Document, UserMixin):
         self.save()
         return True
 
+    @property
+    def is_admin(self):
+        """检查用户是否拥有管理员权限"""
+        return self.role.role_name == 'admin'
+
+    def can(self, permission):
+        """检查用户是否拥有指定权限"""
+        return self.role and permission in self.role.permissions
+
+    def set_role(self):
+        """除网站管理员外，为每个用户指定初始角色为reader（"""
+        if self.email != current_app.config['ORIGINBLOG_ADMIN_EMAIL']:
+            self.role = Role.objects.filter(role_name='reader').first()
+        else:
+            self.role = Role.objects.filter(role_name='admin').first()
+
+    def clean(self):
+        """在创建对象并写入到数据库之前为其设置角色"""
+        self.set_role()
+
     meta = {
         'indexes': ['username'],
     }
@@ -141,7 +178,7 @@ class Post(db.Document):
     title = db.StringField(max_length=255, required=True)
     slug = db.StringField(max_length=255, required=True, unique=True)
     abstract = db.StringField(max_length=255)
-    author = db.ReferenceField('User', reverse_delete_rule=db.CASCADE) # 用户被删除时，关联的文章也会被删除
+    author = db.ReferenceField('User', reverse_delete_rule=db.CASCADE)  # 用户被删除时，关联的文章也会被删除
     raw_content = db.StringField(required=True)
     html_content = db.StringField(required=True)
     pub_time = db.DateTimeField()

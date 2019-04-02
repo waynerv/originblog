@@ -29,6 +29,12 @@ class BlogSettings:
         'facebook': {'fa_icon': 'fa fa-facebook', 'url': None},
         'linkedin': {'fa_icon': 'fa fa-linkedin', 'url': None},
     }
+    ROLE_PERMISSION_MAP = {
+        'reader': ['COMMENT'],
+        'writer': ['COMMENT', 'POST'],
+        'editor': ['COMMENT', 'POST', 'MODERATE'],
+        'admin': ['COMMENT', 'POST', 'MODERATE', 'ADMINISTRATE']
+    }
 
 
 class Operations:
@@ -50,13 +56,13 @@ class BaseConfig(object):
     MAIL_USE_SSL = True
     MAIL_PORT = 465
     MAIL_DEFAULT_SENDER = ('kaka', os.getenv('MAIL_USERNAME'))
-    ORIGINLOG_ADMIN_EMAIL = os.getenv('ORIGINLOG_ADMIN_EMAIL')
+    ORIGINBLOG_ADMIN_EMAIL = os.getenv('ORIGINBLOG_ADMIN_EMAIL')
 
-    ORIGINLOG_POST_PER_PAGE = 10
-    ORIGINLOG_MANAGE_POST_PER_PAGE = 20
-    ORIGINLOG_MANAGE_COMMENT_PER_PAGE = 20
-    ORIGINLOG_MANAGE_CATEGORY_PER_PAGE = 10
-    ORIGINLOG_MANAGE_LINK_PER_PAGE = 10
+    ORIGINBLOG_POST_PER_PAGE = 10
+    ORIGINBLOG_MANAGE_POST_PER_PAGE = 20
+    ORIGINBLOG_MANAGE_COMMENT_PER_PAGE = 20
+    ORIGINBLOG_MANAGE_CATEGORY_PER_PAGE = 10
+    ORIGINBLOG_MANAGE_LINK_PER_PAGE = 10
 
     # ('theme name', 'display name')
     ORIGINLOG_THEMES = {'flatly': 'Flatly', 'united': 'United'}
