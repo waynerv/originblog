@@ -1,235 +1,317 @@
-from flask import Blueprint, request, current_app, render_template, flash, redirect, url_for
-from flask_login import login_required
+import time
+import random
+from flask import Blueprint, request, current_app, render_template, flash, redirect, url_for, abort
+from flask.views import MethodView
+from flask_login import login_required, current_user
+from mongoengine import NotUniqueError, DoesNotExist, MultipleObjectsReturned
+from mongoengine.queryset import Q
 
 from originblog.extensions import db
-from originblog.forms import PostForm, AboutForm
-from originblog.models import Post, Comment
+from originblog.forms import PostForm, AboutForm, WidgetForm
+from originblog.models import Post, Comment, PostStatistic, Widget
 from originblog.utils import redirect_back
+from originblog.decorator import admin_required, permission_required
 
 admin_bp = Blueprint('admin', __name__)
 
 
 @admin_bp.route('/post/manage')
-@login_required
-def manage_post():
-    page = request.args.get('page', default=1, type=int)
-    per_page = current_app.config['ORIGINLOG_MANAGE_POST_PER_PAGE']
-    pagination = Post.query.order_by(Post.timestamp.desc()).paginate(page, per_page)
-    posts = pagination.items
-    return render_template('admin/manage_post.html', posts=posts, pagination=pagination)
+class Posts(MethodView):
+    """所有文章"""
+    decorators = [login_required, permission_required('POST')]
 
+    def get(self):  # TODO：对文章内容进行搜索
+        """获取所有文章"""
+        page = request.args.get('page', default=1, type=int)
+        per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
+        post_query = Post.objects.order_by('-update_time', '-weight')
 
-@admin_bp.route('/post/new', methods=['GET', 'POST'])
-@login_required
-def new_post():
-    form = PostForm()
+        # 没有审阅权限的用户只能获取自己发表的文章
+        if not current_user.can('MODERATE'):
+            post_query = post_query.filter(author=current_user._get_current_object())
 
-    if form.validate_on_submit():
-        title = form.title.data
-        body_md = form.body.data
-        body_html = request.form.get('flask-editormd-html-code')
-        category_id = form.category.data
-        # category = Category.query.get(form.category.data)
-        post = Post(title=title, body_md=body_md,body_html=body_html, category_id=category_id)
-        post.set_slug(title)
-        db.session.add(post)
-        db.session.commit()
-        flash('Post published.', 'success')
-        return redirect(url_for('blog.show_post', post_id=post.id))
-    return render_template('admin/new_post.html', form=form)
+        pagination = post_query.paginate(page, per_page)
+        return render_template('admin/manage_post.html', pagination=pagination)
+
+    def post(self):
+        """增加新文章"""
+        form = PostForm()
+
+        if form.validate_on_submit():
+            title = form.title.data
+            abstract = form.abstract.data
+            weight = form.weight.data
+            raw_content = form.raw_content.data
+            category = form.category.data
+            tags = form.tag.data.split() if form.tags.data else None
+            post = Post(
+                title=title,
+                abstract=abstract,
+                weight=weight,
+                raw_content=raw_content,
+                category=category,
+                tags=tags
+            )
+            post.author = current_user._get_current_object()
+            # 保存文章到数据库时，注意处理slug相同的情况
+            try:
+                post.save()
+            except NotUniqueError:
+                post.slug += str(int(time.time()))
+                post.save()
+
+            # 初始化文章的统计数据
+            post_statistic = PostStatistic(post=post)
+            post_statistic.verbose_count_base = random.randint(500, 5000)
+            post_statistic.save()
+
+            flash('Post published.', 'success')
+            return redirect(url_for('blog.show_post', slug=post.slug))
+        return render_template('admin/new_post.html', form=form)
 
 
 @admin_bp.route('/post/edit/<int:post_id>', methods=['GET', 'POST'])
-@login_required
-def edit_post(post_id):
-    form = PostForm()
-    post = Post.query.get_or_404(post_id)
-
-    if form.validate_on_submit():
-        post.title = form.title.data
-        post.body_md = form.body.data
-        post.body_html = request.form.get('flask-editormd-html-code')
-        post.category_id = form.category.data
-        # category = Category.query.get(form.category.data)
-        post.set_slug(form.title.data)
-        db.session.commit()
-        flash('Post updated.', 'success')
-        return redirect(url_for('blog.show_post', post_id=post.id))
-    form.title.data = post.title
-    form.body.data = post.body_md
-    form.category.data = post.category_id
-    return render_template('admin/edit_post.html', form=form)
-
-
 @admin_bp.route('/post/delete/<int:post_id>', methods=['POST'])
-@login_required
-def delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    db.session.delete(post)
-    db.session.commit()
-    flash('Post deleted.', 'success')
-    return redirect_back()
+
+class PostItem(MethodView):
+    decorators = [login_required, permission_required('POST')]
+    # TODO:管理员发表的文章或评论只有管理员可修改
+
+    def get(self, slug, form=None):
+        """获取文章内容与编辑表单"""
+        post = Post.objects.get_or_404(slug=slug)
+        # 只有管理员或文章作者才有权限修改文章
+        if not current_user.is_admin() and post.author != current_user._get_current_object():
+            abort(403)
+
+        if not form:
+            form = PostForm()
+            form.title.data = post.title
+            form.abstract.data = post.abstract
+            form.weight.data = post.weight
+            form.raw_content.data = post.raw_content
+            form.category.data = post.category
+            form.tag.data = ' '.join(post.tags)
+
+        return render_template('admin/edit_post.html', form=form)
+
+    def post(self, slug):
+        """修改文章"""
+        post = Post.objects.get_or_404(slug)
+        # 只有管理员或文章作者才有权限修改文章
+        if not current_user.is_admin() and post.author != current_user._get_current_object():
+            abort(403)
+
+        form = PostForm()
+        if form.validate_on_submit():
+            post.title = form.title.data
+            post.abstract = form.abstract.data
+            post.weight = form.weight.data
+            post.raw_content = form.raw_content.data
+            post.category = form.category.data
+            post.tags = form.tag.data.split() if form.tags.data else None
+            # 修改文章包括标题不会更改slug，以确保链接永久
+            post.save()
+
+            flash('Post updated.', 'success')
+            return redirect(url_for('blog.show_post', slug=post.slug))
+        return self.get(slug, form)
+
+    def put(self, slug):
+        """设置文章是否可评论实现为PUT方法"""
+        post = Post.objects.get_or_404(slug)
+        # 拥有审阅权限才能设置文章是否可评论
+        if not current_user.can('MODERATE'):
+            abort(403)
+
+        if post.can_comment:
+            post.can_comment = False
+            flash('Comment disabled.', 'success')
+        else:
+            post.can_comment = True
+            flash('Comment enabled.', 'success')
+        post.save()
+
+        return redirect_back()  # TODO：该操作需要附加next参数
+
+    def delete(self, slug):
+        """删除文章"""
+        post = Post.objects.get_or_404(slug)
+        # 需要有审核权限或文章作者才能够删除文章
+        if not current_user.can('MODERATE') and post.author != current_user._get_current_object():
+            abort(403)
+
+        try:
+            post_statistic = PostStatistic.objects.get(post=post)
+            post_statistic.delete()
+        except (MultipleObjectsReturned, DoesNotExist):
+            pass
+
+        post.delete()
+        flash('Post deleted.', 'success')
+        return redirect_back()  # TODO：删除操作需要附加next参数
 
 
-@admin_bp.route('/post/set-comment/<int:post_id>', methods=['POST'])
-@login_required
-def set_comment(post_id):
-    post = Post.query.get_or_404(post_id)
-    if post.can_comment:
-        post.can_comment = False
-        flash('Comment disabled.', 'success')
-    else:
-        post.can_comment = True
-        flash('Comment enabled.', 'success')
-    db.session.commit()
-    return redirect_back()
+class Comments(MethodView):
+    decorator = [login_required, permission_required('MODERATE')]
 
+    def get(self):
+        """获取评论列表,可进行分类筛选"""
+        filter_rule = request.args.get('filter', 'all')  # TODO：对评论字符串内容进行搜索
+        page = request.args.get('page', default=1, type=int)
+        per_page = current_app.config['ORIGINBLOG_MANAGE_COMMENT_PER_PAGE']
 
-@admin_bp.route('/comment/manage')
-@login_required
-def manage_comment():
-    filter_rule = request.args.get('filter', 'all')
-    page = request.args.get('page', default=1, type=int)
-    per_page = current_app.config['ORIGINLOG_MANAGE_COMMENT_PER_PAGE']
+        if filter_rule == 'all':
+            filter_comments = Comment.objects
+        elif filter_rule == 'pending':
+            filter_comments = Comment.objects.filter(status='pending')
+        elif filter_rule == 'admin':
+            filter_comments = Comment.objects.filter(from_admin=True)
 
-    if filter_rule == 'all':
-        filter_comments = Comment.query
-    elif filter_rule == 'unread':
-        filter_comments = Comment.query.filter(Comment.reviewed == False)
-    elif filter_rule == 'admin':
-        filter_comments = Comment.query.filter(Comment.from_admin == True)
+        pagination = filter_comments.order_by('-pub_time').paginate(page, per_page)
+        comments = pagination.items  # TODO:统一传入模板格式
+        return render_template('admin/manage_comment.html', comments=comments, pagination=pagination)
 
-    pagination = filter_comments.order_by(Comment.timestamp.desc()).paginate(page, per_page)
-    comments = pagination.items
-    return render_template('admin/manage_comment.html', comments=comments, pagination=pagination)
-
-
-@admin_bp.route('/comment/delete/<int:comment_id>', methods=['POST'])
-@login_required
-def delete_comment(comment_id):
-    comment = Comment.query.get_or_404(comment_id)
-    db.session.delete(comment)
-    db.session.commit()
-    flash('Comment deleted.', 'success')
-    return redirect_back()
+    def delete(self):
+        """删除所有未审核的及标记为垃圾信息的评论"""
+        comments = Comment.objects(Q(status='pending') | Q(status='spam'))
+        comments.delete()
+        flash('All pending comments and spams has been deleted', 'success')
+        return redirect_back()  # TODO：删除操作需要附加next参数
 
 
 @admin_bp.route('/comment/approve/<int:comment_id>', methods=['POST'])
-@login_required
-def approve_comment(comment_id):
-    comment = Comment.query.get_or_404(comment_id)
-    comment.reviewed = True
-    db.session.commit()
-    flash('Comment approved.', 'success')
-    return redirect_back()
+
+@admin_bp.route('/comment/delete/<int:comment_id>', methods=['POST'])
+@admin_bp.route('/post/set-comment/<int:post_id>', methods=['POST'])
+@admin_bp.route('/comment/manage')
+class CommentItem(MethodView):
+    decorators = [login_required, permission_required('MODERATE')]
 
 
-@admin_bp.route('/category/manage')
-@login_required
-def manage_category():
-    page = request.args.get('page', default=1, type=int)
-    per_page = current_app.config['ORIGINLOG_MANAGE_CATEGORY_PER_PAGE']
-    pagination = Category.query.order_by(Category.id).paginate(page, per_page)
-    categories = pagination.items
-    return render_template('admin/manage_category.html', categories=categories, pagination=pagination)
+    def get(self):
+        pass
+
+    def put(self, pk):  # pk为Comment模型的主键，默认为Comment.id(即_id)
+        """更改评论审核状态"""
+        comment = Comment.objects.get_or_404(pk=pk)
+        comment.status = 'approved'
+        comment.save()
+
+        flash('Comment approved.', 'success')
+        return redirect_back()  # TODO：审核操作需要附加next参数
 
 
-@admin_bp.route('/category/new', methods=['GET', 'POST'])
-@login_required
-def new_category():
-    form = CategoryForm()
+    def delete(self, pk):
+        """删除评论"""
+        comment = Comment.objects.get_or_404(pk=pk)
+        if not current_user.is_admin() and comment.from_admin:
+            abort(403)
 
-    if form.validate_on_submit():
-        name = form.name.data
-        category = Category(name=name)
-        db.session.add(category)
-        db.session.commit()
-        flash('Category created.', 'success')
-        return redirect(url_for('admin.manage_category'))
-    return render_template('admin/new_category.html', form=form)
-
-
-@admin_bp.route('/category/edit/<int:category_id>', methods=['GET', 'POST'])
-@login_required
-def edit_category(category_id):
-    form = CategoryForm()
-    category = Category.query.get_or_404(category_id)
-
-    if category.name == 'default':
-        flash('You can not edit the default category.', 'warning')
-        return redirect(url_for('blog.index'))
-
-    if form.validate_on_submit():
-        category.name = form.name.data
-        db.session.commit()
-        flash('Category updated.', 'success')
-        return redirect(url_for('admin.manage_category'))
-    form.name.data = category.name
-    return render_template('admin/edit_category.html', form=form)
-
-
-@admin_bp.route('/category/delete/<int:category_id>', methods=['POST'])
-@login_required
-def delete_category(category_id):
-    category = Category.query.get_or_404(category_id)
-    if category.name == 'default':
-        flash('Sorry, you can not delete default category', 'warning')
-        return redirect(url_for('blog.index'))
-    category.delete()
-    flash('Category deleted.', 'success')
-    return redirect_back()
+        comment.delete()
+        flash('Comment deleted.', 'success')
+        return redirect_back()  # TODO：审核操作需要附加next参数
 
 
 @admin_bp.route('/link/manage')
-@login_required
-def manage_link():
-    page = request.args.get('page', default=1, type=int)
-    per_page = current_app.config['ORIGINLOG_MANAGE_LINK_PER_PAGE']
-    pagination = Link.query.order_by(Link.id).paginate(page, per_page)
-    links = pagination.items
-    return render_template('admin/manage_link.html', links=links, pagination=pagination)
-
-
 @admin_bp.route('/link/new', methods=['GET', 'POST'])
-@login_required
-def new_link():
-    form = LinkForm()
-
-    if form.validate_on_submit():
-        name = form.name.data
-        url = form.url.data
-        link = Link(name=name, url=url)
-        db.session.add(link)
-        db.session.commit()
-        flash('Link created.', 'success')
-        return redirect(url_for('admin.manage_link'))
-    return render_template('admin/new_link.html', form=form)
+class Widgets(MethodView):
+    decorators = [login_required, admin_required]
 
 
-@admin_bp.route('/link/edit/<int:link_id>', methods=['GET', 'POST'])
-@login_required
-def edit_link(link_id):
-    form = LinkForm()
-    link = Link.query.get_or_404(link_id)
+    def get(self):
+        """获取widget列表"""
+        widgets = Widget.objects.all()
 
-    if form.validate_on_submit():
-        link.name = form.name.data
-        link.url = form.url.data
-        db.session.commit()
-        flash('Link updated.', 'success')
-        return redirect(url_for('admin.manage_link'))
-    form.name.data = link.name
-    form.url.data = link.url
-    return render_template('admin/edit_link.html', form=form)
+        return render_template('admin/manage_widget.html', widgets=widgets)
+
+    def post(self):
+        """新增widget"""
+        form = WidgetForm()
+
+        if form.validate_on_submit():
+            title = form.title.data
+            priority = form.priority.data
+            widget = Widget(title=title, priority=priority)
+            if form.content_type.data == 'html':
+                widget.html_content = form.content.data
+                widget.raw_content = None
+            else:
+                widget.raw_content = form.content.data
+            widget.save()
+
+            flash('Widget created.', 'success')
+            return redirect(url_for('admin.manage_link'))
+        return render_template('admin/new_widget.html', form=form)
 
 
-@admin_bp.route('/link/delete/<int:link_id>', methods=['POST'])
-@login_required
-def delete_link(link_id):
-    link = Link.query.get_or_404(link_id)
-    db.session.delete(link)
-    flash('Link deleted.', 'success')
-    return redirect_back()
+class WidgetItem(MethodView):
+    decorators = [login_required, admin_required]
+
+    def get(self, pk, form=None):
+        """获取widget内容与编辑表单"""
+        widget = Widget.objects.get_or_404(pk)
+
+        if not form:
+            form = WidgetForm()
+            form.title = widget.title
+            form.priority = widget.priority
+            if widget.raw_content:
+                form.content_type = 'markdown'
+                form.content = widget.raw_content
+            else:
+                form.content_type = 'html'
+                form.content = widget.html_content
+        return render_template('admin/edit_widget.html', form=form)
+
+    def post(self, pk):
+        """修改widget"""
+        widget = Widget.objects.get_or_404(pk)
+
+        form = WidgetForm
+        if form.validate_on_submit():
+            widget.title = form.title.data
+            widget.priority = form.priority.data
+            if form.content_type.data == 'html':
+                widget.html_content = form.content.data
+                widget.raw_content = None  # 清除原有内容
+            else:
+                widget.raw_content = form.content.data
+            widget.save()
+
+            flash('Widget updated.', 'success')
+            return redirect(url_for('admin/manage_widget'))
+        return self.get(pk, form)
+
+    def delete(self, pk):
+        """删除widget"""
+        widget = Widget.objects.get_or_404(pk)
+        widget.delete()
+        flash('Widget deleted.', 'success')
+        return redirect_back()  # TODO：审核操作需要附加next参数
+
+
+class PostStatistics(MethodView):
+    decorators = [login_required, admin_required]
+
+    def get(self):
+        page = request.args.get('page', default=1, type=int)
+        per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
+        pagination = PostStatistic.objects.paginate(page, per_page)
+        return render_template('admin/manage_statistic.html', pagination=pagination)
+
+
+class PostStatisticItem(MethodView):
+    decorators = [login_required, admin_required]
+
+    def get(self, slug):
+        page = request.args.get('page', default=1, type=int)
+        per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
+
+        post = Post.objects.get_or_404(slug=slug)
+        post_statistic = PostStatistics.objects.get_or_404(post=post)
+        tracker_pagination = Tracker.objects.filter(post=post).paginate(page, per_page)
+        return render_template('admin/show_statistic',post_statistic=post_statistic, trackers=tracker_pagination)
 
 
 @admin_bp.route('/settings', methods=['GET', 'POST'])
@@ -250,4 +332,3 @@ def settings():
     form.blog_sub_title.data = admin.blog_sub_title
     form.about.data = admin.about
     return render_template('admin/edit_about.html', form=form)
-

@@ -54,16 +54,11 @@ def show_post(slug):
     """
     post = Post.objects.get_or_404(slug=slug)
 
-    from_post_author = False
-    comment_status = 'pending'
     if current_user.is_authenticated:
         form = UserCommentForm()
         form.author.data = current_user.name
         form.email.data = current_app.config['ORIGINBLOG_ADMIN_EMAIL']
         form.homepage.data = url_for('blog.index')
-        if current_user.username == post.author.username:
-            from_post_author = True
-            comment_status = 'approved'
     else:
         form = CommentForm()
 
@@ -72,11 +67,17 @@ def show_post(slug):
         email = form.email.data
         homepage = form.homepage.data
         content = form.content.data
-        comment = Comment(author=author, email=email, homepage=homepage, content=content, status=comment_status,
-                          from_post_author=from_post_author, post_slug=post.slug, post_title=post.title)
+        comment = Comment(author=author, email=email, homepage=homepage, content=content, post_slug=post.slug,
+                          post_title=post.title)
         reply_to = request.args.get('replyto')
         if reply_to:
             comment.reply_to = Comment.objects.get_or_404(id=reply_to)
+        if current_user.is_authenticated and current_user.username == post.author.username:
+            comment.from_post_author = True
+            comment.status = 'approved'
+        if current_user.is_admin():
+            comment.from_admin = True
+            comment.status = 'approved'
 
         comment.save()
         flash('Thanks, your comment will be published after reviewed.', 'info')
@@ -112,7 +113,7 @@ def reply_comment(comment_id):
 
 @blog_bp.route('/author-detail/<string:username>')
 def author_detail(username):
-    """"""
+    """显示作者个人页面"""
     author = User.objects.get_or_404(username=username)
     posts = Post.objects.filter(author=author, is_draft=False).order_by('-pub_time')
 
@@ -124,6 +125,7 @@ def author_detail(username):
 
 @blog_bp.route('/achive')
 def archive():
+    """TODO:按时间归档文章"""
     posts = Post.objects.filter(is_draft=False).order_by('-pub_time')
 
     page = request.args.get('page', default=1, type=int)

@@ -104,12 +104,12 @@ class ChangePasswordForm(FlaskForm):
 class PostForm(FlaskForm):
     """定义文章编辑表单"""
     title = StringField('Title', validators=[DataRequired(), Length(1, 60)])
-    slug = StringField('Slug', validators=[DataRequired(), Length(1, 255)])
+    # TODO slug = StringField('Slug', validators=[DataRequired(), Length(1, 255)])
     weight = IntegerField('Weight', default=10)
     raw_content = TextAreaField('Content', validators=[DataRequired()])
     abstract = TextAreaField('Abstract', validators=[Optional(), Length(0, 255)])
     category = StringField('Category', validators=[Optional(), Length(0, 64)])
-    tags = StringField('Tags', validators=[Optional(), Length(0, 64)])
+    tags = StringField('Tags(separate with space)', validators=[Optional(), Length(0, 64)])
     post_id = HiddenField('post_id')
     from_draft = HiddenField('from_draft')
     submit = SubmitField('Submit')

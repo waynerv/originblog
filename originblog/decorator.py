@@ -1,7 +1,9 @@
 from functools import wraps
 
-from flask import abort
+from flask import abort, flash, url_for, Markup
 from flask_login import current_user
+
+from originblog.utils import redirect_back
 
 
 def permission_required(permission):
@@ -22,3 +24,20 @@ def permission_required(permission):
 def admin_required(func):
     """检查访问视图的用户是否拥有管理员权限"""
     return permission_required('ADMINSTRATE')(func)
+
+
+def confirm_required(view):
+    """检查访问视图的用户是否已确认账户"""
+    @wraps(view)
+    def wrapped_view(*args, **kwargs):
+        if not current_user.confirmed:
+            message = Markup(
+                'Please confirm your account first.'
+                'Not receive the email?'
+                '<a class="alert-link" href="%s">Resend Confirm Email</a>' % url_for('auth.resend_confirm_email')
+            )
+            flash(message, 'warning')
+            return redirect_back()
+        return view(*args, **kwargs)
+
+    return wrapped_view

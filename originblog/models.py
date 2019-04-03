@@ -16,6 +16,7 @@ from originblog.extensions import db
 from originblog.settings import BlogSettings
 from originblog.settings import Operations
 
+# 获取博客配置
 COMMENT_STATUS = BlogSettings.COMMENT_STATUS
 GAVATAR_CDN_BASE = BlogSettings.GAVATAR_CDN_BASE
 GAVATAR_DEFAULT_IMAGE = BlogSettings.GAVATAR_DEFAULT_IMAGE
@@ -47,7 +48,7 @@ def slugify(text, delim=u'-'):
     result = []
     for word in _punct_re.split(text.lower()):
         result.extend(unidecode(word).lower().split())
-    return unidecode(delim.join(result))
+    return unidecode(delim.join(result))[:230]
 
 
 class Role(db.Document):
@@ -158,7 +159,7 @@ class User(db.Document, UserMixin):
         return self.role and permission in self.role.permissions
 
     def set_role(self):
-        """除网站管理员外，为每个用户指定初始角色为reader（"""
+        """除网站管理员外，为每个用户指定初始角色为reader"""
         if self.email != current_app.config['ORIGINBLOG_ADMIN_EMAIL']:
             self.role = Role.objects.filter(role_name='reader').first()
         else:
@@ -198,15 +199,20 @@ class Post(db.Document):
         return [comment for comment in self.comments if comment.reviewed is True]
 
     def clean(self):
-        """保存到数据库前更新时间戳并将markdown文本转换为html"""
+        """保存到数据库前更新时间戳, 生成标题别名并将markdown文本转换为html"""
         now = datetime.utcnow()
         if not self.pub_time:
             self.pub_time = now
         self.update_time = now
-        self.set_slug(self.title)
+        if not self.slug:
+            self.set_slug(self.title)
+
         self.html_content = markdown2.markdown(self.raw_content,
                                                extras=['code-friendly', 'fenced-code-blocks', 'tables'])
         self.html_content = get_clean_html_content(self.html_content)
+        # 若未设置摘要，自动截取正文作为摘要
+        if not self.abstract:
+            self.abstract = self.html_content[:140]
 
     def to_dict(self):
         """把类的对象转化为 dict 类型的数据，将对象序列化"""
@@ -268,11 +274,13 @@ class Comment(db.Document):
     md_content = db.StringField(required=True)
     html_content = db.StringField(required=True)
     pub_time = db.DateTimeField()
-    update_time = db.DateTimeField()
+    update_time = db.DateTimeField()  # TODO:评论发布后不应可以修改，考虑删除该字段
     reply_to = db.ReferenceField('self')
     status = db.StringField(choices=COMMENT_STATUS, default='pending')
     from_post_author = db.BooleanField(default=False)
+    from_admin = db.BooleanField(default=False)
     gavatar_id = db.StringField(default='00000000000')
+    # TODO:标识评论来源于管理员
 
     def clean(self):
         """保存到数据库前更新时间戳,生成头像id，并将markdown文本转换为html"""
@@ -313,7 +321,7 @@ class Comment(db.Document):
     }
 
 
-class PostStatistics(db.Document):
+class PostStatistic(db.Document):
     """统计每篇文章的阅读次数等统计信息"""
     post = db.ReferenceField(Post)
     visit_count = db.IntField(default=0)
