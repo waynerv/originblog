@@ -19,7 +19,8 @@ class BlogSettings:
         'donate_img_url': 'pending',
         'dispaly_wechat':True,
         'wechat_message': 'pending',
-        'wechat_img_url': 'pending,'
+        'wechat_img_url': 'pending',
+        'baidu_site_verification': os.getenv('baidu_site_verification', 'yOI4ewdkCY')
     }
     SOCIAL_NETWORKS = {
         'weibo': {'fa_icon': 'fa fa-weibo', 'url': None},
@@ -34,6 +35,9 @@ class BlogSettings:
         'writer': ['COMMENT', 'POST'],
         'editor': ['COMMENT', 'POST', 'MODERATE'],
         'admin': ['COMMENT', 'POST', 'MODERATE', 'ADMINISTRATE']
+    }
+    SEARCH_ENGINE_SUBMIT_URLS = {
+        'baidu': 'pending'
     }
 
 

@@ -23,6 +23,7 @@ mongoengine = "*"
 flask-mongoengine = "*"
 markdown2 = "*"
 bleach = "*"
+requests = "*"
 
 [requires]
 python_version = "3.6"

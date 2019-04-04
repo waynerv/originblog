@@ -6,11 +6,11 @@ from flask_login import login_required, current_user
 from mongoengine import NotUniqueError, DoesNotExist, MultipleObjectsReturned
 from mongoengine.queryset import Q
 
-from originblog.extensions import db
 from originblog.forms import PostForm, AboutForm, WidgetForm
 from originblog.models import Post, Comment, PostStatistic, Widget
 from originblog.utils import redirect_back
 from originblog.decorator import admin_required, permission_required
+from originblog.signals import post_published
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -65,6 +65,9 @@ class Posts(MethodView):
             post_statistic.verbose_count_base = random.randint(500, 5000)
             post_statistic.save()
 
+            # 发送文章发布的信号
+            post_published.send(current_app._get_current_object(), post=post)
+
             flash('Post published.', 'success')
             return redirect(url_for('blog.show_post', slug=post.slug))
         return render_template('admin/new_post.html', form=form)
@@ -72,7 +75,6 @@ class Posts(MethodView):
 
 @admin_bp.route('/post/edit/<int:post_id>', methods=['GET', 'POST'])
 @admin_bp.route('/post/delete/<int:post_id>', methods=['POST'])
-
 class PostItem(MethodView):
     decorators = [login_required, permission_required('POST')]
     # TODO:管理员发表的文章或评论只有管理员可修改
@@ -187,10 +189,6 @@ class Comments(MethodView):
 @admin_bp.route('/comment/manage')
 class CommentItem(MethodView):
     decorators = [login_required, permission_required('MODERATE')]
-
-
-    def get(self):
-        pass
 
     def put(self, pk):  # pk为Comment模型的主键，默认为Comment.id(即_id)
         """更改评论审核状态"""
@@ -314,21 +312,21 @@ class PostStatisticItem(MethodView):
         return render_template('admin/show_statistic',post_statistic=post_statistic, trackers=tracker_pagination)
 
 
-@admin_bp.route('/settings', methods=['GET', 'POST'])
-@login_required
-def settings():
-    form = AboutForm()
-    admin = Admin.query.first_or_404()
-
-    if form.validate_on_submit():
-        admin.blog_title = form.blog_title.data
-        admin.blog_sub_title = form.blog_sub_title.data
-        admin.about = form.about.data
-        db.session.commit()
-        flash('Settings updated.', 'success')
-        return redirect(url_for('blog.index'))
-
-    form.blog_title.data = admin.blog_title
-    form.blog_sub_title.data = admin.blog_sub_title
-    form.about.data = admin.about
-    return render_template('admin/edit_about.html', form=form)
+# @admin_bp.route('/settings', methods=['GET', 'POST'])
+# @login_required
+# def settings():
+#     form = AboutForm()
+#     admin = Admin.query.first_or_404()
+#
+#     if form.validate_on_submit():
+#         admin.blog_title = form.blog_title.data
+#         admin.blog_sub_title = form.blog_sub_title.data
+#         admin.about = form.about.data
+#         db.session.commit()
+#         flash('Settings updated.', 'success')
+#         return redirect(url_for('blog.index'))
+#
+#     form.blog_title.data = admin.blog_title
+#     form.blog_sub_title.data = admin.blog_sub_title
+#     form.about.data = admin.about
+#     return render_template('admin/edit_about.html', form=form)

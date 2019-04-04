@@ -5,6 +5,7 @@ from mongoengine.queryset.visitor import Q
 from originblog.forms import CommentForm, UserCommentForm
 from originblog.models import Post, Comment, Widget, User
 from originblog.utils import redirect_back
+from originblog.signals import post_visited
 
 blog_bp = Blueprint('blog', __name__)
 
@@ -54,11 +55,12 @@ def show_post(slug):
     """
     post = Post.objects.get_or_404(slug=slug)
 
+    # 若用户为认证用户，使用专门的评论表单
     if current_user.is_authenticated:
         form = UserCommentForm()
         form.author.data = current_user.name
-        form.email.data = current_app.config['ORIGINBLOG_ADMIN_EMAIL']
-        form.homepage.data = url_for('blog.index')
+        form.email.data = current_user.email
+        form.homepage.data = current_user.homepage
     else:
         form = CommentForm()
 
@@ -87,6 +89,8 @@ def show_post(slug):
     per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
     comment_pagination = Comment.objects.filter(post_slug=post.slug, status='approved').paginate(page,
                                                                                                  per_page=per_page)
+    # 发送文章被浏览的信号
+    post_visited.send(current_app._get_current_object(), post=post)
 
     return render_template('blog/post.html', post=post, comment_pagination=comment_pagination, form=form)
 

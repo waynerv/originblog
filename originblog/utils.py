@@ -1,3 +1,4 @@
+import requests
 from urllib.parse import urlparse, urljoin
 
 from flask import request, redirect, url_for
@@ -34,3 +35,9 @@ def is_safe_url(target):
     ref_url = urlparse(request.host_url)  # 将请求的主机地址（含协议）解析为6元组(scheme, netloc, path, params, query, fragment)
     test_url = urlparse(urljoin(request.host_url, target))  # 合并baseurl和url， 优先保留url中的地址（因为target可能是相对地址）
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc  # 对比网址的主机地址
+
+
+def submit_url_to_baidu(baidu_url, url):
+    """使用request手动提交文章链接到百度站长平台"""
+    result = requests.post(baidu_url, data=url)
+    return result

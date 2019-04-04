@@ -328,6 +328,18 @@ class PostStatistic(db.Document):
     verbose_count_base = db.IntField(default=0)
 
 
+class Tracker(db.Document):
+    post = db.ReferenceField(Post)
+    ip = db.StringField()
+    user_agent = db.StringField()
+    create_time = db.DatetimeField(default=datetime.utcnow)
+
+    meta = {
+        'indexes': ['ip'],
+        'ordering': ['-create_time']
+    }
+
+
 class Widget(db.Document):
     """在主页显示文本内容的小组件"""
     title = db.StringField(default='widget')
