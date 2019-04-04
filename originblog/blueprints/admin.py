@@ -26,11 +26,11 @@ class Posts(MethodView):
     """所有文章资源"""
     decorators = [login_required, permission_required('POST')]
 
-    def get(self):  # TODO：对文章内容进行搜索
+    def get(self, post_type='post'):  # TODO：对文章内容进行搜索
         """获取所有文章"""
         page = request.args.get('page', default=1, type=int)
         per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
-        post_query = Post.objects.order_by('-update_time', '-weight')
+        post_query = Post.objects.filter(post_type=post_type).order_by('-update_time', '-weight')
 
         # 没有审阅权限的用户只能获取自己发表的文章
         if not current_user.can('MODERATE'):
@@ -39,7 +39,7 @@ class Posts(MethodView):
         pagination = post_query.paginate(page, per_page)
         return render_template('admin/manage_post.html', pagination=pagination)
 
-    def post(self):
+    def post(self, post_type='post' ):
         """增加新文章"""
         form = PostForm()
 
@@ -299,9 +299,15 @@ class PostStatistics(MethodView):
 
     def get(self):
         """获取文章统计信息列表"""
+        filter_rule = request.args.get('filter', 'posts')  # TODO：对评论字符串内容进行搜索
+        if filter_rule == 'posts':
+            filter_statistics = PostStatistic.objects.filter(post__post_type='post')
+        elif filter_rule == 'pages':
+            filter_statistics = PostStatistic.objects.filter(post__post_type='page')
+
         page = request.args.get('page', default=1, type=int)
         per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
-        pagination = PostStatistic.objects.paginate(page, per_page)
+        pagination = filter_statistics.paginate(page, per_page)
         return render_template('admin/manage_statistic.html', pagination=pagination)
 
 

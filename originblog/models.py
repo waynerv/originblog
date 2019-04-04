@@ -186,9 +186,10 @@ class Post(db.Document):
     update_time = db.DateTimeField()
     category = db.StringField(max_length=64, default='default')
     tags = db.ListField(db.StringField(max_length=30))
-    can_comment = db.BooleanField(default=True)
-    is_draft = db.BooleanField(default=False)
     weight = db.IntField(default=10)
+    can_comment = db.BooleanField(default=True)
+    from_admin = db.BooleanField(default=False)
+    post_type = db.StringField(max_length=64, default='post')  # 将使用'page'类型保存捐赠、博客介绍等专用页面
 
     def set_slug(self, title):
         """根据标题自动生成标题别名"""
@@ -224,44 +225,8 @@ class Post(db.Document):
         return post_dict
 
     meta = {
-        'allow_inheritance': True,
         'indexes': ['slug'],
         'ordering': ['-pub_time']
-    }
-
-
-class Draft(db.Document):
-    """定义草稿数据模型"""
-    title = db.StringField(max_length=255, required=True)
-    slug = db.StringField(max_length=255, required=True, unique=True)
-    abstract = db.StringField(max_length=255)
-    author = db.ReferenceField(User)
-    html_content = db.StringField(required=True)
-    raw_content = db.StringField(required=True)
-    pub_time = db.DateTimeField()
-    update_time = db.DateTimeField()
-    category = db.StringField(max_length=64, default='default')
-    tags = db.ListField(db.StringField(max_length=30))
-    is_draft = db.BooleanField(default=True)
-    weight = db.IntField(default=10)
-
-    def set_slug(self, title):
-        """根据标题自动生成标题别名"""
-        self.slug = slugify(title)
-
-    def clean(self):
-        """保存到数据库前更新时间戳并将markdown文本转换为html"""
-        now = datetime.utcnow()
-        if not self.sub_time:
-            self.pub_time = now
-        self.update_time = now
-        self.html_content = markdown2.markdown(self.raw_content,
-                                               extras=['code-friendly', 'fenced-code-blocks', 'tables'])
-        self.html_content = get_clean_html_content(self.html_content)
-
-    meta = {
-        'indexes': ['slug'],
-        'ordering': ['-update_time']
     }
 
 
@@ -281,7 +246,6 @@ class Comment(db.Document):
     from_post_author = db.BooleanField(default=False)
     from_admin = db.BooleanField(default=False)
     gavatar_id = db.StringField(default='00000000000')
-    # TODO:标识评论来源于管理员
 
     def clean(self):
         """保存到数据库前更新时间戳,生成头像id，并将markdown文本转换为html"""
@@ -333,7 +297,7 @@ class Tracker(db.Document):
     post = db.ReferenceField(Post, reverse_delete_rule=db.CASCADE)  # 与文章级联删除
     ip = db.StringField()
     user_agent = db.StringField()
-    create_time = db.DatetimeField(default=datetime.utcnow)
+    create_time = db.DateTimeField(default=datetime.utcnow)
 
     meta = {
         'indexes': ['ip'],

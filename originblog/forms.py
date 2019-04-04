@@ -4,7 +4,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Valid
     HiddenField, IntegerField, RadioField, SelectField
 from wtforms.validators import DataRequired, Length, Email, URL, Optional, Regexp, EqualTo
 
-from originblog.models import Draft, Post, User
+from originblog.models import Post, User
 from originblog.settings import BlogSettings
 
 ROLES = [(i, i) for i in BlogSettings.ROLE_PERMISSION_MAP]
@@ -110,8 +110,6 @@ class PostForm(FlaskForm):
     abstract = TextAreaField('Abstract', validators=[Optional(), Length(0, 255)])
     category = StringField('Category', validators=[Optional(), Length(0, 64)])
     tags = StringField('Tags(separate with space)', validators=[Optional(), Length(0, 64)])
-    post_id = HiddenField('post_id')
-    from_draft = HiddenField('from_draft')
     submit = SubmitField('Submit')
 
     # def __init__(self, *args, **kwargs):
@@ -119,18 +117,12 @@ class PostForm(FlaskForm):
     #     self.category.choices = [(category.id, category.name)
     #                              for category in Category.query.order_by(Category.name).all()]
 
-    def validate_slug(self, field):
-        """验证是否有已重复的slug"""
-        if self.from_draft.data and self.from_draft.data == 'true':
-            posts = Draft.objects.filter(slug=field.data)
-        else:
-            posts = Post.objects.filter(slug=field.data)
-        if posts.count() > 0:
-            if not self.post_id.data or str(posts[0].id) != self.post_id.data:
-                raise ValidationError('slug already in use')
-
-
-SuPostForm = model_form(Post, exclude=['pub_time', 'update_time', 'html_content', 'category', 'tags'])
+    # def validate_slug(self, field):
+    #     """验证是否有已重复的slug"""
+    #     posts = Post.objects.filter(slug=field.data)
+    #     if posts.count() > 0:
+    #         if not self.post_id.data or str(posts[0].id) != self.post_id.data:
+    #             raise ValidationError('slug already in use')
 
 
 class CommentForm(FlaskForm):

@@ -8,6 +8,11 @@ class BlogSettings:
     BLOG_META = {
         'name': 'Origin Blog',
         'subtitle': 'Where everthing begins.',
+        'description': os.getenv('description', 'Oct Blog Description'),
+        'owner': os.getenv('owner', 'Waynerv'),
+        'keywords': os.getenv('keywords','python,django,flask,docker,MongoDB'),
+        'custome_entry1': 'Donation',
+        'custome_entry2': 'About',
         'bg_home': 'static/img/home-bg.jpg',
         'bg_post': 'static/img/post-bg.jpg',
         'bg_about': 'static/img/about-bg.jpg',
@@ -41,6 +46,7 @@ class BlogSettings:
     }
 
 
+
 class Operations:
     CONFIRM = 'confirm'
     RESET_PASSWORD = 'reset-password'
@@ -63,6 +69,7 @@ class BaseConfig(object):
     ORIGINBLOG_ADMIN_EMAIL = os.getenv('ORIGINBLOG_ADMIN_EMAIL')
 
     ORIGINBLOG_POST_PER_PAGE = 10
+    ORIGINBLOG_COMMENT_PER_PAGE = 10
     ORIGINBLOG_MANAGE_POST_PER_PAGE = 20
     ORIGINBLOG_MANAGE_COMMENT_PER_PAGE = 20
     ORIGINBLOG_MANAGE_CATEGORY_PER_PAGE = 10

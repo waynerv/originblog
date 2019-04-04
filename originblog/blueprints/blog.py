@@ -15,7 +15,7 @@ def index():
     """查询所有已发表的文章，根据特定查询参数进行筛选分页，传入到首页模板"""
 
     # 获取已发表并且权重值大于0的文章的QuerySet，按权重和发表时间排序
-    pub_posts = Post.objects.filter(is_draft=False).order_by('-weight', '-pub_time')
+    pub_posts = Post.objects.filter(post_type='post').order_by('-weight', '-pub_time')
     posts = pub_posts.filter(Q(weight__gt=0) | Q(weight=None))
 
     # 根据查询参数获取特定分类的文章QuerySet
@@ -45,15 +45,16 @@ def index():
                            cur_tag=tag, cur_keywords=keywords)
 
 
-@blog_bp.route('/post/<string:slug>', methods=['GET', 'Post'])
-def show_post(slug):
+@blog_bp.route('/posts/<slug>', methods=['GET', 'Post'])
+def show_post(slug, post_type='post'):
     """显示文章正文、评论列表与评论表单并处理表单提交。
 
     已登录用户不需要手动填写评论表单的个人信息,通过查询参数reply-to判断是否为评论回复，并进行相应处理
     :param slug: 文章的标题别名
+    :param post_type: 显示的文章类型（用来区分专用页面）
     :return: 渲染模板或提交表单后重定向回原页面
     """
-    post = Post.objects.get_or_404(slug=slug)
+    post = Post.objects.get_or_404(slug=slug, post_type=post_type)
 
     # 若用户为认证用户，使用专门的评论表单
     if current_user.is_authenticated:
@@ -73,7 +74,8 @@ def show_post(slug):
                           post_title=post.title)
         reply_to = request.args.get('replyto')
         if reply_to:
-            comment.reply_to = Comment.objects.get_or_404(id=reply_to)
+            comment.reply_to = Comment.objects.get_or_404(pk=reply_to)
+        # 管理员和文章作者发布的评论不需要审核
         if current_user.is_authenticated and current_user.username == post.author.username:
             comment.from_post_author = True
             comment.status = 'approved'
@@ -91,24 +93,33 @@ def show_post(slug):
                                                                                                  per_page=per_page)
     # 发送文章被浏览的信号
     post_visited.send(current_app._get_current_object(), post=post)
+    # 根据文章类型使用不同的模板
+    template = {
+        'post': 'blog/post.html',
+        'page': 'blog/page.html'
+    }
 
-    return render_template('blog/post.html', post=post, comment_pagination=comment_pagination, form=form)
+    return render_template(template[post_type], post=post, comment_pagination=comment_pagination, form=form)
 
 
-@blog_bp.route('/reply/comment/<string:comment_id>')  # TODO:id类型的验证，直接从回复按钮跳转
-def reply_comment(comment_id):
+# 为专用页面page注册路由
+blog_bp.add_url_rule('/pages/<slug>/', 'show_page', show_post, defaults={'post_type': 'page'}, methods=['GET', 'POST'])
+
+
+@blog_bp.route('/reply/comment/<pk>')  # TODO:id类型的验证，直接从回复按钮跳转
+def reply_comment(pk):
     """实现评论的回复功能
 
     以该视图作为中转传递被回复的评论的id。
     在show_post视图中获取查询参数并进行相应处理。
-    :param comment_id: 被回复的comment id
+    :param pk: 被回复的comment id
     :return: 跳转到表单填写页面或返回
     """
-    comment = Comment.objects.get_or_404(id=comment_id)
+    comment = Comment.objects.get_or_404(pk=pk)
     post = Post.objects.get_or_404(slug=comment.post_slug)
     if post.can_comment:
         return redirect(
-            url_for('blog.show_post', slug=post.slug, replyto=comment_id,
+            url_for('blog.show_post', slug=post.slug, replyto=pk,
                     author=comment.author) + '#comment-form')
     else:
         flash('This post is comment disabled.', 'warning')
@@ -127,7 +138,7 @@ def author_detail(username):
     return render_template('blog/author.html', user=author, pagination=pagination)
 
 
-@blog_bp.route('/achive')
+@blog_bp.route('/archive')
 def archive():
     """TODO:按时间归档文章"""
     posts = Post.objects.filter(is_draft=False).order_by('-pub_time')

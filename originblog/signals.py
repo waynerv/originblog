@@ -39,12 +39,15 @@ def on_post_visited(sender, post, **kwargs):
 
 
 @post_published.connect
-def on_post_published(sender, post, **kwargs):
+def on_post_published(sender, post, post_type):
     """对文章进行SEO优化
 
     文章发布后，将链接地址提交到百度站长平台，以被收录进搜索结果
     """
-    post_url = url_for('blog.show_post', slug=post.slug, _external=True)
+    if post_type == 'post':
+        post_url = url_for('blog.show_post', slug=post.slug, _external=True)
+    else:
+        post_url = url_for('blog.show_page', slug=post.slug, _external=True)
     baidu_url = BlogSettings.SEARCH_ENGINE_SUBMIT_URLS['baidu']
     if baidu_url:
         result = submit_url_to_baidu(baidu_url, post_url)
