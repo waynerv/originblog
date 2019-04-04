@@ -217,13 +217,14 @@ class Post(db.Document):
     def to_dict(self):
         """把类的对象转化为 dict 类型的数据，将对象序列化"""
         post_dict = {'title': self.title, 'slug': self.slug, 'abstract': self.abstarct, 'author': self.author,
-                     'content_html': self.content, 'content_raw': self.raw_content, 'pub_time': self.pub_time,
+                     'content_html': self.html_content, 'content_raw': self.raw_content, 'pub_time': self.pub_time,
                      'update_time': self.update_time, 'category': self.category, 'tags': self.tags,
                      'comments': self.comments, 'can_comment': self.can_comment}
 
         return post_dict
 
     meta = {
+        'allow_inheritance': True,
         'indexes': ['slug'],
         'ordering': ['-pub_time']
     }
@@ -323,13 +324,13 @@ class Comment(db.Document):
 
 class PostStatistic(db.Document):
     """统计每篇文章的阅读次数等统计信息"""
-    post = db.ReferenceField(Post)
+    post = db.ReferenceField(Post, reverse_delete_rule=db.CASCADE)  # 与文章级联删除
     visit_count = db.IntField(default=0)
     verbose_count_base = db.IntField(default=0)
 
 
 class Tracker(db.Document):
-    post = db.ReferenceField(Post)
+    post = db.ReferenceField(Post, reverse_delete_rule=db.CASCADE)  # 与文章级联删除
     ip = db.StringField()
     user_agent = db.StringField()
     create_time = db.DatetimeField(default=datetime.utcnow)

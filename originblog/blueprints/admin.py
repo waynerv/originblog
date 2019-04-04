@@ -7,7 +7,7 @@ from mongoengine import NotUniqueError, DoesNotExist, MultipleObjectsReturned
 from mongoengine.queryset import Q
 
 from originblog.forms import PostForm, AboutForm, WidgetForm
-from originblog.models import Post, Comment, PostStatistic, Widget
+from originblog.models import Post, Comment, PostStatistic, Widget, Tracker
 from originblog.utils import redirect_back
 from originblog.decorator import admin_required, permission_required
 from originblog.signals import post_published
@@ -15,9 +15,15 @@ from originblog.signals import post_published
 admin_bp = Blueprint('admin', __name__)
 
 
-@admin_bp.route('/post/manage')
+class AdminIndex(MethodView):
+    decorators = [login_required, permission_required('POST')]
+
+    def get(self):
+        return render_template('admin/index.html')
+
+
 class Posts(MethodView):
-    """所有文章"""
+    """所有文章资源"""
     decorators = [login_required, permission_required('POST')]
 
     def get(self):  # TODO：对文章内容进行搜索
@@ -73,10 +79,10 @@ class Posts(MethodView):
         return render_template('admin/new_post.html', form=form)
 
 
-@admin_bp.route('/post/edit/<int:post_id>', methods=['GET', 'POST'])
-@admin_bp.route('/post/delete/<int:post_id>', methods=['POST'])
 class PostItem(MethodView):
+    """单篇文章资源"""
     decorators = [login_required, permission_required('POST')]
+
     # TODO:管理员发表的文章或评论只有管理员可修改
 
     def get(self, slug, form=None):
@@ -97,8 +103,8 @@ class PostItem(MethodView):
 
         return render_template('admin/edit_post.html', form=form)
 
-    def post(self, slug):
-        """修改文章"""
+    def put(self, slug):
+        """修改文章内容"""
         post = Post.objects.get_or_404(slug)
         # 只有管理员或文章作者才有权限修改文章
         if not current_user.is_admin() and post.author != current_user._get_current_object():
@@ -112,15 +118,15 @@ class PostItem(MethodView):
             post.raw_content = form.raw_content.data
             post.category = form.category.data
             post.tags = form.tag.data.split() if form.tags.data else None
-            # 修改文章包括标题不会更改slug，以确保链接永久
+            # 修改文章包括标题不会更改slug，以确保链接的永久
             post.save()
 
             flash('Post updated.', 'success')
             return redirect(url_for('blog.show_post', slug=post.slug))
         return self.get(slug, form)
 
-    def put(self, slug):
-        """设置文章是否可评论实现为PUT方法"""
+    def patch(self, slug):
+        """设置文章是否可评论"""
         post = Post.objects.get_or_404(slug)
         # 拥有审阅权限才能设置文章是否可评论
         if not current_user.can('MODERATE'):
@@ -155,6 +161,7 @@ class PostItem(MethodView):
 
 
 class Comments(MethodView):
+    """所有评论资源"""
     decorator = [login_required, permission_required('MODERATE')]
 
     def get(self):
@@ -182,23 +189,21 @@ class Comments(MethodView):
         return redirect_back()  # TODO：删除操作需要附加next参数
 
 
-@admin_bp.route('/comment/approve/<int:comment_id>', methods=['POST'])
-
-@admin_bp.route('/comment/delete/<int:comment_id>', methods=['POST'])
-@admin_bp.route('/post/set-comment/<int:post_id>', methods=['POST'])
-@admin_bp.route('/comment/manage')
 class CommentItem(MethodView):
+    """单条评论资源（不可修改内容）"""
     decorators = [login_required, permission_required('MODERATE')]
 
-    def put(self, pk):  # pk为Comment模型的主键，默认为Comment.id(即_id)
+    def patch(self, pk):  # pk为Comment模型的主键，默认为Comment.id(即_id)
         """更改评论审核状态"""
         comment = Comment.objects.get_or_404(pk=pk)
-        comment.status = 'approved'
+        if request.form['status'] == 'approved':
+            comment.status = 'approved'
+        elif request.form['status'] == 'spam':
+            comment.status = 'approved'
         comment.save()
 
         flash('Comment approved.', 'success')
         return redirect_back()  # TODO：审核操作需要附加next参数
-
 
     def delete(self, pk):
         """删除评论"""
@@ -211,11 +216,9 @@ class CommentItem(MethodView):
         return redirect_back()  # TODO：审核操作需要附加next参数
 
 
-@admin_bp.route('/link/manage')
-@admin_bp.route('/link/new', methods=['GET', 'POST'])
 class Widgets(MethodView):
+    """所有widget资源"""
     decorators = [login_required, admin_required]
-
 
     def get(self):
         """获取widget列表"""
@@ -244,6 +247,7 @@ class Widgets(MethodView):
 
 
 class WidgetItem(MethodView):
+    """单个widget资源"""
     decorators = [login_required, admin_required]
 
     def get(self, pk, form=None):
@@ -262,8 +266,8 @@ class WidgetItem(MethodView):
                 form.content = widget.html_content
         return render_template('admin/edit_widget.html', form=form)
 
-    def post(self, pk):
-        """修改widget"""
+    def put(self, pk):
+        """修改widget内容"""
         widget = Widget.objects.get_or_404(pk)
 
         form = WidgetForm
@@ -290,9 +294,11 @@ class WidgetItem(MethodView):
 
 
 class PostStatistics(MethodView):
+    """所有文章统计信息资源"""
     decorators = [login_required, admin_required]
 
     def get(self):
+        """获取文章统计信息列表"""
         page = request.args.get('page', default=1, type=int)
         per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
         pagination = PostStatistic.objects.paginate(page, per_page)
@@ -300,16 +306,34 @@ class PostStatistics(MethodView):
 
 
 class PostStatisticItem(MethodView):
+    """单篇文章统计信息资源"""
     decorators = [login_required, admin_required]
 
     def get(self, slug):
+        """获取指定文章的统计信息和浏览记录"""
         page = request.args.get('page', default=1, type=int)
         per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
 
         post = Post.objects.get_or_404(slug=slug)
         post_statistic = PostStatistics.objects.get_or_404(post=post)
         tracker_pagination = Tracker.objects.filter(post=post).paginate(page, per_page)
-        return render_template('admin/show_statistic',post_statistic=post_statistic, trackers=tracker_pagination)
+        return render_template('admin/show_statistic', post_statistic=post_statistic, trackers=tracker_pagination)
+
+
+# 注册路由
+admin_bp.add_url_rule('/', view_func=Posts.as_view('index'), methods=['GET'])
+
+admin_bp.add_url_rule('/posts', view_func=Posts.as_view('posts'), methods=['GET', 'POST'])
+admin_bp.add_url_rule('/posts/<slug>', view_func=Posts.as_view('post'), methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+
+admin_bp.add_url_rule('/posts/comments', view_func=Comments.as_view('comments'), methods=['GET', 'POST'])
+admin_bp.add_url_rule('/posts/comments/<pk>', view_func=CommentItem.as_view('comment'), methods=['PATCH', 'DELETE'])
+
+admin_bp.add_url_rule('/widgets', view_func=Widgets.as_view('widgets'), methods=['GET', 'POST'])
+admin_bp.add_url_rule('/widgets/<pk>', view_func=WidgetItem.as_view('widget'), methods=['GET', 'PUT', 'DELETE'])
+
+admin_bp.add_url_rule('/posts/statistics', view_func=PostStatistics.as_view('statistics'), methods=['GET'])
+admin_bp.add_url_rule('/posts/statistics/<slug>', view_func=PostStatisticItem.as_view('statistic'), methods=['GET'])
 
 
 # @admin_bp.route('/settings', methods=['GET', 'POST'])
