@@ -104,12 +104,13 @@ class ChangePasswordForm(FlaskForm):
 class PostForm(FlaskForm):
     """定义文章编辑表单"""
     title = StringField('Title', validators=[DataRequired(), Length(1, 60)])
-    # TODO slug = StringField('Slug', validators=[DataRequired(), Length(1, 255)])
+    # TODO:slug = StringField('Slug', validators=[Optional(), Length(0, 230)])
     weight = IntegerField('Weight', default=10)
     raw_content = TextAreaField('Content', validators=[DataRequired()])
     abstract = TextAreaField('Abstract', validators=[Optional(), Length(0, 255)])
     category = StringField('Category', validators=[Optional(), Length(0, 64)])
     tags = StringField('Tags(separate with space)', validators=[Optional(), Length(0, 64)])
+    type = RadioField('Type', choices=[('post', 'post'), ('page', 'page')], default='post')
     submit = SubmitField('Submit')
 
     # def __init__(self, *args, **kwargs):
@@ -153,13 +154,6 @@ class SessionCommentForm(FlaskForm):
     homepage = HiddenField('Homepage')
     content = TextAreaField('* Comment', validators=[DataRequired()])
     comment_id = HiddenField('comment_id')
-
-
-class AboutForm(FlaskForm):
-    blog_title = StringField('Blog title', validators=[DataRequired(), Length(1, 60)])
-    blog_sub_title = StringField('Subtitle', validators=[DataRequired(), Length(1, 100)])
-    about = TextAreaField('About', validators=[DataRequired()])
-    submit = SubmitField('Submit')
 
 
 class WidgetForm(FlaskForm):

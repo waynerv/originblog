@@ -44,10 +44,12 @@ def on_post_published(sender, post, post_type):
 
     文章发布后，将链接地址提交到百度站长平台，以被收录进搜索结果
     """
-    if post_type == 'post':
-        post_url = url_for('blog.show_post', slug=post.slug, _external=True)
-    else:
-        post_url = url_for('blog.show_page', slug=post.slug, _external=True)
+    post_type = post.type
+    endpoints = {
+        'post': 'blog.show_post',
+        'page': 'blog.show_page'
+    }
+    post_url = url_for(endpoints[post_type], slug=post.slug, _external=True)
     baidu_url = BlogSettings.SEARCH_ENGINE_SUBMIT_URLS['baidu']
     if baidu_url:
         result = submit_url_to_baidu(baidu_url, post_url)

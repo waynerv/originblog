@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from mongoengine import NotUniqueError, DoesNotExist, MultipleObjectsReturned
 from mongoengine.queryset import Q
 
-from originblog.forms import PostForm, AboutForm, WidgetForm
+from originblog.forms import PostForm, WidgetForm
 from originblog.models import Post, Comment, PostStatistic, Widget, Tracker
 from originblog.utils import redirect_back
 from originblog.decorator import admin_required, permission_required
@@ -30,7 +30,7 @@ class Posts(MethodView):
         """获取所有文章"""
         page = request.args.get('page', default=1, type=int)
         per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
-        post_query = Post.objects.filter(post_type=post_type).order_by('-update_time', '-weight')
+        post_query = Post.objects.filter(type=post_type).order_by('-update_time', '-weight')
 
         # 没有审阅权限的用户只能获取自己发表的文章
         if not current_user.can('MODERATE'):
@@ -39,9 +39,10 @@ class Posts(MethodView):
         pagination = post_query.paginate(page, per_page)
         return render_template('admin/manage_post.html', pagination=pagination)
 
-    def post(self, post_type='post' ):
+    def post(self, post_type='post'):
         """增加新文章"""
         form = PostForm()
+        form.type.data = post_type
 
         if form.validate_on_submit():
             title = form.title.data
@@ -50,13 +51,15 @@ class Posts(MethodView):
             raw_content = form.raw_content.data
             category = form.category.data
             tags = form.tag.data.split() if form.tags.data else None
+            type = form.type.data
             post = Post(
                 title=title,
                 abstract=abstract,
                 weight=weight,
                 raw_content=raw_content,
                 category=category,
-                tags=tags
+                tags=tags,
+                type = type
             )
             post.author = current_user._get_current_object()
             # 保存文章到数据库时，注意处理slug相同的情况
@@ -72,10 +75,15 @@ class Posts(MethodView):
             post_statistic.save()
 
             # 发送文章发布的信号
-            post_published.send(current_app._get_current_object(), post=post)
+            post_published.send(current_app._get_current_object(), post=post, post_type=post_type)
 
             flash('Post published.', 'success')
-            return redirect(url_for('blog.show_post', slug=post.slug))
+            # 跳转到对应端点
+            endpoints = {
+                'post': 'blog.show_post',
+                'page': 'blog.show_page'
+            }
+            return redirect(url_for(endpoints[post_type], slug=post.slug))
         return render_template('admin/new_post.html', form=form)
 
 
@@ -100,8 +108,9 @@ class PostItem(MethodView):
             form.raw_content.data = post.raw_content
             form.category.data = post.category
             form.tag.data = ' '.join(post.tags)
+            form.type.data = post.type
 
-        return render_template('admin/edit_post.html', form=form)
+        return render_template('admin/edit_post.html', form=form)  # TODO:模板是否可改为new_posyt.html
 
     def put(self, slug):
         """修改文章内容"""
@@ -118,11 +127,17 @@ class PostItem(MethodView):
             post.raw_content = form.raw_content.data
             post.category = form.category.data
             post.tags = form.tag.data.split() if form.tags.data else None
+            post.type = form.type.data
             # 修改文章包括标题不会更改slug，以确保链接的永久
             post.save()
 
             flash('Post updated.', 'success')
-            return redirect(url_for('blog.show_post', slug=post.slug))
+            post_type = post.type
+            endpoints = {
+                'post': 'blog.show_post',
+                'page': 'blog.show_page'
+            }
+            return redirect(url_for(endpoints[post_type], slug=post.slug))
         return self.get(slug, form)
 
     def patch(self, slug):
@@ -300,10 +315,12 @@ class PostStatistics(MethodView):
     def get(self):
         """获取文章统计信息列表"""
         filter_rule = request.args.get('filter', 'posts')  # TODO：对评论字符串内容进行搜索
-        if filter_rule == 'posts':
-            filter_statistics = PostStatistic.objects.filter(post__post_type='post')
+        if filter_rule == 'all':
+            filter_statistics = PostStatistic.objects
+        elif filter_rule == 'posts':
+            filter_statistics = PostStatistic.objects.filter(post__type='post')
         elif filter_rule == 'pages':
-            filter_statistics = PostStatistic.objects.filter(post__post_type='page')
+            filter_statistics = PostStatistic.objects.filter(post__type='page')
 
         page = request.args.get('page', default=1, type=int)
         per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
@@ -330,7 +347,10 @@ class PostStatisticItem(MethodView):
 admin_bp.add_url_rule('/', view_func=Posts.as_view('index'), methods=['GET'])
 
 admin_bp.add_url_rule('/posts', view_func=Posts.as_view('posts'), methods=['GET', 'POST'])
-admin_bp.add_url_rule('/posts/<slug>', view_func=Posts.as_view('post'), methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+admin_bp.add_url_rule('/posts/<slug>', view_func=PostItem.as_view('post'), methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+
+admin_bp.add_url_rule('/pages', view_func=Posts.as_view('pages'), methods=['GET', 'POST'])
+admin_bp.add_url_rule('/pages/<slug>', view_func=Posts.as_view('page'), methods=['GET', 'PUT', 'PATCH', 'DELETE'])
 
 admin_bp.add_url_rule('/posts/comments', view_func=Comments.as_view('comments'), methods=['GET', 'POST'])
 admin_bp.add_url_rule('/posts/comments/<pk>', view_func=CommentItem.as_view('comment'), methods=['PATCH', 'DELETE'])

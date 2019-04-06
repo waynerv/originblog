@@ -15,7 +15,7 @@ def index():
     """查询所有已发表的文章，根据特定查询参数进行筛选分页，传入到首页模板"""
 
     # 获取已发表并且权重值大于0的文章的QuerySet，按权重和发表时间排序
-    pub_posts = Post.objects.filter(post_type='post').order_by('-weight', '-pub_time')
+    pub_posts = Post.objects.filter(type='post').order_by('-weight', '-pub_time')
     posts = pub_posts.filter(Q(weight__gt=0) | Q(weight=None))
 
     # 根据查询参数获取特定分类的文章QuerySet
@@ -54,7 +54,7 @@ def show_post(slug, post_type='post'):
     :param post_type: 显示的文章类型（用来区分专用页面）
     :return: 渲染模板或提交表单后重定向回原页面
     """
-    post = Post.objects.get_or_404(slug=slug, post_type=post_type)
+    post = Post.objects.get_or_404(slug=slug)
 
     # 若用户为认证用户，使用专门的评论表单
     if current_user.is_authenticated:
@@ -85,7 +85,12 @@ def show_post(slug, post_type='post'):
 
         comment.save()
         flash('Thanks, your comment will be published after reviewed.', 'info')
-        return redirect(url_for('blog.show_post', slug=slug))
+        # 根据文章类型使用不同的端点
+        endpoints = {
+            'post': 'blog.show_post',
+            'page': 'blog.show_page'
+        }
+        return redirect(url_for(endpoints[post_type], slug=slug))
 
     page = request.args.get('page', default=1, type=int)
     per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
@@ -94,20 +99,21 @@ def show_post(slug, post_type='post'):
     # 发送文章被浏览的信号
     post_visited.send(current_app._get_current_object(), post=post)
     # 根据文章类型使用不同的模板
-    template = {
+    templates = {
         'post': 'blog/post.html',
         'page': 'blog/page.html'
     }
 
-    return render_template(template[post_type], post=post, comment_pagination=comment_pagination, form=form)
+    return render_template(templates[post_type], post=post, comment_pagination=comment_pagination, form=form)
 
 
 # 为专用页面page注册路由
 blog_bp.add_url_rule('/pages/<slug>/', 'show_page', show_post, defaults={'post_type': 'page'}, methods=['GET', 'POST'])
 
 
-@blog_bp.route('/reply/comment/<pk>')  # TODO:id类型的验证，直接从回复按钮跳转
-def reply_comment(pk):
+@blog_bp.route('/reply/comment/<pk>', defaults={'post_type': 'post'})
+@blog_bp.route('/reply/<post_type>/comment/<pk>')  # pk会被默认的string converter转换为字符串
+def reply_comment(pk, post_type):
     """实现评论的回复功能
 
     以该视图作为中转传递被回复的评论的id。
@@ -118,8 +124,12 @@ def reply_comment(pk):
     comment = Comment.objects.get_or_404(pk=pk)
     post = Post.objects.get_or_404(slug=comment.post_slug)
     if post.can_comment:
+        endpoints = {
+            'post': 'blog.show_post',
+            'page': 'blog.show_page'
+        }
         return redirect(
-            url_for('blog.show_post', slug=post.slug, replyto=pk,
+            url_for(endpoints[post_type], slug=post.slug, replyto=pk,
                     author=comment.author) + '#comment-form')
     else:
         flash('This post is comment disabled.', 'warning')
@@ -156,7 +166,12 @@ def sitemap():
 
     posts = Post.objects.filter(is_draft=False)
     for post in posts:
-        pages.append((url_for('blog.show_post', slug=post.slug, _external=True),
+        post_type = post.type
+        endpoints = {
+            'post': 'blog.show_post',
+            'page': 'blog.show_page'
+        }
+        pages.append((url_for(endpoints[post_type], slug=post.slug, _external=True),
                       post.update_time.datetime().data().isoformat(), 'weekly', '0.8'))
 
     sitemap_xml = render_template('blog/sitemap.xml', pages=pages)

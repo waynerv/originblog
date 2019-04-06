@@ -189,7 +189,7 @@ class Post(db.Document):
     weight = db.IntField(default=10)
     can_comment = db.BooleanField(default=True)
     from_admin = db.BooleanField(default=False)
-    post_type = db.StringField(max_length=64, default='post')  # 将使用'page'类型保存捐赠、博客介绍等专用页面
+    type = db.StringField(max_length=64, default='post')  # 将使用'page'类型保存捐赠、博客介绍等专用页面
 
     def set_slug(self, title):
         """根据标题自动生成标题别名"""
@@ -217,15 +217,27 @@ class Post(db.Document):
 
     def to_dict(self):
         """把类的对象转化为 dict 类型的数据，将对象序列化"""
-        post_dict = {'title': self.title, 'slug': self.slug, 'abstract': self.abstarct, 'author': self.author,
-                     'content_html': self.html_content, 'content_raw': self.raw_content, 'pub_time': self.pub_time,
-                     'update_time': self.update_time, 'category': self.category, 'tags': self.tags,
-                     'comments': self.comments, 'can_comment': self.can_comment}
+        post_dict = {
+            'title': self.title,
+            'slug': self.slug,
+            'abstract': self.abstarct,
+            'author': self.author,
+            'html_content': self.html_content,
+            'raw_content': self.raw_content,
+            'pub_time': self.pub_time,
+            'update_time': self.update_time,
+            'category': self.category,
+            'tags': self.tags,
+            'weight': self.weight,
+            'can_comment': self.can_comment,
+            'from_admin': self.from_admin,
+            'type': self.type,
+        }
 
         return post_dict
 
     meta = {
-        'indexes': ['slug'],
+        'indexes': ['slug', 'type'],  # 添加type索引以加快对专用页面的查询速度
         'ordering': ['-pub_time']
     }
 
