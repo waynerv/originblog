@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% from 'macros.html' import render_entire_pagination %}
 
-{% block title %} Author | {{ user.name }} {% endblock %}
+{% block title %} Author | {{ current_user.name }} {% endblock %}
 
 {% block header %}
     <header class="masthead" style="background-image: url({{ blog_meta.bg_about }})">

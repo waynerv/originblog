@@ -6,8 +6,8 @@ from flask_login import login_required, current_user
 from mongoengine import NotUniqueError, DoesNotExist, MultipleObjectsReturned
 from mongoengine.queryset import Q
 
-from originblog.forms import PostForm, WidgetForm
-from originblog.models import Post, Comment, PostStatistic, Widget, Tracker
+from originblog.forms import PostForm, WidgetForm, MetaPostForm, RegisterForm, MetaUserForm
+from originblog.models import Post, Comment, PostStatistic, Widget, Tracker, User, Role
 from originblog.utils import redirect_back
 from originblog.decorator import admin_required, permission_required
 from originblog.signals import post_published
@@ -16,7 +16,7 @@ admin_bp = Blueprint('admin', __name__)
 
 
 class AdminIndex(MethodView):
-    decorators = [login_required, permission_required('POST')]
+    decorators = [permission_required('POST')]
 
     def get(self):
         return render_template('admin/index.html')
@@ -24,7 +24,7 @@ class AdminIndex(MethodView):
 
 class Posts(MethodView):
     """所有文章资源"""
-    decorators = [login_required, permission_required('POST')]
+    decorators = [permission_required('POST')]
 
     def get(self, post_type='post'):  # TODO：对文章内容进行搜索
         """获取所有文章"""
@@ -89,14 +89,12 @@ class Posts(MethodView):
 
 class PostItem(MethodView):
     """单篇文章资源"""
-    decorators = [login_required, permission_required('POST')]
-
-    # TODO:管理员发表的文章或评论只有管理员可修改
+    decorators = [permission_required('POST')]
 
     def get(self, slug, form=None):
         """获取文章内容与编辑表单"""
         post = Post.objects.get_or_404(slug=slug)
-        # 只有管理员或文章作者才有权限修改文章
+        # 只有管理员或文章作者才有权限修改文章内容
         if not current_user.is_admin() and post.author != current_user._get_current_object():
             abort(403)
 
@@ -143,8 +141,10 @@ class PostItem(MethodView):
     def patch(self, slug):
         """设置文章是否可评论"""
         post = Post.objects.get_or_404(slug)
-        # 拥有审阅权限才能设置文章是否可评论
+        # 拥有审核权限才能设置文章是否可评论,管理员的文章只有管理员可设置
         if not current_user.can('MODERATE'):
+            abort(403)
+        elif not current_user.is_admin and post.from_admin:
             abort(403)
 
         if post.can_comment:
@@ -160,8 +160,10 @@ class PostItem(MethodView):
     def delete(self, slug):
         """删除文章"""
         post = Post.objects.get_or_404(slug)
-        # 需要有审核权限或文章作者才能够删除文章
+        # 需要有审核权限或文章作者才能够删除文章，管理员的文章只有管理员可删除
         if not current_user.can('MODERATE') and post.author != current_user._get_current_object():
+            abort(403)
+        elif not current_user.is_admin and post.from_admin:
             abort(403)
 
         try:
@@ -175,9 +177,124 @@ class PostItem(MethodView):
         return redirect_back()  # TODO：删除操作需要附加next参数
 
 
+class MetaPosts(MethodView):
+    """所有文章元资源"""
+    decorators = [admin_required]
+
+    def get(self, post_type='post'):  # TODO：对文章内容进行搜索
+        """获取所有文章"""
+        page = request.args.get('page', default=1, type=int)
+        per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
+        post_query = Post.objects.filter(type=post_type).order_by('-update_time', '-weight')
+
+        pagination = post_query.paginate(page, per_page)
+        return render_template('admin/manage_post.html', pagination=pagination)
+
+    def post(self):
+        """增加新文章"""
+        form = MetaPostForm()
+
+        if form.validate_on_submit():
+            title = form.title.data
+            abstract = form.abstract.data
+            raw_content = form.raw_content.data
+            pub_time = form.pub_time.data
+            category = form.category.data
+            tags = form.tag.data.split() if form.tags.data else None
+            weight = form.weight.data
+            can_comment = form.can_comment.data
+            type = form.type.data
+            post = Post(
+                title=title,
+                abstract=abstract,
+                pub_time=pub_time,
+                raw_content=raw_content,
+                category=category,
+                tags=tags,
+                weight=weight,
+                can_commen=can_comment,
+                type = type
+            )
+            post.author = current_user._get_current_object()  # TODO:如何修改文章作者，是否有必要
+            # 保存文章到数据库时，注意处理slug相同的情况
+            try:
+                post.save()
+            except NotUniqueError:
+                post.slug += str(int(time.time()))
+                post.save()
+
+            # 初始化文章的统计数据
+            post_statistic = PostStatistic(post=post)
+            post_statistic.verbose_count_base = random.randint(500, 5000)
+            post_statistic.save()
+
+            # 发送文章发布的信号
+            post_published.send(current_app._get_current_object(), post=post, post_type=post.type)
+
+            flash('Post published.', 'success')
+            # 跳转到对应端点
+            endpoints = {
+                'post': 'blog.show_post',
+                'page': 'blog.show_page'
+            }
+            return redirect(url_for(endpoints[post.type], slug=post.slug))
+        return render_template('admin/new_post.html', form=form)
+
+
+class MetaPostItem(MethodView):
+    """单篇文章元资源"""
+    decorators = [admin_required]
+
+    def get(self, slug, form=None):
+        """获取文章内容与编辑表单"""
+        post = Post.objects.get_or_404(slug=slug)
+        # 只有管理员或文章作者才有权限修改文章内容
+        if not current_user.is_admin() and post.author != current_user._get_current_object():
+            abort(403)
+
+        if not form:
+            form = MetaPostForm()
+            form.title.data = post.title
+            form.abstract.data = post.abstract
+            form.weight.data = post.weight
+            form.raw_content.data = post.raw_content
+            form.pub_time = post.pub_time
+            form.category.data = post.category
+            form.tag.data = ' '.join(post.tags)
+            form.can_comment = post.can_comment
+            form.type.data = post.type
+
+        return render_template('admin/edit_post.html', form=form)  # TODO:模板是否可改为new_posyt.html
+
+    def put(self, slug):
+        """修改文章内容"""
+        form = MetaPostForm()
+        if form.validate_on_submit():
+            post = Post.objects.get_or_404(slug)
+            post.title = form.title.data
+            post.abstract = form.abstract.data
+            post.raw_content = form.raw_content.data
+            post.pub_time = form.pub_time.data
+            post.category = form.category.data
+            post.tags = form.tag.data.split() if form.tags.data else None
+            post.weight = form.weight.data
+            post.can_comment = form.can_comment.data
+            post.type = form.type.data
+            # 修改文章包括标题不会更改slug，以确保链接的永久
+            post.save()
+
+            flash('Post updated.', 'success')
+            endpoints = {
+                'post': 'blog.show_post',
+                'page': 'blog.show_page'
+            }
+            return redirect(url_for(endpoints[post.type], slug=post.slug))
+        return self.get(slug, form)
+
+
 class Comments(MethodView):
     """所有评论资源"""
-    decorator = [login_required, permission_required('MODERATE')]
+    decorator = [permission_required('MODERATE')]
 
     def get(self):
         """获取评论列表,可进行分类筛选"""
@@ -206,7 +323,7 @@ class Comments(MethodView):
 
 class CommentItem(MethodView):
     """单条评论资源（不可修改内容）"""
-    decorators = [login_required, permission_required('MODERATE')]
+    decorators = [permission_required('MODERATE')]
 
     def patch(self, pk):  # pk为Comment模型的主键，默认为Comment.id(即_id)
         """更改评论审核状态"""
@@ -223,6 +340,7 @@ class CommentItem(MethodView):
     def delete(self, pk):
         """删除评论"""
         comment = Comment.objects.get_or_404(pk=pk)
+        # 来自管理员的评论只有管理员自己可以删除
         if not current_user.is_admin() and comment.from_admin:
             abort(403)
 
@@ -231,9 +349,96 @@ class CommentItem(MethodView):
         return redirect_back()  # TODO：审核操作需要附加next参数
 
 
+class Users(MethodView):
+    """所有用户"""
+    decorator = [permission_required('MODERATE')]
+
+    def get(self):
+        """获取所有用户列表"""
+        page = request.args.get('page', default=1, type=int)
+        per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
+        pagination = User.objects.paginate(page, per_page)
+        return render_template('admin/manage_user.html', pagination=pagination)
+
+    def post(self):
+        """手动添加新用户"""
+        form = RegisterForm()
+
+        if form.validate_on_submit():
+            name = form.name.data
+            username = form.username.data
+            email = form.email.data
+            password = form.password.data
+            user = User(
+                name=name,
+                username=username,
+                email=email
+            )
+            user.set_password(password)
+            user.email_confirmed = True
+            user.save()
+            flash('User created.', 'success')
+            return self.get()
+        return render_template('admin/new_user.html', form=form)
+
+
+class MetaUserItem(MethodView):
+    decorators = [admin_required]
+
+    def get(self, pk, form=None):
+        """获取用户资料与表单"""
+        user = User.objects.get_or_404(pk=pk)
+
+        if not form:
+            form = MetaUserForm()
+            form.email.data = user.email
+            form.email_confirmed.data = user.email_confirmed
+            form.name.data = user.name
+            form.bio.data = user.bio
+            form.homepage.data = user.homepage
+            form.weibo.data = user.social_networks.get('weibo')
+            form.weixin.data = user.social_networks.get('weixin')
+            form.github.data = user.social_networks.get('github')
+            form.role.data = user.role.role_name
+            form.active.data = user.active
+
+        return render_template('admin/edit_user.html', form=form)
+
+    def put(self, pk):
+        """修改用户资料"""
+        form = MetaUserForm()
+        if form.validate_on_submit():
+            user = User.objects.get_or_404(pk=pk)
+            user.email = form.eamil.data
+            user.email_confirmed = form.eamil_confirmed.data
+            user.name = form.name.data
+            user.bio = form.bio.data
+            user.homepage = form.homepage.data
+            user.social_networks['weibo'] = form.weibo.data
+            user.social_networks['weixin'] = form.weixin.data
+            user.social_networks['github'] = form.github.data
+            user.role = Role.objects.filter(role_name=form.role.data) or Role.objects.filter(role_name='reader')
+            user.active = form.active.data
+            user.save()
+
+            flash('User updated', 'success')
+            return Users.get()
+        return self.get(pk, form)
+
+    def delete(self, pk):
+        """删除用户"""
+        user = User.objects.get_or_404(pk=pk)
+        if user.is_admin():
+            flash('Admin can not be deleted.', 'warning')
+            return redirect_back()
+        user.delete()
+        flash('User deleted.', 'success')
+        return redirect_back()
+
+
 class Widgets(MethodView):
     """所有widget资源"""
-    decorators = [login_required, admin_required]
+    decorators = [admin_required]
 
     def get(self):
         """获取widget列表"""
@@ -263,7 +468,7 @@ class Widgets(MethodView):
 
 class WidgetItem(MethodView):
     """单个widget资源"""
-    decorators = [login_required, admin_required]
+    decorators = [admin_required]
 
     def get(self, pk, form=None):
         """获取widget内容与编辑表单"""
@@ -310,7 +515,7 @@ class WidgetItem(MethodView):
 
 class PostStatistics(MethodView):
     """所有文章统计信息资源"""
-    decorators = [login_required, admin_required]
+    decorators = [admin_required]
 
     def get(self):
         """获取文章统计信息列表"""
@@ -330,7 +535,7 @@ class PostStatistics(MethodView):
 
 class PostStatisticItem(MethodView):
     """单篇文章统计信息资源"""
-    decorators = [login_required, admin_required]
+    decorators = [admin_required]
 
     def get(self, slug):
         """获取指定文章的统计信息和浏览记录"""
@@ -360,23 +565,3 @@ admin_bp.add_url_rule('/widgets/<pk>', view_func=WidgetItem.as_view('widget'), m
 
 admin_bp.add_url_rule('/posts/statistics', view_func=PostStatistics.as_view('statistics'), methods=['GET'])
 admin_bp.add_url_rule('/posts/statistics/<slug>', view_func=PostStatisticItem.as_view('statistic'), methods=['GET'])
-
-
-# @admin_bp.route('/settings', methods=['GET', 'POST'])
-# @login_required
-# def settings():
-#     form = AboutForm()
-#     admin = Admin.query.first_or_404()
-#
-#     if form.validate_on_submit():
-#         admin.blog_title = form.blog_title.data
-#         admin.blog_sub_title = form.blog_sub_title.data
-#         admin.about = form.about.data
-#         db.session.commit()
-#         flash('Settings updated.', 'success')
-#         return redirect(url_for('blog.index'))
-#
-#     form.blog_title.data = admin.blog_title
-#     form.blog_sub_title.data = admin.blog_sub_title
-#     form.about.data = admin.about
-#     return render_template('admin/edit_about.html', form=form)

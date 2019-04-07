@@ -43,42 +43,6 @@ class RegisterForm(FlaskForm):
             raise ValidationError('The email is already in use.')
 
 
-class SuUserForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
-    is_superuser = BooleanField('Is superuser')
-    is_email_confirmed = BooleanField('Is Email confirmed.')
-    role = SelectField('Role', choices=ROLES)
-    name = StringField('Display Name', validators=[Length(1, 128)])
-    bio = StringField('Bio', validators=[Optional(), Length(0, 200)])
-    homepage_url = StringField('Homepage', validators=[Optional(), URL()])
-    weibo = StringField('Weibo', validators=[Optional(), URL()])
-    weixin = StringField('Weixin', validators=[Optional(), URL()])
-    github = StringField('github', validators=[Optional(), URL()])
-
-
-class ProfileForm(FlaskForm):
-    """定义修改个人资料表单"""
-    email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
-    name = StringField('Display Name', validators=[Length(1, 128)])
-    bio = StringField('Bio', validators=[Optional(), Length(0, 200)])
-    homepage_url = StringField('Homepage', validators=[Optional(), URL()])
-    weibo = StringField('Weibo', validators=[Optional(), URL()])
-    weixin = StringField('Weixin', validators=[Optional(), URL()])
-    github = StringField('github', validators=[Optional(), URL()])
-
-    @staticmethod
-    def validate_username(field):
-        """验证用户名是否已注册"""
-        if User.objects.filter(User.username == field.data).first():
-            raise ValidationError('The username is already in use.')
-
-    @staticmethod
-    def validate_email(field):
-        """验证email是否已注册"""
-        if User.objects.filter(User.email == field.data.lower()).first():
-            raise ValidationError('The email is already in use.')
-
-
 class ForgetPasswordForm(FlaskForm):
     """定义忘记密码表单"""
     email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
@@ -99,6 +63,43 @@ class ChangePasswordForm(FlaskForm):
     password = PasswordField('New password', validators=[DataRequired(), Length(6, 128), EqualTo('password2')])
     password2 = PasswordField('Confirm password', validators=[DataRequired()])
     submit = SubmitField()
+
+
+class ProfileForm(FlaskForm):
+    """定义修改个人资料表单"""
+    email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
+    name = StringField('Display Name', validators=[Length(1, 128)])
+    bio = StringField('Bio', validators=[Optional(), Length(0, 200)])
+    homepage = StringField('Homepage', validators=[Optional(), URL()])
+    weibo = StringField('Weibo', validators=[Optional(), URL()])
+    weixin = StringField('Weixin', validators=[Optional(), URL()])
+    github = StringField('github', validators=[Optional(), URL()])
+
+    @staticmethod
+    def validate_email(field):
+        """验证email是否已注册"""
+        if User.objects.filter(User.email == field.data.lower()).first():
+            raise ValidationError('The email is already in use.')
+
+
+class MetaUserForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
+    # is_superuser = BooleanField('Is superuser')
+    email_confirmed = BooleanField('Is Email confirmed.')
+    role = SelectField('Role', choices=ROLES)
+    name = StringField('Display Name', validators=[Length(1, 128)])
+    bio = StringField('Bio', validators=[Optional(), Length(0, 200)])
+    homepage = StringField('Homepage', validators=[Optional(), URL()])
+    weibo = StringField('Weibo', validators=[Optional(), URL()])
+    weixin = StringField('Weixin', validators=[Optional(), URL()])
+    github = StringField('github', validators=[Optional(), URL()])
+    active = BooleanField('Active', default=True)
+
+    @staticmethod
+    def validate_email(field):
+        """验证email是否已注册"""
+        if User.objects.filter(User.email == field.data.lower()).first():
+            raise ValidationError('The email is already in use.')
 
 
 class PostForm(FlaskForm):
@@ -126,6 +127,10 @@ class PostForm(FlaskForm):
     #             raise ValidationError('slug already in use')
 
 
+# 使用flask-mongoengine从模型直接生成表单
+MetaPostForm = model_form(Post, exclude=['slug', 'author', 'html_content', 'update_time', 'from_admin'])
+
+
 class CommentForm(FlaskForm):
     """定义评论表单"""
     author = StringField('* Name', validators=[DataRequired(), Length(1, 30)])
@@ -148,12 +153,12 @@ class UserCommentForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
-class SessionCommentForm(FlaskForm):
-    email = HiddenField('* Email')
-    author = HiddenField('* Name')
-    homepage = HiddenField('Homepage')
-    content = TextAreaField('* Comment', validators=[DataRequired()])
-    comment_id = HiddenField('comment_id')
+# class SessionCommentForm(FlaskForm):
+#     email = HiddenField('* Email')
+#     author = HiddenField('* Name')
+#     homepage = HiddenField('Homepage')
+#     content = TextAreaField('* Comment', validators=[DataRequired()])
+#     comment_id = HiddenField('comment_id')
 
 
 class WidgetForm(FlaskForm):

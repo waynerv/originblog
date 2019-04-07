@@ -11,8 +11,8 @@ class BlogSettings:
         'description': os.getenv('description', 'Oct Blog Description'),
         'owner': os.getenv('owner', 'Waynerv'),
         'keywords': os.getenv('keywords','python,django,flask,docker,MongoDB'),
-        'custome_entry1': 'Donation',
-        'custome_entry2': 'About',
+        'index_nav1': 'Donation',
+        'index_nav2': 'About',
         'bg_home': 'static/img/home-bg.jpg',
         'bg_post': 'static/img/post-bg.jpg',
         'bg_about': 'static/img/about-bg.jpg',
@@ -80,8 +80,14 @@ class BaseConfig(object):
 
 
 class DevelopmentConfig(BaseConfig):
+    # 配置mongod实例的连接
     MONGODB_SETTINGS = {
         'db': 'originblog',
+        # 'host': '192.168.1.35',
+        # 'port': 12345,
+        # 'username': 'webapp',
+        # 'password': 'pwd123'
+        # 'connect': False
     }
 
 

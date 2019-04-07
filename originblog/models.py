@@ -78,11 +78,12 @@ class User(db.Document, UserMixin):
     create_time = db.DateTimeField(default=datetime.utcnow, required=True)
     last_login = db.DateTimeField(default=datetime.utcnow, required=True)
     email_confirmed = db.BooleanField(default=False)
-    is_superuser = db.BooleanField(default=False)
+    # is_superuser = db.BooleanField(default=False)
     role = db.ReferenceField('Role')
     bio = db.StringField(max_length=200)
     homepage = db.URLField(max_length=255)
     social_networks = db.DictField(default=SOCIAL_NETWORKS)
+    active = db.BooleanField(default=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -153,6 +154,11 @@ class User(db.Document, UserMixin):
     def is_admin(self):
         """检查用户是否拥有管理员权限"""
         return self.role.role_name == 'admin'
+
+    @property
+    def is_active(self):
+        """Flask-Login检查用户是否活跃"""
+        return self.active
 
     def can(self, permission):
         """检查用户是否拥有指定权限"""

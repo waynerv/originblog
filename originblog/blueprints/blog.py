@@ -45,7 +45,7 @@ def index():
                            cur_tag=tag, cur_keywords=keywords)
 
 
-@blog_bp.route('/posts/<slug>', methods=['GET', 'Post'])
+@blog_bp.route('/posts/<slug>', methods=['GET', 'POST'])
 def show_post(slug, post_type='post'):
     """显示文章正文、评论列表与评论表单并处理表单提交。
 
@@ -151,7 +151,7 @@ def author_detail(username):
 @blog_bp.route('/archive')
 def archive():
     """TODO:按时间归档文章"""
-    posts = Post.objects.filter(is_draft=False).order_by('-pub_time')
+    posts = Post.objects.filter(type='post').order_by('-pub_time')
 
     page = request.args.get('page', default=1, type=int)
     per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']

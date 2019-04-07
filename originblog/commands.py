@@ -30,7 +30,7 @@ def register_command(app):
         click.echo('Generating the administrator...')
         fake_admin()
 
-        click.echo(f'Generating {widget} links...')
+        click.echo(f'Generating {widget} widgets...')
         fake_widget(widget)
 
         click.echo(f'Generating {post} posts...')
