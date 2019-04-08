@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, current_app, redirect, ur
 from flask_login import current_user
 from mongoengine.queryset.visitor import Q
 
-from originblog.forms import CommentForm, UserCommentForm
+from originblog.forms.blog import CommentForm, UserCommentForm
 from originblog.models import Post, Comment, Widget, User
 from originblog.utils import redirect_back
 from originblog.signals import post_visited
@@ -140,7 +140,7 @@ def reply_comment(pk, post_type):
 def author_detail(username):
     """显示作者个人页面"""
     author = User.objects.get_or_404(username=username)
-    posts = Post.objects.filter(author=author, is_draft=False).order_by('-pub_time')
+    posts = Post.objects.filter(type='post', author=author).order_by('-pub_time')
 
     page = request.args.get('page', default=1, type=int)
     per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
@@ -150,13 +150,18 @@ def author_detail(username):
 
 @blog_bp.route('/archive')
 def archive():
-    """TODO:按时间归档文章"""
-    posts = Post.objects.filter(type='post').order_by('-pub_time')
-
+    """按时间归档文章"""
     page = request.args.get('page', default=1, type=int)
     per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
-    pagination = posts.paginate(page, per_page=per_page)
-    return render_template('blog/archive.html', pagination=pagination)
+    pagination = Post.objects.filter(type='post').order_by('-pub_time').only('title', 'slug', 'pub_time').paginate(page, per_page)
+    posts = pagination.items
+    # 按年份分组当页posts
+    data = {}
+    years = list(set([post.pub_time.year for post in posts]))
+    for year in years:
+        post_items = [post for post in posts if post.pub_time.year == year]
+        data[year] = post_items
+    return render_template('blog/archive.html', pagination=pagination, data=data)
 
 
 @blog_bp.route('/sitemap.xml/')

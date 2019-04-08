@@ -1,16 +1,18 @@
-import time
 import random
+import time
+
 from flask import Blueprint, request, current_app, render_template, flash, redirect, url_for, abort
 from flask.views import MethodView
-from flask_login import login_required, current_user
+from flask_login import current_user
 from mongoengine import NotUniqueError, DoesNotExist, MultipleObjectsReturned
 from mongoengine.queryset import Q
 
-from originblog.forms import PostForm, WidgetForm, MetaPostForm, RegisterForm, MetaUserForm
-from originblog.models import Post, Comment, PostStatistic, Widget, Tracker, User, Role
-from originblog.utils import redirect_back
 from originblog.decorator import admin_required, permission_required
+from originblog.forms.admin import PostForm, WidgetForm, MetaPostForm, MetaUserForm
+from originblog.forms.auth import RegisterForm
+from originblog.models import Post, Comment, PostStatistic, Widget, Tracker, User, Role
 from originblog.signals import post_published
+from originblog.utils import redirect_back
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -59,7 +61,7 @@ class Posts(MethodView):
                 raw_content=raw_content,
                 category=category,
                 tags=tags,
-                type = type
+                type=type
             )
             post.author = current_user._get_current_object()
             # 保存文章到数据库时，注意处理slug相同的情况
@@ -213,7 +215,7 @@ class MetaPosts(MethodView):
                 tags=tags,
                 weight=weight,
                 can_commen=can_comment,
-                type = type
+                type=type
             )
             post.author = current_user._get_current_object()  # TODO:如何修改文章作者，是否有必要
             # 保存文章到数据库时，注意处理slug相同的情况
@@ -367,7 +369,7 @@ class Users(MethodView):
         if form.validate_on_submit():
             name = form.name.data
             username = form.username.data
-            email = form.email.data
+            email = form.email.data.lower()
             password = form.password.data
             user = User(
                 name=name,

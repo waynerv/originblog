@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import login_user, current_user, login_required, logout_user, login_fresh, confirm_login
 
-from originblog.forms import LoginForm, RegisterForm, ForgetPasswordForm, ResetPasswordForm
+from originblog.forms.auth import LoginForm, RegisterForm, ForgetPasswordForm, ResetPasswordForm
 from originblog.models import User
 from originblog.utils import redirect_back
 from originblog.settings import Operations
@@ -53,9 +53,13 @@ def register():
     if form.validate_on_submit():
         name = form.name.data
         username = form.username.data
-        email = form.email.data
+        email = form.email.data.lower()
         password = form.password.data
-        user = User(name=name, username=username, email=email)
+        user = User(
+            name=name,
+            username=username,
+            email=email
+        )
         user.set_password(password)
         user.save()
 

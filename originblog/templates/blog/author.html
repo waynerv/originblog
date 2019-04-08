@@ -34,7 +34,7 @@
                     <dd>{{ user.bio }}</dd>
                 </dl>
                 <dl class="dl-horizontal">
-                    <dt>Social Network</dt>
+                    <dt>Social Network:</dt>
                     <dd>
                         {% if user.social_networks['github']['url'] %}
                             <a href='{{ user.social_networks["github"]["url"] }}'><i class="fa fa-github fa-lg"></i></a>
@@ -81,7 +81,7 @@
             <div class="col-lg-8 col-md-10 mx-auto">
                 <h3>Articles</h3>
                 <ul>
-                    {% for post in pagination.items() %}
+                    {% for post in pagination.items %}
                         {% if post %}
                             <li><a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></li>
                         {% else %}
