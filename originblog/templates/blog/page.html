@@ -15,7 +15,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-md-10 mx-auto">
-                    <div class="post-heading">
+                    <div class="page-heading">
                         <h1>{{ post.title }}</h1>
                         <span class="meta">Posted by
                             <a href="{{ url_for('user.index', username=post.author.username) }}">{{ post.author.name }}</a>
@@ -59,48 +59,8 @@
                 </article>
                 <hr>
             </div>
-
-            <!-- sidebar -->
-            {% include "blog/index_sidebar.html" %}
         </div>
-        <!-- dispaly share, copyright, donate and wechat information -->
-        {% if blog_meta.display_copyright %}
-        <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <p><strong>{{ blog_meta.copyright_message }}</strong></p>
-                <hr>
-            </div>
-        </div>
-        {% endif %}
-        {% if blog_meta.allow_share %}
-        <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <div class="share-component" data-sites="weibo,wechat,douban,qq,facebook"></div>
-            </div>
-        </div>
-        {% endif %}
-        <br>
-        {% if blog_meta.allow_donate %}
-        <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <p>{{ blog_meta.donate_message }}</p>
-                <i class="fa fa-jpy"></i> | <i class="fa fa-usd"></i><br>
-                <div>
-                    <img src="{{ blog_meta.donate_img_url }}" title="Donate" alt="donate qrcode">
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        {% if blog_meta.dispaly_wechat %}
-        <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <p>{{ blog_meta.wechat_message }}<i class="fa fa-weixin" aria-hidden="true"></i></p>
-                <img src="{{ blog_meta.wechat_img_url }}" title="wechat" alt="wechat qrcode">
-            </div>
-        </div>
-        {% endif %}
     </article>
-    <hr>
 
     {% if post.can_comment %}
     <!-- comment form and list -->
@@ -210,7 +170,6 @@
         {% endif %}
     </div>
     {% endif %}
-
 </div>
 {% endblock main %}
 

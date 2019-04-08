@@ -12,7 +12,10 @@ blog_bp = Blueprint('blog', __name__)
 
 @blog_bp.route('/')
 def index():
-    """查询所有已发表的文章，根据特定查询参数进行筛选分页，传入到首页模板"""
+    """构建博客首页
+
+    查询所有已发表的文章，根据分类、标签、关键字搜索等特定查询参数进行筛选分页
+    """
 
     # 获取已发表并且权重值大于0的文章的QuerySet，按权重和发表时间排序
     pub_posts = Post.objects.filter(type='post').order_by('-weight', '-pub_time')
@@ -33,12 +36,12 @@ def index():
     if keywords:
         posts = posts.filter(Q(raw_content__icontains=keywords) | Q(title__icontains=keywords))
 
-    # 获取首页所有组件对象
+    # 获取首页所有widgets
     widgets = Widget.objects
 
-    # 从查询参数获取当前页数并对QuerySet分页，页数默认值为1
-    page = request.args.get('page', default=1, type=int)  # 从查询字符串获取当前页数
-    per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']  # 每页数量
+    # 从查询参数获取当前页数并对QuerySet分页
+    page = request.args.get('page', default=1, type=int)
+    per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
     pagination = posts.paginate(page, per_page=per_page)  # 分页对象
 
     return render_template('blog/index.html', pagination=pagination, widgets=widgets, cur_category=category,
@@ -134,18 +137,6 @@ def reply_comment(pk, post_type):
     else:
         flash('This post is comment disabled.', 'warning')
         return redirect_back()
-
-
-@blog_bp.route('/author-detail/<string:username>')
-def author_detail(username):
-    """显示作者个人页面"""
-    author = User.objects.get_or_404(username=username)
-    posts = Post.objects.filter(type='post', author=author).order_by('-pub_time')
-
-    page = request.args.get('page', default=1, type=int)
-    per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
-    pagination = posts.paginate(page, per_page=per_page)
-    return render_template('blog/author.html', user=author, pagination=pagination)
 
 
 @blog_bp.route('/archive')

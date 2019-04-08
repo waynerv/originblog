@@ -8,7 +8,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-md-10 mx-auto">
-                    <div class="site-heading">
+                    <div class="page-heading">
                         <h1>{{ blog_meta.name }}</h1>
                         <hr class="small">
                         <span class="subheading">{{ blog_meta.subtitle }} <a href="{{ url_for('blog.index') }}"><i class="fa fa-rss"></i></a></span>
@@ -54,7 +54,7 @@
 <hr>
 {% endblock %}
 
-{% block js %}
+{% block scripts %}
 {{ moment.include_moment(local_js="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js") }}
 <script type="text/javascript">
 $('.rm-filter').on('click', function (event) {

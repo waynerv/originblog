@@ -8,7 +8,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-md-10 mx-auto">
-                    <div class="site-heading">
+                    <div class="page-heading">
                         <h1>About Author</h1>
                         <hr class="small">
                         <span class="subheading">{{ blog_meta.subtitle }}</span>
@@ -91,15 +91,15 @@
                 </ul>
                 <!-- pagination -->
                 <ul class="pagination">
-                    {% if pagination.has_next %}
+                    {% if pagination.has_prev %}
                         <li class="next">
-                            <a href="{{ url_for('blog.author_detail', username=user.username, page=pagination.next_num) }}">Older
+                            <a href="{{ url_for('user.index', username=user.username, page=pagination.prev_num) }}">Previous
                                 Posts</a>
                         </li>
                     {% endif %}
-                    {% if pagination.has_prev %}
+                    {% if pagination.has_next %}
                         <li class="next">
-                            <a href="{{ url_for('blog.author_detail', username=user.username, page=pagination.prev_num) }}">Previous
+                            <a href="{{ url_for('user.index', username=user.username, page=pagination.next_num) }}">Older
                                 Posts</a>
                         </li>
                     {% endif %}

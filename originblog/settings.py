@@ -38,7 +38,7 @@ class BlogSettings:
     ROLE_PERMISSION_MAP = {
         'reader': ['COMMENT'],
         'writer': ['COMMENT', 'POST'],
-        'editor': ['COMMENT', 'POST', 'MODERATE'],
+        'moderator': ['COMMENT', 'POST', 'MODERATE'],
         'admin': ['COMMENT', 'POST', 'MODERATE', 'ADMINISTRATE']
     }
     SEARCH_ENGINE_SUBMIT_URLS = {

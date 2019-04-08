@@ -551,7 +551,7 @@ class PostStatisticItem(MethodView):
 
 
 # 注册路由
-admin_bp.add_url_rule('/', view_func=Posts.as_view('index'), methods=['GET'])
+admin_bp.add_url_rule('/', view_func=AdminIndex.as_view('index'), methods=['GET'])
 
 admin_bp.add_url_rule('/posts', view_func=Posts.as_view('posts'), methods=['GET', 'POST'])
 admin_bp.add_url_rule('/posts/<slug>', view_func=PostItem.as_view('post'), methods=['GET', 'PUT', 'PATCH', 'DELETE'])
@@ -559,8 +559,14 @@ admin_bp.add_url_rule('/posts/<slug>', view_func=PostItem.as_view('post'), metho
 admin_bp.add_url_rule('/pages', view_func=Posts.as_view('pages'), methods=['GET', 'POST'])
 admin_bp.add_url_rule('/pages/<slug>', view_func=Posts.as_view('page'), methods=['GET', 'PUT', 'PATCH', 'DELETE'])
 
+admin_bp.add_url_rule('/meta/posts', view_func=MetaPosts.as_view('meta_posts'), methods=['GET', 'POST'])
+admin_bp.add_url_rule('/meta/posts/<slug>', view_func=MetaPostItem.as_view('meta_post'), methods=['GET', 'PUT'])
+
 admin_bp.add_url_rule('/posts/comments', view_func=Comments.as_view('comments'), methods=['GET', 'POST'])
 admin_bp.add_url_rule('/posts/comments/<pk>', view_func=CommentItem.as_view('comment'), methods=['PATCH', 'DELETE'])
+
+admin_bp.add_url_rule('/users', view_func=Users.as_view('users'), methods=['GET', 'POST'])
+admin_bp.add_url_rule('/meta/users/<pk>', view_func=MetaUserItem.as_view('meta_user'), methods=['GET', 'PUT', 'DELETE'])
 
 admin_bp.add_url_rule('/widgets', view_func=Widgets.as_view('widgets'), methods=['GET', 'POST'])
 admin_bp.add_url_rule('/widgets/<pk>', view_func=WidgetItem.as_view('widget'), methods=['GET', 'PUT', 'DELETE'])

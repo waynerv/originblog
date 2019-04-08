@@ -1,7 +1,7 @@
 import click
-from originblog.extensions import db
-from originblog.models import User, Role
 from mongoengine import connect
+
+from originblog.models import User, Role
 
 
 def register_command(app):
@@ -10,14 +10,9 @@ def register_command(app):
     @click.option('--comment', default=500, help='Quantity of comments, default is 500')
     @click.option('--widget', default=4, help='Quantity of widgets, default is 4')
     def forge(post, widget, comment):
-        """生成测试用的管理员账户、文章、分类、评论、以及链接。
+        """生成测试用的管理员账户、文章、widget、评论。
 
         生成测试数据时将删除所有并重新创建数据库中的表
-        :param post: 将要生成文章的数量
-        :param category: 将要生成分类的数量
-        :param comment: 将要生成评论的数量
-        :param link: 将要生成链接的数量
-        :return: None
         """
         from originblog.fake import fake_admin, fake_comment, fake_post, fake_widget
 
@@ -25,7 +20,7 @@ def register_command(app):
         db.drop_database('originblog')
 
         click.echo('Initializing roles and permissions.')
-        Role.init()
+        Role.init()  # 初始化角色与权限
 
         click.echo('Generating the administrator...')
         fake_admin()
@@ -43,11 +38,7 @@ def register_command(app):
 
     @app.cli.command()
     def initdb():
-        """重置数据库，删除所有表并重新创建
-
-        :param drop: 是否删除表
-        :return: None
-        """
+        """重置数据库，删除所有集合"""
         click.confirm('This operation will delete the database, do you want to continue?', abort=True)
         db = connect('originblog')
         db.drop_database('originblog')
@@ -55,35 +46,26 @@ def register_command(app):
 
     @app.cli.command()
     @click.option('--username', prompt=True, help='The username used to login.')
+    @click.option('--email', prompt=True, help='The email used to login.')
     @click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True,
                   help='The password used to login.')
-    def init(username, password):
-        """建表并创建管理员账户以及初始文章类别
-
-        :param username: 管理员用户名
-        :param password: 管理员密码
-        :return: None
-        """
-        click.echo('Initializing the database...')
-        db.create_all()
-
-        admin = User.query.first()
+    def init(username, email, password):
+        """创建唯一管理员账户"""
+        admin_role = Role.objects.filter(role_name='admin').first()
+        admin = User.objects.filter(role=admin_role).first()
         if admin:
             click.echo('The administrator is already exists, updating...')
             admin.username = username
             admin.set_password(password)
         else:
             click.echo('Creating new Administrator...')
-            admin = User(username=username, name='kaka4nerv', blog_title='Originlog',
-                          blog_sub_title='Where everything begins...', about='Anything about you.')
+            admin = User(
+                username=username,
+                name='test_administrator',
+                email=email
+            )
             admin.set_password(password)
-            db.session.add(admin)
+            admin.role = admin_role
+            admin.save()
 
-        # category = Category.query.first()
-        # if category is None:
-        #     click.echo('Creating the default category...')
-        #     category = Category(name='Default')
-        #     db.session.add(category)
-
-        db.session.commit()
         click.echo('Done.')
