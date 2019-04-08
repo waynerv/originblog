@@ -1,26 +1,104 @@
 {% extends 'base.html' %}
-{% from 'bootstrap/form.html' import render_form %}
 
 {% block title %}Register{% endblock %}
 
-{% block content %}
-    <div class="jumbotron">
-        <div class="row">
-            <div class="col-md-8">
-                <img src="{{ url_for('static', filename='images/index.jpg') }}" class="rounded img-fluid">
-            </div>
-            <div class="col-md-4">
-                <div class="card mb-3 w-100 bg-light">
-                    <div class="card-header"><h4>Welcome to Origin Blog</h4></div>
-                    <div class="card-body">
-                        {{ render_form(form) }}
-                        <hr>
-                        <small>Already have an account?
-                            <a href="{{ url_for('auth.login') }}">Click here to log in.</a>
-                        </small>
+{% block custom_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/signin.css') }}">
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block main %}
+    <div class="row justify-content-center">
+        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+            <div class="card card-signin my-5">
+              <div class="card-body">
+                <h5 class="card-title text-center">Register</h5>
+                <form class="form-signin" method="post">
+                    {{ form.csrf_token }}
+                    <div class="form-label-group">
+                        {{ form.username(class_='form-control', placeholder='Username', autofocus=True) }}
+                        {{ form.username.label }}
+                        {% for message in form.username.errors %}
+                            <small class="error">{{ message }}</small>
+                        {% endfor %}
                     </div>
-                </div>
+
+                    <div class="form-label-group">
+                        {{ form.name(class_='form-control', placeholder='Name') }}
+                        {{ form.name.label }}
+                        {% for message in form.name.errors %}
+                            <small class="error">{{ message }}</small>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-label-group">
+                        {{ form.email(class_='form-control', placeholder='Email') }}
+                        {{ form.email.label }}
+                        {% for message in form.email.errors %}
+                            <small class="error">{{ message }}</small>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-label-group">
+                        {{ form.password(class_='form-control', placeholder='Password') }}
+                        {{ form.password.label }}
+                        {% for message in form.password.errors %}
+                            <small class="error">{{ message }}</small>
+                        {% endfor %}
+                    </div>
+                    <div class="form-label-group">
+                        {{ form.password2(class_='form-control', placeholder='Confirm Password') }}
+                        {{ form.password2.label }}
+                        {% for message in form.password2.errors %}
+                            <small class="error">{{ message }}</small>
+                        {% endfor %}
+                    </div>
+
+                    {{ form.submit(class_='btn btn-lg btn-primary btn-block text-uppercase') }}
+                    <hr class="my-4">
+                    <div class="text-center">
+                        <a class="small" href="{{ url_for('auth.login') }}">Already have an Account!</a>
+                    </div>
+                </form>
+              </div>
             </div>
+          </div>
+        </div>
+    <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+            <ul class="list-inline text-center">
+                <li class="list-inline-item">
+                    <a href="#">
+                        <span class="fa-stack fa-lg">
+                            <i class="fas fa-circle fa-stack-2x"></i>
+                            <i class="fab fa-twitter fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </a>
+                </li>
+                <li class="list-inline-item">
+                    <a href="#">
+                        <span class="fa-stack fa-lg">
+                            <i class="fas fa-circle fa-stack-2x"></i>
+                            <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </a>
+                </li>
+                <li class="list-inline-item">
+                    <a href="#">
+                        <span class="fa-stack fa-lg">
+                            <i class="fas fa-circle fa-stack-2x"></i>
+                            <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+            <p class="copyright text-center">Copyright &copy; Your Website 2019</p>
         </div>
     </div>
+{% endblock %}
+
+{% block footer %}
+
 {% endblock %}

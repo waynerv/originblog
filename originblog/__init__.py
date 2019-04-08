@@ -57,8 +57,8 @@ def register_extensions(app):
 def register_template_context(app):
     @app.context_processor
     def make_template_context():
-        if current_user.is_authenticated:
-            unread_comments = Comment.query.filter(Comment.reviewed == False).count()
+        if current_user.is_admin:
+            unread_comments = Comment.objects.filter(status='pending').count()
         else:
             unread_comments = None
 

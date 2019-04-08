@@ -67,6 +67,7 @@ class BaseConfig(object):
     MAIL_PORT = 465
     MAIL_DEFAULT_SENDER = ('kaka', os.getenv('MAIL_USERNAME'))
     ORIGINBLOG_ADMIN_EMAIL = os.getenv('ORIGINBLOG_ADMIN_EMAIL')
+    APP_MAIL_SUBJECT_PREFIX = 'From Origin Blog:'
 
     ORIGINBLOG_POST_PER_PAGE = 10
     ORIGINBLOG_COMMENT_PER_PAGE = 10

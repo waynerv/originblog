@@ -173,7 +173,8 @@ class User(db.Document, UserMixin):
 
     def clean(self):
         """在创建对象并写入到数据库之前为其设置角色"""
-        self.set_role()
+        if not self.role:
+            self.set_role()
 
     meta = {
         'indexes': ['username'],

@@ -49,7 +49,6 @@
 
     {% block custom_head %}{% endblock %}
 
-    <style> html{display : none ; } </style>
     <script>
     if( self == top ) {
               document.documentElement.style.display = 'block' ;
@@ -74,21 +73,47 @@
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="about.html">About</a>
+                        <a class="nav-link" href="{{ url_for('blog.index') }}">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('blog.archive') }}">Archive</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="contact.html">Contact</a>
+                        <a class="nav-link" href="about.html">About</a>
                     </li>
-                    {% if current_user.is_authenticated %}
-                    <li>
-                        <a href="{{ url_for('admin_bp.index') }}">{{ current_user.username }}</i></a>
-                    </li>
+                    {% if not current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">Sign in</a>
+                        </li>
+                    {% else %}
+                        <li class="dropdown nav-item">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                User
+                                <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                <h6 class="dropdown-header">Logged in as {{ current_user.username }}</h6>
+                                <a class="dropdown-item" href="{{ url_for('user.index', username=current_user.username) }}">
+                                    <span class="oi oi-person"></span> My Home
+                                </a>
+                                <a class="dropdown-item" href="{{ url_for('user.edit_profile') }}">
+                                    <span class="oi oi-cog"></span> Settings
+                                </a>
+                                {% if current_user.can('MODERATE') %}
+                                    <a class="dropdown-item" href="{{ url_for('admin.index') }}">
+                                        <span class="oi oi-dashboard"></span> Dashboard
+                                    </a>
+                                {% endif %}
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                    <span class="oi oi-power-standby"></span> Logout
+                                </a>
+                            </div>
+                        </li>
                     {% endif %}
                 </ul>
             </div>
@@ -98,7 +123,7 @@
     <!-- Page Header -->
     <!-- Set your background image for this header on the line below. -->
     {% block header %}
-    <header class="masthead" style="background-image: url('img/home-bg.jpg')">
+    <header class="masthead" style="background-image: url({{ blog_meta.bg_home }})">
         <div class="overlay"></div>
         <div class="container">
             <div class="row">
@@ -114,9 +139,21 @@
     {% endblock %}
 
     <!-- Main Content -->
-    {% block main %}{% endblock %}
+    <div class="container">
+        {% for message in get_flashed_messages(with_categories=True) %}
+        <div class="alert alert-{{ message[0] }}" role="alert">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message[1] }}
+        </div>
+        {% endfor %}
+
+        {% block main %}
+        {% endblock %}
+    </div>
+
 
     <!-- Footer -->
+    {% block footer %}
     <footer>
         <div class="container">
             <div class="row">
@@ -152,6 +189,7 @@
             </div>
         </div>
     </footer>
+    {% endblock %}
 
     <!-- Bootstrap core JavaScript -->
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>

@@ -11,9 +11,13 @@
     /*display: inline;*/
 /*}*/
 
-.page-header {
-    padding-top: 20px;
-    padding-bottom: 20px;
+/*.page-header {*/
+/*    padding-top: 20px;*/
+/*    padding-bottom: 20px;*/
+/*}*/
+
+.error {
+    color: red;
 }
 
 .comments {

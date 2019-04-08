@@ -16,7 +16,6 @@ class ChangePasswordForm(FlaskForm):
 
 class ProfileForm(FlaskForm):
     """定义修改个人资料表单"""
-    email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
     name = StringField('Display Name', validators=[Length(1, 128)])
     bio = StringField('Bio', validators=[Optional(), Length(0, 200)])
     homepage = StringField('Homepage', validators=[Optional(), URL()])
@@ -24,19 +23,14 @@ class ProfileForm(FlaskForm):
     weixin = StringField('Weixin', validators=[Optional(), URL()])
     github = StringField('github', validators=[Optional(), URL()])
 
-    @staticmethod
-    def validate_email(field):
-        """验证email是否已注册"""
-        if User.objects.filter(User.email == field.data.lower()).first():
-            raise ValidationError('The email is already in use.')
-
 
 class ChangeEmailForm(FlaskForm):
     email = StringField('New email', validators=[DataRequired(), Length(1, 254), Email()])
     submit = SubmitField()
 
     def validate_email(self, field):
-        if User.query.filter(User.email == field.data.lower()).first():
+        """验证email是否已注册"""
+        if User.objects.filter(email=field.data.lower()).first():
             raise ValidationError('The email is already in use.')
 
 

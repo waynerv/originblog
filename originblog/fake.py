@@ -1,5 +1,5 @@
 import random
-from originblog.models import User, Post, Comment, Widget
+from originblog.models import User, Post, Comment, Widget, Role
 from faker import Faker
 
 fake = Faker('zh_CN')
@@ -8,10 +8,11 @@ fake = Faker('zh_CN')
 def fake_admin():
     user = User(username='admin',
                 name='kaka4nerv',
-                email='testmail@gmail.com',
+                email='ampedee@163.com',
                 role='admin',
                 bio='Hello guys.')
     user.set_password('123456789')
+    user.role = Role.objects.filter(role_name='admin').first()
     user.save()
 
 

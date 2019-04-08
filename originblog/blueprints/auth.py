@@ -22,16 +22,16 @@ def login():
         username = form.username.data
         password = form.password.data
         remember = form.remember.data
-        admin = User.query.first()
-        if admin:
-            if username == admin.username and admin.validate_password(password):
-                login_user(admin, remember)
+        user = User.objects.filter(username=username).first()
+        if user:
+            if username == user.username and user.validate_password(password):
+                login_user(user, remember)
                 flash('Welcome back', 'info')
                 return redirect_back()
             flash('Invalid username or password.', 'warning')
         else:
             flash('No account.', 'warning')
-    return render_template('auth/login.html', form=form)
+    return render_template('auth/signin.html', form=form)
 
 
 @auth_bp.route('/logout')
@@ -43,7 +43,7 @@ def logout():
     return redirect_back()
 
 
-@auth_bp.route('/register')
+@auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     """处理用户注册"""
     if current_user.is_authenticated:
@@ -106,7 +106,7 @@ def forget_password():
 
     form = ForgetPasswordForm()
     if form.validate_on_submit():
-        email = form.data.email
+        email = form.email.data
         user = User.objects.filter(email=email).first()
 
         if user:
@@ -152,4 +152,4 @@ def re_authenticate():
     if form.validate_on_submit() and current_user.validate_password(form.password.data):
         confirm_login()
         return redirect_back()
-    return render_template('auth/login.html', form=form)
+    return render_template('auth/signin.html', form=form)

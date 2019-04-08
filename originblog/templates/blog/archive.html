@@ -20,7 +20,6 @@
 {% endblock %}
 
 {% block main %}
-<div class="container">
     <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
             {% for (year, posts) in data.items() %}
@@ -49,18 +48,9 @@
             </div>
         </div>
     </div>
-</div>
-
-<hr>
+    <hr>
 {% endblock %}
 
 {% block scripts %}
 {{ moment.include_moment(local_js="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js") }}
-<script type="text/javascript">
-$('.rm-filter').on('click', function (event) {
-
-    location.href = "/";
-    return false;
-  });
-</script>
 {% endblock %}

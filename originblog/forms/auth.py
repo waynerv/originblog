@@ -10,7 +10,7 @@ class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(1, 20)])
     password = PasswordField('Password', validators=[DataRequired(), Length(6, 128)])
     remember = BooleanField('Remember me')
-    submit = SubmitField('Log in')
+    submit = SubmitField('Sign in')
 
 
 class RegisterForm(FlaskForm):
@@ -25,16 +25,14 @@ class RegisterForm(FlaskForm):
     password2 = PasswordField('Confirm Password', validators=[DataRequired()])
     submit = SubmitField('Register')
 
-    @staticmethod
-    def validate_username(field):
+    def validate_username(self, field):
         """验证用户名是否已注册"""
-        if User.objects.filter(User.username == field.data).first():
+        if User.objects.filter(username=field.data).first():
             raise ValidationError('The username is already in use.')
 
-    @staticmethod
-    def validate_email(field):
+    def validate_email(self, field):
         """验证email是否已注册"""
-        if User.objects.filter(User.email == field.data.lower()).first():
+        if User.objects.filter(email=field.data.lower()).first():
             raise ValidationError('The email is already in use.')
 
 

@@ -30,16 +30,20 @@ def edit_profile():
 
     if form.validate_on_submit():
         current_user.name = form.name.data
-        current_user.username = form.username.data
         current_user.homepage = form.homepage.data
         current_user.bio = form.bio.data
+        current_user.social_networks['weibo'] = form.weibo.data
+        current_user.social_networks['weixin'] = form.weixin.data
+        current_user.social_networks['github'] = form.github.data
         current_user.save()
         flash('Profile updated.', 'success')
         return redirect(url_for('user.edit_profile'))
     form.name.data = current_user.name
-    form.username.data = current_user.username
     form.homepage.data = current_user.homepage
     form.bio.data = current_user.bio
+    form.weibo.data = current_user.social_networks.get('weibo')
+    form.weixin.data = current_user.social_networks.get('weixin')
+    form.github.data = current_user.social_networks.get('github')
     return render_template('user/edit_profile.html', form=form)
 
 
