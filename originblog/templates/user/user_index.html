@@ -25,15 +25,15 @@
             <div class="col-lg-8 col-md-10 mx-auto">
                 <h3>About {{ user.name }}</h3>
                 <hr>
-                <dl class="dl-horizontal">
+                <dl>
                     <dt>Username:</dt>
                     <dd>{{ user.username }}</dd>
                 </dl>
-                <dl class="dl-horizontal">
+                <dl>
                     <dt>Bio:</dt>
                     <dd>{{ user.bio }}</dd>
                 </dl>
-                <dl class="dl-horizontal">
+                <dl>
                     <dt>Social Network:</dt>
                     <dd>
                         {% if user.social_networks['github']['url'] %}
@@ -64,7 +64,7 @@
                         {% endif %}
                     </dd>
                 </dl>
-                <dl class="dl-horizontal">
+                <dl>
                     <dt>Homepage:</dt>
                     <dd>
                         {% if user.homepage %}

@@ -39,7 +39,7 @@ class RegisterForm(FlaskForm):
 class ForgetPasswordForm(FlaskForm):
     """定义忘记密码表单"""
     email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
-    submit = SubmitField()
+    submit = SubmitField('Send Email')
 
 
 class ResetPasswordForm(FlaskForm):
@@ -47,4 +47,4 @@ class ResetPasswordForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(6, 128), EqualTo('password2')])
     password2 = PasswordField('Confirm Password', validators=[DataRequired()])
-    submit = SubmitField()
+    submit = SubmitField('Reset Password')

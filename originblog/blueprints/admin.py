@@ -21,7 +21,17 @@ class AdminIndex(MethodView):
     decorators = [permission_required('POST')]
 
     def get(self):
-        return render_template('admin/index.html')
+        post_count = Post.objects.count()
+        comment_count = Comment.objects.count()
+        user_count = User.objects.count()
+        read_count = PostStatistic.objects.aggregate(
+            {'$group': {
+                '_id': 'null',
+                'count': {'$sum': '$visit_count'}
+            }}
+        )
+        return render_template('admin/admin_index.html', posts=post_count, comments=comment_count, users=user_count,
+                               reads=read_count)
 
 
 class Posts(MethodView):
@@ -562,7 +572,7 @@ admin_bp.add_url_rule('/pages/<slug>', view_func=Posts.as_view('page'), methods=
 admin_bp.add_url_rule('/meta/posts', view_func=MetaPosts.as_view('meta_posts'), methods=['GET', 'POST'])
 admin_bp.add_url_rule('/meta/posts/<slug>', view_func=MetaPostItem.as_view('meta_post'), methods=['GET', 'PUT'])
 
-admin_bp.add_url_rule('/posts/comments', view_func=Comments.as_view('comments'), methods=['GET', 'POST'])
+admin_bp.add_url_rule('/posts/comments', view_func=Comments.as_view('comments'), methods=['GET', 'DELETE'])
 admin_bp.add_url_rule('/posts/comments/<pk>', view_func=CommentItem.as_view('comment'), methods=['PATCH', 'DELETE'])
 
 admin_bp.add_url_rule('/users', view_func=Users.as_view('users'), methods=['GET', 'POST'])
@@ -573,3 +583,10 @@ admin_bp.add_url_rule('/widgets/<pk>', view_func=WidgetItem.as_view('widget'), m
 
 admin_bp.add_url_rule('/posts/statistics', view_func=PostStatistics.as_view('statistics'), methods=['GET'])
 admin_bp.add_url_rule('/posts/statistics/<slug>', view_func=PostStatisticItem.as_view('statistic'), methods=['GET'])
+
+
+@admin_bp.route('/posts/new_post')
+@permission_required('POST')
+def new_post():
+    form = PostForm
+    return render_template('admin/new_post.html', form=form)

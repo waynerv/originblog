@@ -1,32 +1,34 @@
-{% extends 'base.html' %}
+{% extends 'admin/base.html' %}
 {% from 'bootstrap/form.html' import render_field %}
 
-{% block head %}
+{% block custom_head %}
     {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='editormd/css/editormd.min.css') }}"/>
-{% endblock head %}
+{% endblock %}
 
-{% block title %}
-    New Post
-{% endblock title %}
+{% block title %}New Post{% endblock title %}
 
-{% block content %}
+{% block main %}
     <div class="page-header">
         <h1>New Post</h1>
     </div>
-    <form method="post">
+    <form action="{{ url_for('admin.posts') }}" method="post">
         {{ form.csrf_token }}
         {{ render_field(form.title) }}
+        {{ render_field(form.weight) }}
+        {{ render_field(form.abstract) }}
         {{ render_field(form.category) }}
+        {{ render_field(form.tags) }}
+        {{ render_field(form.type) }}
         <div id="flask-editormd" class="editormd">
-        {{ form.body(style="display:none;") }}
+        {{ form.raw_content(style="display:none;") }}
         </div>
-        {% if form.body.errors %}
+        {% if form.raw_content.errors %}
             {% for message in form.body.errors %}
             <small class="error">{{ message }}</small><br>
             {% endfor %}
         {% endif %}
-        {{ form.submit(class="btn btn-primary") }}
+        {{ form.submit(class_="btn btn-primary") }}
     </form>
 {% endblock %}
 

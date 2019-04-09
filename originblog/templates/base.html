@@ -98,7 +98,7 @@
                             <div class="dropdown-menu dropdown-menu-right" role="menu">
                                 <h6 class="dropdown-header">Logged in as {{ current_user.username }}</h6>
                                 <a class="dropdown-item" href="{{ url_for('user.index', username=current_user.username) }}">
-                                    <span class="oi oi-person"></span> My Home
+                                    <span class="oi oi-person"></span> Profile
                                 </a>
                                 <a class="dropdown-item" href="{{ url_for('user.edit_profile') }}">
                                     <span class="oi oi-cog"></span> Settings
