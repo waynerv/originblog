@@ -1,7 +1,7 @@
 import random
 import time
 
-from flask import Blueprint, request, current_app, render_template, flash, redirect, url_for, abort
+from flask import Blueprint, request, current_app, render_template, flash, redirect, url_for, abort, jsonify
 from flask.views import MethodView
 from flask_login import current_user
 from mongoengine import NotUniqueError, DoesNotExist, MultipleObjectsReturned
@@ -62,7 +62,7 @@ class Posts(MethodView):
             weight = form.weight.data
             raw_content = form.raw_content.data
             category = form.category.data
-            tags = form.tag.data.split() if form.tags.data else None
+            tags = form.tags.data.split() if form.tags.data else None
             type = form.type.data
             post = Post(
                 title=title,
@@ -107,7 +107,7 @@ class PostItem(MethodView):
         """获取文章内容与编辑表单"""
         post = Post.objects.get_or_404(slug=slug)
         # 只有管理员或文章作者才有权限修改文章内容
-        if not current_user.is_admin() and post.author != current_user._get_current_object():
+        if not current_user.is_admin and post.author != current_user._get_current_object():
             abort(403)
 
         if not form:
@@ -117,7 +117,7 @@ class PostItem(MethodView):
             form.weight.data = post.weight
             form.raw_content.data = post.raw_content
             form.category.data = post.category
-            form.tag.data = ' '.join(post.tags)
+            form.tags.data = ' '.join(post.tags)
             form.type.data = post.type
 
         return render_template('admin/edit_post.html', form=form)  # TODO:模板是否可改为new_posyt.html
@@ -126,7 +126,7 @@ class PostItem(MethodView):
         """修改文章内容"""
         post = Post.objects.get_or_404(slug)
         # 只有管理员或文章作者才有权限修改文章
-        if not current_user.is_admin() and post.author != current_user._get_current_object():
+        if not current_user.is_admin and post.author != current_user._get_current_object():
             abort(403)
 
         form = PostForm()
@@ -152,31 +152,31 @@ class PostItem(MethodView):
 
     def patch(self, slug):
         """设置文章是否可评论"""
-        post = Post.objects.get_or_404(slug)
+        post = Post.objects.get_or_404(slug=slug)
         # 拥有审核权限才能设置文章是否可评论,管理员的文章只有管理员可设置
         if not current_user.can('MODERATE'):
-            abort(403)
+            jsonify(message='No Permission.'), 403
         elif not current_user.is_admin and post.from_admin:
-            abort(403)
+            jsonify(message='No Permission.'), 403
 
         if post.can_comment:
             post.can_comment = False
-            flash('Comment disabled.', 'success')
+            message = 'Comment disabled.'
         else:
             post.can_comment = True
-            flash('Comment enabled.', 'success')
+            message = 'Comment enabled.'
         post.save()
-
-        return redirect_back()  # TODO：该操作需要附加next参数
+        return jsonify(message=message)
 
     def delete(self, slug):
         """删除文章"""
-        post = Post.objects.get_or_404(slug)
+        post = Post.objects.get_or_404(slug=slug)
+
         # 需要有审核权限或文章作者才能够删除文章，管理员的文章只有管理员可删除
         if not current_user.can('MODERATE') and post.author != current_user._get_current_object():
-            abort(403)
+            return jsonify(message='No Permission.'), 403
         elif not current_user.is_admin and post.from_admin:
-            abort(403)
+            return jsonify(message='No Permission.'), 403
 
         try:
             post_statistic = PostStatistic.objects.get(post=post)
@@ -185,8 +185,8 @@ class PostItem(MethodView):
             pass
 
         post.delete()
-        flash('Post deleted.', 'success')
-        return redirect_back()  # TODO：删除操作需要附加next参数
+        # flash('Post deleted.', 'success')
+        return jsonify(message='Post deleted.')
 
 
 class MetaPosts(MethodView):
@@ -261,7 +261,7 @@ class MetaPostItem(MethodView):
         """获取文章内容与编辑表单"""
         post = Post.objects.get_or_404(slug=slug)
         # 只有管理员或文章作者才有权限修改文章内容
-        if not current_user.is_admin() and post.author != current_user._get_current_object():
+        if not current_user.is_admin and post.author != current_user._get_current_object():
             abort(403)
 
         if not form:
@@ -353,7 +353,7 @@ class CommentItem(MethodView):
         """删除评论"""
         comment = Comment.objects.get_or_404(pk=pk)
         # 来自管理员的评论只有管理员自己可以删除
-        if not current_user.is_admin() and comment.from_admin:
+        if not current_user.is_admin and comment.from_admin:
             abort(403)
 
         comment.delete()
@@ -440,7 +440,7 @@ class MetaUserItem(MethodView):
     def delete(self, pk):
         """删除用户"""
         user = User.objects.get_or_404(pk=pk)
-        if user.is_admin():
+        if user.is_admin:
             flash('Admin can not be deleted.', 'warning')
             return redirect_back()
         user.delete()
@@ -588,5 +588,5 @@ admin_bp.add_url_rule('/posts/statistics/<slug>', view_func=PostStatisticItem.as
 @admin_bp.route('/posts/new_post')
 @permission_required('POST')
 def new_post():
-    form = PostForm
+    form = PostForm()
     return render_template('admin/new_post.html', form=form)

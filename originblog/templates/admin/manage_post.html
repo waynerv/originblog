@@ -1,70 +1,81 @@
-{% extends 'base.html' %}
+{% extends 'admin/base.html' %}
 {% from 'bootstrap/pagination.html' import render_pagination %}
 
 {% block title %}
-    Manage Posts
+    All Posts
 {% endblock title %}
 
-{% block content %}
-    <div class="page-header">
-        <h1>
-            Posts
+{% block main %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            All Post
             <small class="text-muted">{{ pagination.total }}</small>
             <span class="float-right"><a class="btn btn-primary btn-sm"
                                          href="{{ url_for('admin.new_post') }}">New Post</a></span>
         </h1>
     </div>
-    {% if posts %}
-        <table class="table table-striped">
+    {% if pagination.items %}
+        <table class="table table-bordered shadow">
             <thead>
             <tr>
                 <th>No.</th>
                 <th>Title</th>
+                <th>Weight</th>
                 <th>Category</th>
-                <th>Date</th>
+                <th>Tags</th>
                 <th>Comments</th>
                 <th>Words</th>
+                <th>Publish</th>
+                <th>Update</th>
                 <th>Actions</th>
             </tr>
             </thead>
-            {% for post in posts %}
+            {% for post in pagination.items %}
                 <tr>
-                    <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINLOG_MANAGE_POST_PER_PAGE) }}</td>
-                    <td><a href="{{ url_for('blog.show_post', post_id=post.id) }}">{{ post.title }}</a></td>
+                    <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINBLOG_MANAGE_POST_PER_PAGE) }}</td>
+                    <td><a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></td>
+                    <td>{{ post.weight }}</td>
                     <td>
-                        <a href="{{ url_for('blog.show_category', category_id=post.category.id) }}">{{ post.category.name }}</a>
+                        <a href="{{ url_for('blog.index', category=post.category) }}">{{ post.category }}</a>
                     </td>
-                    <td>{{ moment(post.timestamp).format('LL') }}</td>
                     <td>
-                        <a href="{{ url_for('blog.show_post', post_id=post.id) }}#comment">{{ post.comments|length }}</a>
+                        {% for tag in post.tags %}
+                            <a href="{{ url_for('blog.index', tag=tag) }}" class="fa fa-tag">
+                                <span class="label label-default">{{ tag }}</span>
+                            </a>
+                            &nbsp;
+                        {% endfor %}
                     </td>
-                    <td>{{ post.body|length }}</td>
                     <td>
-                        <form class="inline" method="post"
-                          action="{{ url_for('admin.set_comment', post_id=post.id, next=request.full_path) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-warning btn-sm">
+                        <a href="{{ url_for('blog.show_post', slug=post.slug) }}#comment">{{ post.comments_count }}</a>
+                    </td>
+                    <td>{{ post.html_content|length }}</td>
+                    <td>{{ moment(post.pub_time).format('LL') }}</td>
+                    <td>{{ moment(post.update_time).format('LL') }}</td>
+                    <td>
+                        <button data-id="disableComment" data-href="{{ url_for('admin.post', slug=post.slug) }}"
+                                class="btn btn-warning btn-sm d-inline patch-request" type="button">
                             {% if post.can_comment %}Disabled{% else %}Enable{% endif %} Comment
                         </button>
-                        </form>
-                        <a class="btn btn-info btn-sm" href="{{ url_for('admin.edit_post', post_id=post.id) }}">Edit</a>
-                        <form class="inline" method="post"
-                              action="{{ url_for('admin.delete_post', post_id=post.id, next=request.full_path) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Are you sure?')">Delete
-                            </button>
-                        </form>
+                        <button class="btn btn-info btn-sm d-inline" type="button"
+                           href="{{ url_for('admin.post', slug=post.slug) }}">Edit</button>
+                        <button data-id="deletePost" data-href="{{ url_for('admin.post', slug=post.slug) }}"
+                                class="btn btn-danger btn-sm d-inline delete-request" type="button">Delete
+                        </button>
                     </td>
                 </tr>
             {% endfor %}
         </table>
-        <div class="page-footer">
+        <div class="pagination">
             {{ render_pagination(pagination) }}
         </div>
     {% else %}
         <div class="tip">
-        <h5>No posts</h5>
+            <h5>No posts</h5>
         </div>
     {% endif %}
-{% endblock content %}
+{% endblock %}
+
+{% block scripts %}
+    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
+{% endblock %}

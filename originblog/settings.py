@@ -42,7 +42,7 @@ class BlogSettings:
         'admin': ['COMMENT', 'POST', 'MODERATE', 'ADMINISTRATE']
     }
     SEARCH_ENGINE_SUBMIT_URLS = {
-        'baidu': 'pending'
+        'baidu': 'https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/form'
     }
 
 

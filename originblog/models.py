@@ -206,6 +206,10 @@ class Post(db.Document):
         """返回已审核通过的评论列表"""
         return [comment for comment in self.comments if comment.reviewed is True]
 
+    @property
+    def comments_count(self):
+        return Comment.objects.filter(post_slug=self.slug).count()
+
     def clean(self):
         """保存到数据库前更新时间戳, 生成标题别名并将markdown文本转换为html"""
         now = datetime.utcnow()

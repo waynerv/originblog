@@ -2,15 +2,14 @@
 {% from 'bootstrap/form.html' import render_field %}
 
 {% block custom_head %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='editormd/css/editormd.min.css') }}"/>
+    <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
 {% endblock %}
 
 {% block title %}New Post{% endblock title %}
 
 {% block main %}
-    <div class="page-header">
-        <h1>New Post</h1>
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">New Post</h1>
     </div>
     <form action="{{ url_for('admin.posts') }}" method="post">
         {{ form.csrf_token }}
@@ -20,9 +19,8 @@
         {{ render_field(form.category) }}
         {{ render_field(form.tags) }}
         {{ render_field(form.type) }}
-        <div id="flask-editormd" class="editormd">
-        {{ form.raw_content(style="display:none;") }}
-        </div>
+        {{ form.raw_content.label }}
+        {{ form.raw_content(id="easymde") }}
         {% if form.raw_content.errors %}
             {% for message in form.body.errors %}
             <small class="error">{{ message }}</small><br>
@@ -30,21 +28,15 @@
         {% endif %}
         {{ form.submit(class_="btn btn-primary") }}
     </form>
+    <br>
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
-    <script type="text/javascript" src="{{ url_for('static',filename='editormd/editormd.min.js') }}"></script>
-    <script type="text/javascript">
-        $(function () {
-            editormd("flask-editormd", {
-                // width: "100%", 该配置不起作用，可能与Bootstrap4冲突
-                height: 640,
-                syncScrolling: "single",
-                path: "{{ url_for('static',filename='editormd/lib/') }}",
-                saveHTMLToTextarea : true,
-                previewTheme : "dark"
-            });
-        });
+    <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+    <script>
+    let easyMDE = new EasyMDE({element: $('#easymde')[0]});
+    $('#submit').click(function(){
+      $('#easymde').text(easyMDE.value());
+    });
     </script>
 {% endblock %}

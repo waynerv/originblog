@@ -197,11 +197,14 @@
     <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
 
     <script src="https://cdn.bootcss.com/highlight.js/9.15.6/highlight.min.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
 
     <!-- Custom scripts for this template -->
     {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
     <script src="{{ url_for('static', filename='js/clean-blog.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
     {% block scripts %}{% endblock %}
 </body>
