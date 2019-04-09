@@ -21,7 +21,8 @@ class ProfileForm(FlaskForm):
     homepage = StringField('Homepage', validators=[Optional(), URL()])
     weibo = StringField('Weibo', validators=[Optional(), URL()])
     weixin = StringField('Weixin', validators=[Optional(), URL()])
-    github = StringField('github', validators=[Optional(), URL()])
+    github = StringField('GitHub', validators=[Optional(), URL()])
+    submit = SubmitField()
 
 
 class ChangeEmailForm(FlaskForm):

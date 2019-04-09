@@ -11,10 +11,11 @@
     /*display: inline;*/
 /*}*/
 
-/*.page-header {*/
-/*    padding-top: 20px;*/
-/*    padding-bottom: 20px;*/
-/*}*/
+.page-header {
+    margin-top: 45px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
 
 .error {
     color: red;

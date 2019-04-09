@@ -1,10 +1,10 @@
-{% extends 'user/settings/base.html' %}
+{% extends 'user/base.html' %}
 {% from 'bootstrap/form.html' import render_form %}
 
 {% block title %}Delete Account{% endblock %}
 
 {% block setting_content %}
-    <div class="card w-100 bg-light">
+    <div class="card w-100 bg-light border-danger">
         <h3 class="card-header">Delete Account</h3>
         <div class="card-body">
             {{ render_form(form) }}

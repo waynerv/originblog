@@ -41,7 +41,7 @@ class Guest(AnonymousUserMixin):
 login_manager.login_view = 'auth.login'
 login_manager.login_message = '请先登录！'
 login_manager.login_message_category = 'warning'
-login_manager.refresh_view = 'auth.login'
+login_manager.refresh_view = 'auth.re_authenticate'
 login_manager.needs_refresh_message = '请重新认证！'
 login_manager.needs_refresh_message_category = 'warning'
 login_manager.anonymous_user = Guest

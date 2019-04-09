@@ -32,23 +32,23 @@ def edit_profile():
         current_user.name = form.name.data
         current_user.homepage = form.homepage.data
         current_user.bio = form.bio.data
-        current_user.social_networks['weibo'] = form.weibo.data
-        current_user.social_networks['weixin'] = form.weixin.data
-        current_user.social_networks['github'] = form.github.data
+        current_user.social_networks['weibo']['url'] = form.weibo.data
+        current_user.social_networks['weixin']['url'] = form.weixin.data
+        current_user.social_networks['github']['url'] = form.github.data
         current_user.save()
         flash('Profile updated.', 'success')
         return redirect(url_for('user.edit_profile'))
     form.name.data = current_user.name
     form.homepage.data = current_user.homepage
     form.bio.data = current_user.bio
-    form.weibo.data = current_user.social_networks.get('weibo')
-    form.weixin.data = current_user.social_networks.get('weixin')
-    form.github.data = current_user.social_networks.get('github')
+    form.weibo.data = current_user.social_networks['weibo'].get('url')
+    form.weixin.data = current_user.social_networks['weixin'].get('url')
+    form.github.data = current_user.social_networks['github'].get('url')
     return render_template('user/edit_profile.html', form=form)
 
 
 @user_bp.route('/settings/change-password', methods=['GET', 'POST'])
-@fresh_login_required
+@login_required
 def change_password():
     """更改密码"""
     form = ChangePasswordForm()

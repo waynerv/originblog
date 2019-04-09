@@ -2,7 +2,23 @@
 {% from 'bootstrap/form.html' import render_form %}
 {% from 'bootstrap/nav.html' import render_nav_item %}
 
-{% block content %}
+{% block header %}
+    <header class="masthead" style="background-image: url({{ blog_meta.bg_home }})">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <div class="page-heading" style="padding: 70px 0">
+                        <h1>Account Settings</h1>
+{#                        <hr class="small">#}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+{% endblock %}
+
+{% block main %}
 <div class="page-header">
     <h1>Settings</h1>
 </div>
@@ -10,11 +26,8 @@
     <div class="col-md-3">
         <div class="nav nav-pills flex-column" role="tablist" aria-orientation="vertical">
             {{ render_nav_item('user.edit_profile', 'Edite Profile') }}
-            {{ render_nav_item('user.change_avatar', 'Change Avatar') }}
             {{ render_nav_item('user.change_password', 'Change Password') }}
             {{ render_nav_item('user.change_email_request', 'Change Email') }}
-            {{ render_nav_item('user.notification_setting', 'Notification') }}
-            {{ render_nav_item('user.privacy_setting', 'Privacy') }}
             {{ render_nav_item('user.delete_account', 'Delete Account') }}
         </div>
     </div>
