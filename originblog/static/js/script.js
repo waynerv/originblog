@@ -1,3 +1,4 @@
+// 初始化moment库
 $(function () {
     function render_time() {
         return moment($(this).data('timestamp')).format('lll')
@@ -7,7 +8,7 @@ $(function () {
     );
 });
 
-// 用来显示弹窗
+// 用来显示不同类型弹窗
 var flash =null;
 function toast(body, category) {
     clearTimeout(flash);
@@ -57,7 +58,7 @@ $(document).ajaxError(function (event, request, settings) {
     toast(message, 'error'); // 弹出提示消息
 });
 
-// 发送PATCH方法ajax请求
+// 发送PATCH方法ajax请求切换文章评论状态并更新页面
 function switchComment(e) {
     var $el = $(e.target);
 
@@ -79,6 +80,7 @@ function switchComment(e) {
     });
 }
 
+// 发送PATCH方法ajax请求审核评论并更新页面
 function handleComment(e) {
     var $el = $(e.target);
     var id = $el.data('id');
@@ -114,10 +116,6 @@ function deleteRequest(e) {
             $('#'+id).remove();
             toast(data.message);
         },
-        // 使用统一回调函数
-        // error: function (error) {
-        //     alert(error.message)
-        // }
     });
 }
 

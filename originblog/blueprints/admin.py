@@ -316,7 +316,7 @@ class Comments(MethodView):
 
         if filter_rule == 'all':
             filter_comments = Comment.objects
-        elif filter_rule == 'pending':
+        elif filter_rule == 'unread':
             filter_comments = Comment.objects.filter(status='pending')
         elif filter_rule == 'admin':
             filter_comments = Comment.objects.filter(from_admin=True)

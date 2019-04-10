@@ -12,6 +12,26 @@
             <small class="text-muted">{{ pagination.total }}</small>
         </h1>
     </div>
+    <ul class="nav nav-pills" style="margin-bottom: 10px">
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#">Filter</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'all' %}active{% endif %}"
+               href="{{ url_for('admin.comments', filter='all') }}">All</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'unread' %}active{% endif %}"
+               href="{{ url_for('admin.comments', filter='unread') }}">Unread
+            {% if unread_comments %}
+                <span class="badge badge-success">{{ unread_comments }}</span>
+            {% endif %}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'admin' %}active{% endif %}"
+               href="{{ url_for('admin.comments', filter='admin') }}">Admin</a>
+        </li>
+    </ul>
     {% if pagination.items %}
         <table class="table table-bordered shadow">
             <thead>
@@ -47,7 +67,7 @@
                         </button>
                         {% endif %}
                         <button data-id="{{ comment.id }}" data-href="{{ url_for('admin.comment', pk=comment.id) }}"
-                                class="btn btn-danger btn-sm d-inline delete-request" type="button">Delete
+                                class="btn btn-danger btn-sm d-inline delete-item" type="button">Delete
                         </button>
                     </td>
                 </tr>
