@@ -103,7 +103,7 @@
         <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Manage Users:</h6>
-            <a class="collapse-item" href="{{ url_for('admin.users') }}">Add User</a>
+            <a class="collapse-item" href="{{ url_for('admin.add_user') }}">Add User</a>
             <a class="collapse-item" href="{{ url_for('admin.users') }}">All Users</a>
           </div>
         </div>
@@ -126,7 +126,7 @@
         <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Manage Pages:</h6>
-            <a class="collapse-item" href="{{ url_for('admin.pages') }}">New Page</a>
+            <a class="collapse-item" href="{{ url_for('admin.new_page') }}">New Page</a>
             <a class="collapse-item" href="{{ url_for('admin.pages') }}">All Pages</a>
           </div>
         </div>
@@ -148,8 +148,8 @@
         <div id="collapseThree" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Manage Widgets:</h6>
-            <a class="collapse-item" href="{{ url_for('admin.posts') }}">New Widget</a>
-            <a class="collapse-item" href="{{ url_for('admin.posts') }}">All Widgets</a>
+            <a class="collapse-item" href="{{ url_for('admin.new_widget') }}">New Widget</a>
+            <a class="collapse-item" href="{{ url_for('admin.widgets') }}">All Widgets</a>
           </div>
         </div>
       </li>
@@ -289,6 +289,15 @@
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
+
+        <!-- Display Flashed Message-->
+        {% for message in get_flashed_messages(with_categories=True) %}
+        <div class="alert alert-{{ message[0] }}" role="alert">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message[1] }}
+        </div>
+        {% endfor %}
+
         {% block main %}
 
         {% endblock %}

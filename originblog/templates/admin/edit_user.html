@@ -1,0 +1,27 @@
+{% extends 'admin/base.html' %}
+{% from 'bootstrap/form.html' import render_field %}
+
+
+{% block title %}Edit User{% endblock title %}
+
+{% block main %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Edit User</h1>
+    </div>
+    <form action="{{ url_for('admin.meta_user', pk=pk) }}" method="post" class="col-md-7 col-lg-5 col-xl-3 pl-0">
+        {{ form.csrf_token }}
+        {{ render_field(form.username) }}
+        {{ render_field(form.name) }}
+        {{ render_field(form.email) }}
+        {{ render_field(form.email_confirmed) }}
+        {{ render_field(form.bio) }}
+        {{ render_field(form.homepage) }}
+        {{ render_field(form.weibo) }}
+        {{ render_field(form.weixin) }}
+        {{ render_field(form.github) }}
+        {{ render_field(form.role) }}
+        {{ render_field(form.active) }}
+        {{ form.submit(class_="btn btn-primary") }}
+    </form>
+    <br>
+{% endblock %}

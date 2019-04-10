@@ -74,14 +74,14 @@ class User(db.Document, UserMixin):
     username = db.StringField(max_length=20, required=True, unique=True)
     password_hash = db.StringField(max_length=128, required=True)
     name = db.StringField(max_length=30, default=username)
-    email = db.EmailField(max_length=255, required=True)
+    email = db.EmailField(max_length=255, required=True, unique=True)
     create_time = db.DateTimeField(default=datetime.utcnow, required=True)
     last_login = db.DateTimeField(default=datetime.utcnow, required=True)
     email_confirmed = db.BooleanField(default=False)
     # is_superuser = db.BooleanField(default=False)
     role = db.ReferenceField('Role')
     bio = db.StringField(max_length=200)
-    homepage = db.URLField(max_length=255)
+    homepage = db.StringField(max_length=255)
     social_networks = db.DictField(default=SOCIAL_NETWORKS)
     active = db.BooleanField(default=True)
 
@@ -160,6 +160,11 @@ class User(db.Document, UserMixin):
         """Flask-Login检查用户是否活跃"""
         return self.active
 
+    @property
+    def posts_count(self):
+        """发表的文章总数"""
+        return Post.objects.filter(author=self).count()
+
     def can(self, permission):
         """检查用户是否拥有指定权限"""
         return self.role and permission in self.role.permissions
@@ -208,6 +213,7 @@ class Post(db.Document):
 
     @property
     def comments_count(self):
+        """收到的评论总数"""
         return Comment.objects.filter(post_slug=self.slug).count()
 
     def clean(self):
@@ -314,6 +320,11 @@ class PostStatistic(db.Document):
     post = db.ReferenceField(Post, reverse_delete_rule=db.CASCADE)  # 与文章级联删除
     visit_count = db.IntField(default=0)
     verbose_count_base = db.IntField(default=0)
+    post_type = db.StringField(max_length=64, default='post')
+
+    def clean(self):
+        if not self.post_type:
+            self.post_type = self.post.type
 
 
 class Tracker(db.Document):

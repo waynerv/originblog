@@ -2,16 +2,14 @@
 {% from 'bootstrap/pagination.html' import render_pagination %}
 
 {% block title %}
-    All Widgets
+    Statistic Detail
 {% endblock title %}
 
 {% block main %}
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">
-            All Widgets
+            Statistic Detail
             <small class="text-muted">{{ pagination.total }}</small>
-            <span class="float-right"><a class="btn btn-primary btn-sm"
-                                         href="{{ url_for('admin.new_widget') }}">New Widget</a></span>
         </h1>
     </div>
     {% if pagination.items %}
@@ -19,27 +17,21 @@
             <thead>
             <tr>
                 <th>No.</th>
-                <th>Title</th>
-                <th>Priority</th>
-                <th>Content</th>
-                <th>Publish</th>
-                <th>Actions</th>
+                <th>Post</th>
+                <th>IP</th>
+                <th>Agent</th>
+                <th>Time</th>
             </tr>
             </thead>
-            {% for widget in pagination.items %}
-                <tr id="{{ widget.id }}">
+            {% for tracker in pagination.items %}
+                <tr id="{{ tracker.id }}">
                     <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINBLOG_MANAGE_POST_PER_PAGE) }}</td>
-                    <td>{{ widget.title }}</td>
-                    <td>{{ widget.priority }}</td>
-                    <td>{{ widget.html_content|safe }}</td>
-                    <td>{{ moment(widget.pub_time).format('LL') }}</td>
                     <td>
-                        <button class="btn btn-info btn-sm d-inline" type="button"><a class="text-white"
-                                href="{{ url_for('admin.widget', pk=widget.pk) }}">Edit</a></button>
-                        <button data-id="{{ widget.id }}" data-href="{{ url_for('admin.widget', pk=widget.pk) }}"
-                                class="btn btn-danger btn-sm d-inline delete-item" type="button">Delete
-                        </button>
+                        <a href="{{ url_for('blog.show_post', slug=tracker.post.slug) }}">{{ tracker.post.title }}</a>
                     </td>
+                    <td>{{ tracker.ip }}</td>
+                    <td>{{ tracker.user_agent }}</td>
+                    <td>{{ moment(tracker.create_time).format('LLL') }}</td>
                 </tr>
             {% endfor %}
         </table>
@@ -48,7 +40,7 @@
         </div>
     {% else %}
         <div class="tip">
-            <h5>No widgets</h5>
+            <h5>No Details</h5>
         </div>
     {% endif %}
 {% endblock %}

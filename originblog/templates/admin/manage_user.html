@@ -1,0 +1,88 @@
+{% extends 'admin/base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+
+{% block title %}
+    All Users
+{% endblock title %}
+
+{% block main %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            All Users
+            <small class="text-muted">{{ pagination.total }}</small>
+        </h1>
+    </div>
+    <ul class="nav nav-pills" style="margin-bottom: 10px">
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#">Filter</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'all' %}active{% endif %}"
+               href="{{ url_for('admin.users', filter='all') }}">All</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'writer' %}active{% endif %}"
+               href="{{ url_for('admin.users', filter='writer') }}">Writer</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'moderator' %}active{% endif %}"
+               href="{{ url_for('admin.users', filter='moderator') }}">Moderator</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'admin' %}active{% endif %}"
+               href="{{ url_for('admin.users', filter='admin') }}">Administrator</a>
+        </li>
+    </ul>
+    {% if pagination.items %}
+        <table class="table table-bordered shadow">
+            <thead>
+            <tr>
+                <th>No.</th>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Homepage</th>
+                <th>Created</th>
+                <th>Published</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            {% for user in pagination.items %}
+                <tr id="{{ user.id }}">
+                    <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINBLOG_MANAGE_POST_PER_PAGE) }}</td>
+                    <td><a href="{{ url_for('user.index', username=user.username) }}">{{ user.username }}</a></td>
+                    <td>{{ user.name }}</td>
+                    <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+                    <td><a href="{{ user.homepage }}">{{ user.homepage }}</a></td>
+                    <td>{{ moment(user.create_time).format('LL') }}</td>
+                    <td>{{ user.posts_count }}</td>
+                    <td>{{ user.role.role_name }}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm d-inline" type="button"><a class="text-white"
+                                href="{{ url_for('admin.meta_user', pk=user.id) }}">Edit</a></button>
+                        <button data-id="{{ user.id }}" data-href="{{ url_for('admin.meta_user', pk=user.id) }}"
+                                class="btn btn-danger btn-sm d-inline delete-item" type="button">Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div class="pagination">
+            {{ render_pagination(pagination) }}
+        </div>
+    {% else %}
+        <div class="tip">
+            <h5>No Users</h5>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 生成csrf令牌
+        var csrf_token = "{{ csrf_token() }}";
+        var default_error_message = 'Server error, please try again later';
+    </script>
+    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
+{% endblock %}

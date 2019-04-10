@@ -16,7 +16,7 @@ class ChangePasswordForm(FlaskForm):
 
 class ProfileForm(FlaskForm):
     """定义修改个人资料表单"""
-    name = StringField('Display Name', validators=[Length(1, 128)])
+    name = StringField('Name', validators=[Length(1, 128)])
     bio = StringField('Bio', validators=[Optional(), Length(0, 200)])
     homepage = StringField('Homepage', validators=[Optional(), URL()])
     weibo = StringField('Weibo', validators=[Optional(), URL()])

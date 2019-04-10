@@ -22,7 +22,7 @@
         {{ form.raw_content.label }}
         {{ form.raw_content(id="easymde") }}
         {% if form.raw_content.errors %}
-            {% for message in form.body.errors %}
+            {% for message in form.raw_content.errors %}
             <small class="error">{{ message }}</small><br>
             {% endfor %}
         {% endif %}

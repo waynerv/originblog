@@ -23,7 +23,7 @@ def permission_required(permission):
 
 def admin_required(func):
     """检查访问视图的用户是否拥有管理员权限"""
-    return permission_required('ADMINSTRATE')(func)
+    return permission_required('ADMINISTRATE')(func)
 
 
 def confirm_required(view):

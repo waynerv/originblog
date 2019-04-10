@@ -1,13 +1,39 @@
-{% extends 'base.html' %}
-{% from 'bootstrap/form.html' import render_form %}
+{% extends 'admin/base.html' %}
+{% from 'bootstrap/form.html' import render_field %}
 
-{% block title %}
-    New Link
+{% block custom_head %}
+    <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
 {% endblock %}
 
-{% block content %}
-    <div class="page-header">
-        <h1>New Link</h1>
+{% block title %}New Widget{% endblock title %}
+
+{% block main %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">New Widget</h1>
     </div>
-    {{ render_form(form) }}
+    <form action="{{ url_for('admin.widgets') }}" method="post">
+        {{ form.csrf_token }}
+        {{ render_field(form.title) }}
+        {{ render_field(form.priority) }}
+        {{ render_field(form.content_type) }}
+        {{ form.content.label }}
+        {{ form.content(id="easymde") }}
+        {% if form.content.errors %}
+            {% for message in form.content.errors %}
+            <small class="error">{{ message }}</small><br>
+            {% endfor %}
+        {% endif %}
+        {{ form.submit(class_="btn btn-primary") }}
+    </form>
+    <br>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+    <script>
+    let easyMDE = new EasyMDE({element: $('#easymde')[0]});
+    $('#submit').click(function(){
+      $('#easymde').text(easyMDE.value());
+    });
+    </script>
 {% endblock %}

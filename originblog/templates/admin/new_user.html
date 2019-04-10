@@ -1,0 +1,20 @@
+{% extends 'admin/base.html' %}
+{% from 'bootstrap/form.html' import render_field %}
+
+{% block title %}Add User{% endblock title %}
+
+{% block main %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Add User</h1>
+    </div>
+    <form action="{{ url_for('admin.users') }}" method="post" class="col-md-7 col-lg-5 col-xl-3 pl-0">
+        {{ form.csrf_token }}
+        {{ render_field(form.name) }}
+        {{ render_field(form.username) }}
+        {{ render_field(form.email) }}
+        {{ render_field(form.password) }}
+        {{ render_field(form.password2) }}
+        {{ form.submit(class_="btn btn-primary", value='Add') }}
+    </form>
+    <br>
+{% endblock %}

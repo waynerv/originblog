@@ -51,10 +51,9 @@ class Posts(MethodView):
         pagination = post_query.paginate(page, per_page)
         return render_template('admin/manage_post.html', pagination=pagination)
 
-    def post(self, post_type='post'):
+    def post(self):
         """增加新文章"""
         form = PostForm()
-        form.type.data = post_type
 
         if form.validate_on_submit():
             title = form.title.data
@@ -87,7 +86,7 @@ class Posts(MethodView):
             post_statistic.save()
 
             # 发送文章发布的信号
-            post_published.send(current_app._get_current_object(), post=post, post_type=post_type)
+            post_published.send(current_app._get_current_object(), post=post, post_type=post.type)
 
             flash('Post published.', 'success')
             # 跳转到对应端点
@@ -95,7 +94,7 @@ class Posts(MethodView):
                 'post': 'blog.show_post',
                 'page': 'blog.show_page'
             }
-            return redirect(url_for(endpoints[post_type], slug=post.slug))
+            return redirect(url_for(endpoints[post.type], slug=post.slug))
         return render_template('admin/new_post.html', form=form)
 
 
@@ -311,19 +310,19 @@ class Comments(MethodView):
     def get(self):
         """获取评论列表,可进行分类筛选"""
         filter_rule = request.args.get('filter', 'all')  # TODO：对评论字符串内容进行搜索
-        page = request.args.get('page', default=1, type=int)
-        per_page = current_app.config['ORIGINBLOG_MANAGE_COMMENT_PER_PAGE']
-
         if filter_rule == 'all':
             filter_comments = Comment.objects
         elif filter_rule == 'unread':
             filter_comments = Comment.objects.filter(status='pending')
         elif filter_rule == 'admin':
             filter_comments = Comment.objects.filter(from_admin=True)
+        else:
+            filter_comments = Comment.objects
 
+        page = request.args.get('page', default=1, type=int)
+        per_page = current_app.config['ORIGINBLOG_MANAGE_COMMENT_PER_PAGE']
         pagination = filter_comments.order_by('-pub_time').paginate(page, per_page)
-        comments = pagination.items  # TODO:统一传入模板格式
-        return render_template('admin/manage_comment.html', comments=comments, pagination=pagination)
+        return render_template('admin/manage_comment.html', pagination=pagination)
 
     def delete(self):
         """删除所有未审核的及标记为垃圾信息的评论"""
@@ -370,9 +369,24 @@ class Users(MethodView):
 
     def get(self):
         """获取所有用户列表"""
+        filter_rule = request.args.get('filter', 'all')
+        if filter_rule == 'all':
+            filter_users = User.objects
+        elif filter_rule == 'writer':
+            role = Role.objects.filter(role_name='writer').first()
+            filter_users = User.objects.filter(role=role)
+        elif filter_rule == 'moderator':
+            role = Role.objects.filter(role_name='moderator').first()
+            filter_users = User.objects.filter(role=role)
+        elif filter_rule == 'admin':
+            role = Role.objects.filter(role_name='admin').first()
+            filter_users = User.objects.filter(role=role)
+        else:
+            filter_users = User.objects
+
         page = request.args.get('page', default=1, type=int)
         per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
-        pagination = User.objects.paginate(page, per_page)
+        pagination = filter_users.paginate(page, per_page)
         return render_template('admin/manage_user.html', pagination=pagination)
 
     def post(self):
@@ -405,50 +419,52 @@ class MetaUserItem(MethodView):
         user = User.objects.get_or_404(pk=pk)
 
         if not form:
-            form = MetaUserForm()
+            form = MetaUserForm(user)
+            form.username.data = user.username
             form.email.data = user.email
             form.email_confirmed.data = user.email_confirmed
             form.name.data = user.name
             form.bio.data = user.bio
             form.homepage.data = user.homepage
-            form.weibo.data = user.social_networks.get('weibo')
-            form.weixin.data = user.social_networks.get('weixin')
-            form.github.data = user.social_networks.get('github')
+            form.weibo.data = user.social_networks['weibo'].get('url')
+            form.weixin.data = user.social_networks['weixin'].get('url')
+            form.github.data = user.social_networks['github'].get('url')
             form.role.data = user.role.role_name
             form.active.data = user.active
 
-        return render_template('admin/edit_user.html', form=form)
+        return render_template('admin/edit_user.html', pk=pk, form=form)
 
     def post(self, pk):
         """修改用户资料"""
-        form = MetaUserForm()
+        user = User.objects.get_or_404(pk=pk)
+        form = MetaUserForm(user)
         if form.validate_on_submit():
-            user = User.objects.get_or_404(pk=pk)
-            user.email = form.eamil.data
-            user.email_confirmed = form.eamil_confirmed.data
+            user.username = form.username.data
+            user.email = form.email.data
+            user.email_confirmed = form.email_confirmed.data
             user.name = form.name.data
             user.bio = form.bio.data
             user.homepage = form.homepage.data
-            user.social_networks['weibo'] = form.weibo.data
-            user.social_networks['weixin'] = form.weixin.data
-            user.social_networks['github'] = form.github.data
-            user.role = Role.objects.filter(role_name=form.role.data) or Role.objects.filter(role_name='reader')
+            user.social_networks['weibo']['url'] = form.weibo.data
+            user.social_networks['weixin']['url'] = form.weixin.data
+            user.social_networks['github']['url'] = form.github.data
+            user.role = Role.objects.filter(role_name=form.role.data).first() or Role.objects.filter(
+                role_name='reader').first()
             user.active = form.active.data
             user.save()
 
             flash('User updated', 'success')
-            return Users.get()
+            return redirect(url_for('admin.users'))
         return self.get(pk, form)
 
     def delete(self, pk):
         """删除用户"""
         user = User.objects.get_or_404(pk=pk)
         if user.is_admin:
-            flash('Admin can not be deleted.', 'warning')
-            return redirect_back()
+            return jsonify(message='Admin cannot be deleted.'), 403
         user.delete()
-        flash('User deleted.', 'success')
-        return redirect_back()
+        # flash('User deleted.', 'success')
+        return jsonify(message='User deleted.')
 
 
 class Widgets(MethodView):
@@ -457,9 +473,10 @@ class Widgets(MethodView):
 
     def get(self):
         """获取widget列表"""
-        widgets = Widget.objects.all()
-
-        return render_template('admin/manage_widget.html', widgets=widgets)
+        page = request.args.get('page', default=1, type=int)
+        per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
+        pagination = Widget.objects.paginate(page, per_page)
+        return render_template('admin/manage_widget.html', pagination=pagination)
 
     def post(self):
         """新增widget"""
@@ -469,15 +486,15 @@ class Widgets(MethodView):
             title = form.title.data
             priority = form.priority.data
             widget = Widget(title=title, priority=priority)
-            if form.content_type.data == 'html':
+            if form.content_type.data == 'markdown':
+                widget.raw_content = form.content.data
+            else:
                 widget.html_content = form.content.data
                 widget.raw_content = None
-            else:
-                widget.raw_content = form.content.data
             widget.save()
 
             flash('Widget created.', 'success')
-            return redirect(url_for('admin.manage_link'))
+            return redirect(url_for('admin.widgets'))
         return render_template('admin/new_widget.html', form=form)
 
 
@@ -487,25 +504,25 @@ class WidgetItem(MethodView):
 
     def get(self, pk, form=None):
         """获取widget内容与编辑表单"""
-        widget = Widget.objects.get_or_404(pk)
+        widget = Widget.objects.get_or_404(pk=pk)
 
         if not form:
             form = WidgetForm()
-            form.title = widget.title
-            form.priority = widget.priority
+            form.title.data = widget.title
+            form.priority.data = widget.priority
             if widget.raw_content:
-                form.content_type = 'markdown'
-                form.content = widget.raw_content
+                form.content_type.data = 'markdown'
+                form.content.data = widget.raw_content
             else:
-                form.content_type = 'html'
-                form.content = widget.html_content
-        return render_template('admin/edit_widget.html', form=form)
+                form.content_type.data = 'html'
+                form.content.data = widget.html_content
+        return render_template('admin/edit_widget.html', pk=pk, form=form)
 
     def post(self, pk):
         """修改widget内容"""
-        widget = Widget.objects.get_or_404(pk)
+        widget = Widget.objects.get_or_404(pk=pk)
 
-        form = WidgetForm
+        form = WidgetForm()
         if form.validate_on_submit():
             widget.title = form.title.data
             widget.priority = form.priority.data
@@ -517,15 +534,15 @@ class WidgetItem(MethodView):
             widget.save()
 
             flash('Widget updated.', 'success')
-            return redirect(url_for('admin/manage_widget'))
+            return redirect(url_for('admin.widgets'))
         return self.get(pk, form)
 
     def delete(self, pk):
         """删除widget"""
-        widget = Widget.objects.get_or_404(pk)
+        widget = Widget.objects.get_or_404(pk=pk)
         widget.delete()
-        flash('Widget deleted.', 'success')
-        return redirect_back()  # TODO：审核操作需要附加next参数
+        # flash('Widget deleted.', 'success')
+        return jsonify(message='Widget deleted.')
 
 
 class PostStatistics(MethodView):
@@ -534,13 +551,15 @@ class PostStatistics(MethodView):
 
     def get(self):
         """获取文章统计信息列表"""
-        filter_rule = request.args.get('filter', 'posts')  # TODO：对评论字符串内容进行搜索
+        filter_rule = request.args.get('filter', 'all')
         if filter_rule == 'all':
             filter_statistics = PostStatistic.objects
         elif filter_rule == 'posts':
-            filter_statistics = PostStatistic.objects.filter(post__type='post')
+            filter_statistics = PostStatistic.objects.filter(post_type='post')
         elif filter_rule == 'pages':
-            filter_statistics = PostStatistic.objects.filter(post__type='page')
+            filter_statistics = PostStatistic.objects.filter(post_type='page')
+        else:
+            filter_statistics = PostStatistic.objects
 
         page = request.args.get('page', default=1, type=int)
         per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
@@ -558,9 +577,9 @@ class PostStatisticItem(MethodView):
         per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
 
         post = Post.objects.get_or_404(slug=slug)
-        post_statistic = PostStatistics.objects.get_or_404(post=post)
-        tracker_pagination = Tracker.objects.filter(post=post).paginate(page, per_page)
-        return render_template('admin/show_statistic', post_statistic=post_statistic, trackers=tracker_pagination)
+        post_statistic = PostStatistic.objects.get_or_404(post=post)
+        pagination = Tracker.objects.filter(post=post).paginate(page, per_page)
+        return render_template('admin/show_statistic.html', post_statistic=post_statistic, pagination=pagination)
 
 
 # 注册路由
@@ -569,7 +588,8 @@ admin_bp.add_url_rule('/', view_func=AdminIndex.as_view('index'), methods=['GET'
 admin_bp.add_url_rule('/posts', view_func=Posts.as_view('posts'), methods=['GET', 'POST'])
 admin_bp.add_url_rule('/posts/<slug>', view_func=PostItem.as_view('post'), methods=['GET', 'POST', 'PATCH', 'DELETE'])
 
-admin_bp.add_url_rule('/pages', view_func=Posts.as_view('pages'), methods=['GET', 'POST'])
+admin_bp.add_url_rule('/pages', view_func=Posts.as_view('pages'), methods=['GET', 'POST'],
+                      defaults={'post_type': 'page'})
 admin_bp.add_url_rule('/pages/<slug>', view_func=Posts.as_view('page'), methods=['GET', 'POST', 'PATCH', 'DELETE'])
 
 admin_bp.add_url_rule('/meta/posts', view_func=MetaPosts.as_view('meta_posts'), methods=['GET', 'POST'])
@@ -579,7 +599,8 @@ admin_bp.add_url_rule('/posts/comments', view_func=Comments.as_view('comments'),
 admin_bp.add_url_rule('/posts/comments/<pk>', view_func=CommentItem.as_view('comment'), methods=['PATCH', 'DELETE'])
 
 admin_bp.add_url_rule('/users', view_func=Users.as_view('users'), methods=['GET', 'POST'])
-admin_bp.add_url_rule('/meta/users/<pk>', view_func=MetaUserItem.as_view('meta_user'), methods=['GET', 'POST', 'DELETE'])
+admin_bp.add_url_rule('/meta/users/<pk>', view_func=MetaUserItem.as_view('meta_user'),
+                      methods=['GET', 'POST', 'DELETE'])
 
 admin_bp.add_url_rule('/widgets', view_func=Widgets.as_view('widgets'), methods=['GET', 'POST'])
 admin_bp.add_url_rule('/widgets/<pk>', view_func=WidgetItem.as_view('widget'), methods=['GET', 'POST', 'DELETE'])
@@ -593,3 +614,25 @@ admin_bp.add_url_rule('/posts/statistics/<slug>', view_func=PostStatisticItem.as
 def new_post():
     form = PostForm()
     return render_template('admin/new_post.html', form=form)
+
+
+@admin_bp.route('/posts/add_user')
+@permission_required('MODERATE')
+def add_user():
+    form = RegisterForm()
+    return render_template('admin/new_user.html', form=form)
+
+
+@admin_bp.route('/pages/new_page')
+@admin_required
+def new_page():
+    form = PostForm()
+    form.type.data = 'page'
+    return render_template('admin/new_post.html', form=form)
+
+
+@admin_bp.route('/widgets/new_widget')
+@admin_required
+def new_widget():
+    form = WidgetForm()
+    return render_template('admin/new_widget.html', form=form)
