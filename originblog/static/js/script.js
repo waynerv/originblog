@@ -58,7 +58,7 @@ $(document).ajaxError(function (event, request, settings) {
 });
 
 // 发送PATCH方法ajax请求
-function patchRequest(e) {
+function switchComment(e) {
     var $el = $(e.target);
 
     $.ajax({
@@ -66,9 +66,9 @@ function patchRequest(e) {
         url: $el.data('href'),
         success: function (data) {
             if (data.message.includes('disabled')) {
-                $el.text('Enable Comment')
+                $el.text('Enable Comment');
             } else if (data.message.includes('enabled')) {
-                $el.text('Disabled Comment')
+                $el.text('Disabled Comment');
             }
             toast(data.message);
         },
@@ -76,6 +76,28 @@ function patchRequest(e) {
         // error: function (error) {
         //     alert(error.message)
         // }
+    });
+}
+
+function handleComment(e) {
+    var $el = $(e.target);
+    var id = $el.data('id');
+
+    $.ajax({
+        type: 'PATCH',
+        url: $el.data('href'),
+        data: JSON.stringify({'operation': $el.data('op')}),
+        contentType: 'application/json; charset=UTF-8',
+        dataType: 'json',
+        success: function (data) {
+            $('.'+id+'button').remove();
+            if (data.message.includes('approved')) {
+                $('#'+id+'status').text('approved');
+            } else if (data.message.includes('Spam')) {
+                $('#'+id+'status').text('spam');
+            }
+            toast(data.message);
+        },
     });
 }
 
@@ -100,5 +122,6 @@ function deleteRequest(e) {
 }
 
 // 绑定事件到按钮
-$(document).on('click', '.patch-request', patchRequest.bind(this));
-$(document).on('click', '.delete-request', deleteRequest.bind(this));
+$(document).on('click', '.switch-comment', switchComment.bind(this));
+$(document).on('click', '.delete-item', deleteRequest.bind(this));
+$(document).on('click', '.handle-comment', handleComment.bind(this));

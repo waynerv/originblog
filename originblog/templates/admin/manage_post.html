@@ -54,13 +54,13 @@
                     <td>{{ moment(post.update_time).format('LL') }}</td>
                     <td>
                         <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
-                                class="btn btn-warning btn-sm d-inline patch-request" type="button">
+                                class="btn btn-warning btn-sm d-inline switch-comment" type="button">
                             {% if post.can_comment %}Disabled{% else %}Enable{% endif %} Comment
                         </button>
                         <button class="btn btn-info btn-sm d-inline" type="button"><a class="text-white"
                                 href="{{ url_for('admin.post', slug=post.slug) }}">Edit</a></button>
                         <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
-                                class="btn btn-danger btn-sm d-inline delete-request" type="button">Delete
+                                class="btn btn-danger btn-sm d-inline delete-item" type="button">Delete
                         </button>
                     </td>
                 </tr>

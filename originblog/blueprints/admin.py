@@ -340,25 +340,28 @@ class CommentItem(MethodView):
     def patch(self, pk):  # pk为Comment模型的主键，默认为Comment.id(即_id)
         """更改评论审核状态"""
         comment = Comment.objects.get_or_404(pk=pk)
-        if request.form['status'] == 'approved':
+        data = request.get_json()
+        if data['operation'] == 'approve':
             comment.status = 'approved'
-        elif request.form['status'] == 'spam':
-            comment.status = 'approved'
+            message = 'Comment approved.'
+        elif data['operation'] == 'spam':
+            comment.status = 'spam'
+            message = 'Spam marked.'
         comment.save()
 
-        flash('Comment approved.', 'success')
-        return redirect_back()  # TODO：审核操作需要附加next参数
+        # flash('Comment approved.', 'success')
+        return jsonify(message=message)
 
     def delete(self, pk):
         """删除评论"""
         comment = Comment.objects.get_or_404(pk=pk)
         # 来自管理员的评论只有管理员自己可以删除
         if not current_user.is_admin and comment.from_admin:
-            abort(403)
+            return jsonify(message='No Permission.'), 403
 
         comment.delete()
-        flash('Comment deleted.', 'success')
-        return redirect_back()  # TODO：审核操作需要附加next参数
+        # flash('Comment deleted.', 'success')
+        return jsonify(message='Comment deleted.')
 
 
 class Users(MethodView):

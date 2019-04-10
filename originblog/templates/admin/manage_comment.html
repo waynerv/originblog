@@ -1,91 +1,73 @@
-{% extends 'base.html' %}
+{% extends 'admin/base.html' %}
 {% from 'bootstrap/pagination.html' import render_pagination %}
 
 {% block title %}
-    Manage Comments
+    All Comments
 {% endblock title %}
 
-{% block content %}
-    <div class="page-header">
-        <h1>
-            Comments
+{% block main %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            All Comments
             <small class="text-muted">{{ pagination.total }}</small>
         </h1>
     </div>
-    <ul class="nav nav-pills">
-        <li class="nav-item">
-            <a class="nav-link disabled" href="#">Filter</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {% if request.args.get('filter', 'all') == 'all' %}active{% endif %}"
-               href="{{ url_for('admin.manage_comment', filter='all') }}">All</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {% if request.args.get('filter', 'all') == 'unread' %}active{% endif %}"
-               href="{{ url_for('admin.manage_comment', filter='unread') }}">Unread
-            {% if unread_comments %}
-                <span class="badge badge-success">{{ unread_comments }}</span>
-            {% endif %}</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {% if request.args.get('filter', 'all') == 'admin' %}active{% endif %}"
-               href="{{ url_for('admin.manage_comment', filter='admin') }}">Admin</a>
-        </li>
-    </ul>
-    {% if comments %}
-        <table class="table table-striped">
+    {% if pagination.items %}
+        <table class="table table-bordered shadow">
             <thead>
             <tr>
                 <th>No.</th>
                 <th>Author</th>
-                <th>Body</th>
-                <th>Date</th>
+                <th>Email</th>
+                <th>Homepage</th>
+                <th>Post</th>
+                <th>Content</th>
+                <th>Publish</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
             </thead>
-            {% for comment in comments %}
-                <tr {% if not comment.reviewed %}class="table-warning"{% endif %}>
-                    <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINLOG_MANAGE_COMMENT_PER_PAGE) }}</td>
+            {% for comment in pagination.items %}
+                <tr id="{{ comment.id }}">
+                    <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINBLOG_MANAGE_POST_PER_PAGE) }}</td>
+                    <td>{{ comment.author }}</td>
+                    <td><a href="mailto:{{ comment.email }}">{{ comment.email }}</a></td>
+                    <td><a href="{{ comment.homepage }}">{{ comment.homepage }}</a></td>
+                    <td><a href="{{ url_for('blog.show_post', slug=comment.post_slug) }}">{{ comment.post_title }}</a></td>
+                    <td>{{ comment.html_content|safe|truncate }}</td>
+                    <td>{{ moment(comment.pub_time).format('LL') }}</td>
+                    <td id="{{ comment.id }}status">{{ comment.status }}</td>
                     <td>
-                        <span>{{ comment.author }}</span>
-                        <br><a href="mailto:{{ comment.email }}">{{ comment.email }}</a>
-                        {% if comment.site %}
-                            <br><a href="{{ comment.site }}">{{ comment.site }}</a>
+                        {% if comment.status == 'pending' %}
+                        <button data-id="{{ comment.id }}" data-href="{{ url_for('admin.comment', pk=comment.id) }}"
+                                data-op="approve" class="btn btn-info btn-sm d-inline handle-comment {{ comment.id }}button" type="button">Approve
+                        </button>
+                        <button data-id="{{ comment.id }}" data-href="{{ url_for('admin.comment', pk=comment.id) }}"
+                                data-op="spam" class="btn btn-warning btn-sm d-inline handle-comment {{ comment.id }}button" type="button">Spam
+                        </button>
                         {% endif %}
-                    </td>
-                    <td>
-                        <p>{{ comment.body }}</p>
-                    </td>
-                    <td>{{ moment(comment.timestamp).format('LL') }}</td>
-                    <td>
-                        {% if not comment.reviewed %}
-                            <form class="inline" method="post"
-                                  action="{{ url_for('admin.approve_comment', comment_id=comment.id, next=request.full_path) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Are you sure?')">Approve
-                                </button>
-                            </form>
-                        {% endif %}
-                        <a class="btn btn-info btn-sm"
-                           href="{{ url_for('blog.show_post', post_id=comment.post.id) }}">Post</a>
-                        <form class="inline" method="post"
-                              action="{{ url_for('admin.delete_comment', comment_id=comment.id, next=request.full_path) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Are you sure?')">Delete
-                            </button>
-                        </form>
+                        <button data-id="{{ comment.id }}" data-href="{{ url_for('admin.comment', pk=comment.id) }}"
+                                class="btn btn-danger btn-sm d-inline delete-request" type="button">Delete
+                        </button>
                     </td>
                 </tr>
             {% endfor %}
         </table>
-        <div class="page-footer">
+        <div class="pagination">
             {{ render_pagination(pagination) }}
         </div>
     {% else %}
         <div class="tip">
-            <h5>No comments</h5>
+            <h5>No Comments</h5>
         </div>
     {% endif %}
-{% endblock content %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 生成csrf令牌
+        var csrf_token = "{{ csrf_token() }}";
+        var default_error_message = 'Server error, please try again later';
+    </script>
+    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
+{% endblock %}
