@@ -7,6 +7,23 @@ $(function () {
     );
 });
 
+// 用来显示弹窗
+var flash =null;
+function toast(body, category) {
+    clearTimeout(flash);
+    var $toast = $('#toast');
+    if (category === 'error') {
+        $toast.css('background-color', 'red') // 错误类型消息
+    } else {
+        $toast.css('background-color', '#333') // 普通类型消息
+    }
+    $toast.text(body).fadeIn();
+    flash = setTimeout(function () {
+        $toast.fadeOut();
+    }, 3000)
+}
+
+// 通过jQuery的ajaxSetup()方法设置AJAX，添加CSRF令牌
 $.ajaxSetup({
     beforeSend: function (xhr, settings) {
         if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -15,39 +32,73 @@ $.ajaxSetup({
     }
 });
 
+// 通过jQuery的ajaxError()方法设置统一处理error回调函数
+$(document).ajaxError(function (event, request, settings) {
+    var message = null;
+    if (request.responseJSON && request.responseJSON.hasOwnProperty('message')) {
+        message = request.responseJSON.message
+    } else if (request.responseText) {
+        var IS_JSON = true;
+        try {
+            var data = JSON.parse(request.responseText); // 作为JSON解析
+        }
+        catch(err) {
+            IS_JSON = false
+        }
+
+        if (IS_JSON && data !== undefined && data.hasOwnProperty('message')) {
+            message = JSON.parse(request.responseText).message;
+        } else {
+            message = default_error_message; // 使用默认错误消息
+        }
+    } else {
+        message = default_error_message; // 使用默认错误消息
+    }
+    toast(message, 'error'); // 弹出提示消息
+});
+
+// 发送PATCH方法ajax请求
 function patchRequest(e) {
     var $el = $(e.target);
-    // var id = $el.data('id');
 
     $.ajax({
         type: 'PATCH',
         url: $el.data('href'),
         success: function (data) {
-            location.reload();
-            alert(data.message);
+            if (data.message.includes('disabled')) {
+                $el.text('Enable Comment')
+            } else if (data.message.includes('enabled')) {
+                $el.text('Disabled Comment')
+            }
+            toast(data.message);
         },
-        error: function (error) {
-            alert(error.message)  // TODO: 注册统一回调函数
-        }
+        // 使用统一回调函数
+        // error: function (error) {
+        //     alert(error.message)
+        // }
     });
 }
 
+// 发送DELETE方法ajax请求
 function deleteRequest(e) {
     var $el = $(e.target);
-    // var id = $el.data('id');
+    var id = $el.data('id');
 
     $.ajax({
         type: 'DELETE',
         url: $el.data('href'),
         success: function (data) {
-            location.reload();
-            alert(data.message);
+            //
+            $('#'+id).remove();
+            toast(data.message);
         },
-        error: function (error) {
-            alert(error.message)  // TODO: 注册统一回调函数
-        }
+        // 使用统一回调函数
+        // error: function (error) {
+        //     alert(error.message)
+        // }
     });
 }
 
+// 绑定事件到按钮
 $(document).on('click', '.patch-request', patchRequest.bind(this));
 $(document).on('click', '.delete-request', deleteRequest.bind(this));

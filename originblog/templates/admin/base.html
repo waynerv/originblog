@@ -338,6 +338,9 @@
     </div>
   </div>
 
+  <!-- Custom Toast-->
+  <div id="toast"></div>
+
   <!-- Bootstrap core JavaScript-->
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
@@ -356,9 +359,6 @@
   <script src="{{ url_for('static', filename='js/chart-area-demo.js') }}"></script>
   <script src="{{ url_for('static', filename='js/chart-pie-demo.js') }}"></script>
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-  <script>
-      var csrf_token = "{{ csrf_token() }}"
-  </script>
 
     {% block scripts %}
     {% endblock %}

@@ -120,11 +120,11 @@ class PostItem(MethodView):
             form.tags.data = ' '.join(post.tags)
             form.type.data = post.type
 
-        return render_template('admin/edit_post.html', form=form)  # TODO:模板是否可改为new_posyt.html
+        return render_template('admin/edit_post.html', slug=slug, form=form)  # TODO:模板是否可改为new_posyt.html
 
-    def put(self, slug):
+    def post(self, slug):
         """修改文章内容"""
-        post = Post.objects.get_or_404(slug)
+        post = Post.objects.get_or_404(slug=slug)
         # 只有管理员或文章作者才有权限修改文章
         if not current_user.is_admin and post.author != current_user._get_current_object():
             abort(403)
@@ -136,7 +136,7 @@ class PostItem(MethodView):
             post.weight = form.weight.data
             post.raw_content = form.raw_content.data
             post.category = form.category.data
-            post.tags = form.tag.data.split() if form.tags.data else None
+            post.tags = form.tags.data.split() if form.tags.data else None
             post.type = form.type.data
             # 修改文章包括标题不会更改slug，以确保链接的永久
             post.save()
@@ -278,7 +278,7 @@ class MetaPostItem(MethodView):
 
         return render_template('admin/edit_post.html', form=form)  # TODO:模板是否可改为new_posyt.html
 
-    def put(self, slug):
+    def post(self, slug):
         """修改文章内容"""
         form = MetaPostForm()
         if form.validate_on_submit():
@@ -416,7 +416,7 @@ class MetaUserItem(MethodView):
 
         return render_template('admin/edit_user.html', form=form)
 
-    def put(self, pk):
+    def post(self, pk):
         """修改用户资料"""
         form = MetaUserForm()
         if form.validate_on_submit():
@@ -498,7 +498,7 @@ class WidgetItem(MethodView):
                 form.content = widget.html_content
         return render_template('admin/edit_widget.html', form=form)
 
-    def put(self, pk):
+    def post(self, pk):
         """修改widget内容"""
         widget = Widget.objects.get_or_404(pk)
 
@@ -564,22 +564,22 @@ class PostStatisticItem(MethodView):
 admin_bp.add_url_rule('/', view_func=AdminIndex.as_view('index'), methods=['GET'])
 
 admin_bp.add_url_rule('/posts', view_func=Posts.as_view('posts'), methods=['GET', 'POST'])
-admin_bp.add_url_rule('/posts/<slug>', view_func=PostItem.as_view('post'), methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+admin_bp.add_url_rule('/posts/<slug>', view_func=PostItem.as_view('post'), methods=['GET', 'POST', 'PATCH', 'DELETE'])
 
 admin_bp.add_url_rule('/pages', view_func=Posts.as_view('pages'), methods=['GET', 'POST'])
-admin_bp.add_url_rule('/pages/<slug>', view_func=Posts.as_view('page'), methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+admin_bp.add_url_rule('/pages/<slug>', view_func=Posts.as_view('page'), methods=['GET', 'POST', 'PATCH', 'DELETE'])
 
 admin_bp.add_url_rule('/meta/posts', view_func=MetaPosts.as_view('meta_posts'), methods=['GET', 'POST'])
-admin_bp.add_url_rule('/meta/posts/<slug>', view_func=MetaPostItem.as_view('meta_post'), methods=['GET', 'PUT'])
+admin_bp.add_url_rule('/meta/posts/<slug>', view_func=MetaPostItem.as_view('meta_post'), methods=['GET', 'POST'])
 
 admin_bp.add_url_rule('/posts/comments', view_func=Comments.as_view('comments'), methods=['GET', 'DELETE'])
 admin_bp.add_url_rule('/posts/comments/<pk>', view_func=CommentItem.as_view('comment'), methods=['PATCH', 'DELETE'])
 
 admin_bp.add_url_rule('/users', view_func=Users.as_view('users'), methods=['GET', 'POST'])
-admin_bp.add_url_rule('/meta/users/<pk>', view_func=MetaUserItem.as_view('meta_user'), methods=['GET', 'PUT', 'DELETE'])
+admin_bp.add_url_rule('/meta/users/<pk>', view_func=MetaUserItem.as_view('meta_user'), methods=['GET', 'POST', 'DELETE'])
 
 admin_bp.add_url_rule('/widgets', view_func=Widgets.as_view('widgets'), methods=['GET', 'POST'])
-admin_bp.add_url_rule('/widgets/<pk>', view_func=WidgetItem.as_view('widget'), methods=['GET', 'PUT', 'DELETE'])
+admin_bp.add_url_rule('/widgets/<pk>', view_func=WidgetItem.as_view('widget'), methods=['GET', 'POST', 'DELETE'])
 
 admin_bp.add_url_rule('/posts/statistics', view_func=PostStatistics.as_view('statistics'), methods=['GET'])
 admin_bp.add_url_rule('/posts/statistics/<slug>', view_func=PostStatisticItem.as_view('statistic'), methods=['GET'])

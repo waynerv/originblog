@@ -31,7 +31,7 @@
             </tr>
             </thead>
             {% for post in pagination.items %}
-                <tr>
+                <tr id="{{ post.id }}">
                     <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINBLOG_MANAGE_POST_PER_PAGE) }}</td>
                     <td><a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></td>
                     <td>{{ post.weight }}</td>
@@ -53,13 +53,13 @@
                     <td>{{ moment(post.pub_time).format('LL') }}</td>
                     <td>{{ moment(post.update_time).format('LL') }}</td>
                     <td>
-                        <button data-id="disableComment" data-href="{{ url_for('admin.post', slug=post.slug) }}"
+                        <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
                                 class="btn btn-warning btn-sm d-inline patch-request" type="button">
                             {% if post.can_comment %}Disabled{% else %}Enable{% endif %} Comment
                         </button>
-                        <button class="btn btn-info btn-sm d-inline" type="button"
-                           href="{{ url_for('admin.post', slug=post.slug) }}">Edit</button>
-                        <button data-id="deletePost" data-href="{{ url_for('admin.post', slug=post.slug) }}"
+                        <button class="btn btn-info btn-sm d-inline" type="button"><a class="text-white"
+                                href="{{ url_for('admin.post', slug=post.slug) }}">Edit</a></button>
+                        <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
                                 class="btn btn-danger btn-sm d-inline delete-request" type="button">Delete
                         </button>
                     </td>
@@ -77,5 +77,10 @@
 {% endblock %}
 
 {% block scripts %}
+    <script>
+        // 生成csrf令牌
+        var csrf_token = "{{ csrf_token() }}";
+        var default_error_message = 'Server error, please try again later';
+    </script>
     {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
 {% endblock %}
