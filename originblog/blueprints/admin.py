@@ -188,7 +188,11 @@ class PostItem(MethodView):
             pass
 
         post.delete()
-        # flash('Post deleted.', 'success')
+
+        # 如果是删除后重载页面的请求，通过flash发送通知
+        data = request.get_json()
+        if data and data.get('flash'):
+            flash('Post deleted.', 'success')
         return jsonify(message='Post deleted.')
 
 
@@ -340,7 +344,7 @@ class Comments(MethodView):
         comments = Comment.objects(Q(status='pending') | Q(status='spam'))
         comments.delete()
         flash('All pending comments and spams has been deleted', 'success')
-        return redirect_back()  # TODO：删除操作需要附加next参数
+        return jsonify(message='All pending comments and spams has been deleted')
 
 
 class CommentItem(MethodView):

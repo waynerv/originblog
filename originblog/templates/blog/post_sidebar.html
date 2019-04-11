@@ -1,4 +1,13 @@
 <div class="col-lg-3 col-md-2">
+    {% if current_user.is_admin %}
+    <div class="sidebar-header">
+        <a class="btn btn-info btn-sm" href="{{ url_for('admin.post', slug=post.slug) }}">Edit</a>
+        <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
+                class="btn btn-danger btn-sm d-inline delete-post" type="button">Delete
+        </button>
+    </div>
+    {% endif %}
+
     <h3>Search</h3>
     <hr>
     <form id="search-form" action="{{ url_for('blog.index') }}">
@@ -61,4 +70,13 @@
         {{ widget.html_content | safe }}
     </div>
     {% endfor %}
+
+    <!-- Table of Content-->
+    <div class="post-toc d-none d-lg-block">
+        <h3>Table of Content</h3>
+        <hr>
+        <div class="toc-list">
+            <ol id="toc" data-toc="#main-content" data-toc-headings="h2,h3,h4,h5"></ol>
+        </div>
+    </div>
 </div>

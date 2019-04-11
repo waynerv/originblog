@@ -9,7 +9,7 @@ class CommentForm(FlaskForm):
     author = StringField('* Name', validators=[DataRequired(), Length(1, 30)])
     email = StringField('* Email', validators=[DataRequired(), Email(), Length(1, 254)])
     homepage = StringField('Homepage', validators=[Optional(), URL(), Length(0, 255)])
-    content = TextAreaField('* Comment <small><span class="label label-info">markdown</span></small>',
+    content = TextAreaField('* Comment <span class="badge badge-info">markdown</span>',
                             validators=[DataRequired()])
     comment_id = HiddenField('comment_id')
     submit = SubmitField('Submit')
@@ -20,7 +20,7 @@ class UserCommentForm(FlaskForm):
     author = HiddenField('* Name', validators=[DataRequired(), Length(1, 30)])
     email = HiddenField('* Email', validators=[DataRequired(), Email(), Length(1, 254)])
     homepage = HiddenField('Homepage', validators=[Optional(), URL(), Length(0, 255)])
-    content = TextAreaField('* Comment <small><span class="label label-info">markdown</span></small>',
+    content = TextAreaField('* Comment <small><span class="badge badge-info">markdown</span></small>',
                             validators=[DataRequired()])
     comment_id = HiddenField('comment_id')
     submit = SubmitField('Submit')

@@ -17,6 +17,11 @@
     padding-bottom: 10px;
 }
 
+.sidebar-header {
+    margin-top: 30px;
+    padding-bottom: 10px;
+}
+
 .error {
     color: red;
 }
@@ -25,8 +30,18 @@
     margin: 20px 0;
 }
 
+.comment-form {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
 .reply-body {
     margin-top: 10px;
+}
+
+.reply-body p {
+    margin: 0;
+    font-size: 15px;
 }
 
 /*@media only screen and (min-width: 576px) {*/
@@ -64,11 +79,15 @@
 }
 
 .category-list{
-    border: 0px;
+    border: 0;
+}
+
+.comment-list{
+    border: 0;
 }
 
 .group-list{
-    border: 0px;
+    border: 0;
 }
 
 #toast { /* form w3school.com */
@@ -84,4 +103,50 @@
     z-index: 1;
     left: 50%;
     bottom: 30px;
+}
+
+/*post toc*/
+.post-toc {
+    display: block;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 70px;
+}
+
+.toc-list {
+    height: 1100px;
+    overflow: auto;
+}
+
+#toc {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    font-size: 16px;
+}
+
+#toc ol {
+    padding: 0 18px;
+}
+
+#toc li {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.8;
+}
+
+#toc a {
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+    transition-delay: 0.1s;
+    transition-property: all;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #999;
+}
+
+#toc a:hover {
+    color: #0085A1;
+    border-bottom: 1px solid #0085A1;
 }

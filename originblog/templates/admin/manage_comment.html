@@ -23,14 +23,25 @@
         <li class="nav-item">
             <a class="nav-link {% if request.args.get('filter', 'all') == 'unread' %}active{% endif %}"
                href="{{ url_for('admin.comments', filter='unread') }}">Unread
-            {% if unread_comments %}
-                <span class="badge badge-success">{{ unread_comments }}</span>
-            {% endif %}</a>
+                {% if unread_comments %}
+                    <span class="badge badge-success">{{ unread_comments }}</span>
+                {% endif %}</a>
         </li>
         <li class="nav-item">
             <a class="nav-link {% if request.args.get('filter', 'all') == 'admin' %}active{% endif %}"
                href="{{ url_for('admin.comments', filter='admin') }}">Admin</a>
         </li>
+        {% if request.args.get('filter', 'all') == 'unread' %}
+            <li>
+            <a href="#" class="btn btn-danger btn-icon-split delete-all" data-href="{{ url_for('admin.comments') }}">
+                <span class="icon text-white-50">
+                    <i class="fas fa-trash"></i>
+                </span>
+                <span class="text">Delete All</span>
+            </a>
+            </li>
+
+        {% endif %}
     </ul>
     {% if pagination.items %}
         <table class="table table-bordered shadow">
@@ -53,18 +64,23 @@
                     <td>{{ comment.author }}</td>
                     <td><a href="mailto:{{ comment.email }}">{{ comment.email }}</a></td>
                     <td><a href="{{ comment.homepage }}">{{ comment.homepage }}</a></td>
-                    <td><a href="{{ url_for('blog.show_post', slug=comment.post_slug) }}">{{ comment.post_title }}</a></td>
+                    <td><a href="{{ url_for('blog.show_post', slug=comment.post_slug) }}">{{ comment.post_title }}</a>
+                    </td>
                     <td>{{ comment.html_content|safe|truncate }}</td>
                     <td>{{ moment(comment.pub_time).format('LL') }}</td>
                     <td id="{{ comment.id }}status">{{ comment.status }}</td>
                     <td>
                         {% if comment.status == 'pending' %}
-                        <button data-id="{{ comment.id }}" data-href="{{ url_for('admin.comment', pk=comment.id) }}"
-                                data-op="approve" class="btn btn-info btn-sm d-inline handle-comment {{ comment.id }}button" type="button">Approve
-                        </button>
-                        <button data-id="{{ comment.id }}" data-href="{{ url_for('admin.comment', pk=comment.id) }}"
-                                data-op="spam" class="btn btn-warning btn-sm d-inline handle-comment {{ comment.id }}button" type="button">Spam
-                        </button>
+                            <button data-id="{{ comment.id }}" data-href="{{ url_for('admin.comment', pk=comment.id) }}"
+                                    data-op="approve"
+                                    class="btn btn-info btn-sm d-inline handle-comment {{ comment.id }}button"
+                                    type="button">Approve
+                            </button>
+                            <button data-id="{{ comment.id }}" data-href="{{ url_for('admin.comment', pk=comment.id) }}"
+                                    data-op="spam"
+                                    class="btn btn-warning btn-sm d-inline handle-comment {{ comment.id }}button"
+                                    type="button">Spam
+                            </button>
                         {% endif %}
                         <button data-id="{{ comment.id }}" data-href="{{ url_for('admin.comment', pk=comment.id) }}"
                                 class="btn btn-danger btn-sm d-inline delete-item" type="button">Delete

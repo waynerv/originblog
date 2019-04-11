@@ -112,14 +112,44 @@ function deleteRequest(e) {
         type: 'DELETE',
         url: $el.data('href'),
         success: function (data) {
-            //
             $('#'+id).remove();
             toast(data.message);
         },
     });
 }
 
+// 发送DELETE方法ajax请求删除所有待审核评论
+function deleteAll(e) {
+    var $el = $(e.target);
+
+    $.ajax({
+        type: 'DELETE',
+        url: $el.data('href'),
+        success: function (data) {
+            location.reload()
+        },
+    });
+}
+
+// 删除文章并跳转到首页
+function deletePost(e) {
+    var $el = $(e.target);
+
+    $.ajax({
+        type: 'DELETE',
+        url: $el.data('href'),
+        data: JSON.stringify({'flash': 'True'}),
+        contentType: 'application/json; charset=UTF-8',
+        success: function (data) {
+            location.href = "/";
+            return false;
+        },
+    });
+}
+
 // 绑定事件到按钮
 $(document).on('click', '.switch-comment', switchComment.bind(this));
-$(document).on('click', '.delete-item', deleteRequest.bind(this));
 $(document).on('click', '.handle-comment', handleComment.bind(this));
+$(document).on('click', '.delete-item', deleteRequest.bind(this));
+$(document).on('click', '.delete-all', deleteAll.bind(this));
+$(document).on('click', '.delete-post', deletePost.bind(this));

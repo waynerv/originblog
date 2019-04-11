@@ -72,8 +72,8 @@ def show_post(slug, post_type='post'):
         author = form.author.data
         email = form.email.data
         homepage = form.homepage.data
-        content = form.content.data
-        comment = Comment(author=author, email=email, homepage=homepage, content=content, post_slug=post.slug,
+        md_content = form.content.data
+        comment = Comment(author=author, email=email, homepage=homepage, md_content=md_content, post_slug=post.slug,
                           post_title=post.title)
         reply_to = request.args.get('replyto')
         if reply_to:
@@ -82,7 +82,7 @@ def show_post(slug, post_type='post'):
         if current_user.is_authenticated and current_user.username == post.author.username:
             comment.from_post_author = True
             comment.status = 'approved'
-        if current_user.is_admin():
+        if current_user.is_admin:
             comment.from_admin = True
             comment.status = 'approved'
 
@@ -133,7 +133,7 @@ def reply_comment(pk, post_type):
         }
         return redirect(
             url_for(endpoints[post_type], slug=post.slug, replyto=pk,
-                    author=comment.author) + '#comment-form')
+                    author=comment.author) + '#comments')
     else:
         flash('This post is comment disabled.', 'warning')
         return redirect_back()

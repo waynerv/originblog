@@ -10,7 +10,7 @@
 {% block title %}{{ post.title }}{% endblock title %}
 
 {% block header %}
-    <header class="masthead" style="background-image: url({{ blog_meta.bg_post }})">
+    <header class="masthead" style="background-image: url({{ url_for('static', filename=blog_meta.bg_post) }})">
         <div class="overlay"></div>
         <div class="container">
             <div class="row">
@@ -35,37 +35,25 @@
 {% endblock %}
 
 {% block main %}
-    <div class="page-header">
-        <span class="float-left">
-        {% if current_user.is_authenticated %}
-            <a class="btn btn-info btn-sm" href="{{ url_for('admin.index', slug=slug) }}">Edit</a>
-            <form class="inline" method="post"
-                  action="{{ url_for('admin.index', next=url_for('blog.index')) }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-danger btn-sm"
-                        onclick="return confirm('Are you sure?')">Delete
-                </button>
-            </form>
-        {% endif %}
-        </span>
-    </div>
+
     <article>
         <div class="row">
             <div class="col-lg-8 col-md-10 mx-auto">
                 <!-- main content -->
-                <article>
+                <article id="main-content">
                 {{ post.html_content|safe }}
                 </article>
                 <hr>
             </div>
 
             <!-- sidebar -->
-            {% include "blog/index_sidebar.html" %}
+            {% include "blog/post_sidebar.html" %}
         </div>
+
         <!-- dispaly share, copyright, donate and wechat information -->
         {% if blog_meta.display_copyright %}
         <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="col-lg-8 col-md-10 offset-lg-0 offset-md-1" style="margin-left: 47.5px">
                 <p><strong>{{ blog_meta.copyright_message }}</strong></p>
                 <hr>
             </div>
@@ -73,7 +61,7 @@
         {% endif %}
         {% if blog_meta.allow_share %}
         <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="col-lg-8 col-md-10 offset-lg-0 offset-md-1" style="margin-left: 47.5px">
                 <div class="share-component" data-sites="weibo,wechat,douban,qq,facebook"></div>
             </div>
         </div>
@@ -81,25 +69,22 @@
         <br>
         {% if blog_meta.allow_donate %}
         <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="col-lg-8 col-md-10 offset-lg-0 offset-md-1" style="margin-left: 47.5px">
                 <p>{{ blog_meta.donate_message }}</p>
-                <i class="fa fa-jpy"></i> | <i class="fa fa-usd"></i><br>
-                <div>
-                    <img src="{{ blog_meta.donate_img_url }}" title="Donate" alt="donate qrcode">
-                </div>
+                <a><i class="fa fa-yen-sign"></i> | <i class="fa fa-dollar-sign"></i><br></a>
+                <img class="img-fluid" src="{{ url_for('static', filename=blog_meta.donate_img_url) }}" title="Donate" alt="donate qrcode">
             </div>
         </div>
         {% endif %}
         {% if blog_meta.dispaly_wechat %}
         <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <p>{{ blog_meta.wechat_message }}<i class="fa fa-weixin" aria-hidden="true"></i></p>
-                <img src="{{ blog_meta.wechat_img_url }}" title="wechat" alt="wechat qrcode">
+            <div class="col-lg-8 col-md-10 offset-lg-0 offset-md-1" style="margin-left: 47.5px">
+                <p>{{ blog_meta.wechat_message }} <i class="fab fa-weixin" aria-hidden="true"></i></p>
+                <img class="img-fluid" src="{{ url_for('static', filename=blog_meta.wechat_img_url) }}" title="wechat" alt="wechat qrcode">
             </div>
         </div>
         {% endif %}
     </article>
-    <hr>
 
     {% if post.can_comment %}
     <!-- comment form and list -->
@@ -107,32 +92,31 @@
         <!-- comment header -->
         <div class="row">
             <div class="col-lg-8 col-md-10 mx-auto">
+                <hr>
                 <h3>{{ comment_pagination.total }} Comments
                     <small>
                         <a href="{{ url_for('blog.show_post', slug=post.slug, page=comment_pagination.pages or 1) }}#comments">
                             latest
                         </a>
                     </small>
-                {% if current_user.is_authenticated %}
-                    <form class="float-right" method="post"
-                          action="{{ url_for('admin.index', post_id=post.id, next=request.full_path) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-warning btn-sm">
-                            {% if post.can_comment %}Disabled{% else %}Enable{% endif %} Comment
-                        </button>
-                    </form>
+                {% if current_user.is_admin %}
+                    <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
+                            class="btn btn-warning btn-sm d-inline float-right switch-comment" type="button">
+                        {% if post.can_comment %}Disabled{% else %}Enable{% endif %} Comment
+                    </button>
                 {% endif %}
                 </h3>
             </div>
         </div>
+
         <!-- comment form -->
-        <div class="row">
+        <div class="row comment-form">
             <div class="col-lg-8 col-md-10 mx-auto">
                 {% if post.can_comment %}
-                    {% if request.args.get('reply') %}
-                    <div class="alert alert-dark">
+                    {% if request.args.get('replyto') %}
+                    <div class="alert alert-info" role="alert">
                         Reply to<strong>{{ request.args.get('author') }}</strong>:
-                        <a class="float-right" href="{{ url_for('blog.show_post', post_id=post.id) }}">Cancel</a>
+                        <a class="float-right" href="{{ url_for('blog.show_post', slug=post.slug) }}#comments">Cancel</a>
                     </div>
                     {% endif %}
                     <div id="comment-form">
@@ -152,7 +136,7 @@
                 {% if comment_pagination.items %}
                 <ul class="list-group">
                     {% for comment in comment_pagination.items %}
-                        <li class="list-group-item list-group-item-action flex-column">
+                        <li class="list-group-item list-group-item-action flex-column" id="{{ comment.pk }}">
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1">
                                     <a href="{% if comment.homepage %}{{ comment.homepage }}{% else %}#{% endif %}"
@@ -162,8 +146,11 @@
                                     {% if comment.from_post_author %}
                                         <span class="badge badge-primary">Author</span>
                                     {% endif %}
+                                    {% if comment.from_admin %}
+                                        <span class="badge badge-warning">Admin</span>
+                                    {% endif %}
                                     {% if comment.reply_to %}
-                                        <span class="badge badge-light">Reply</span>
+                                        <span class="badge badge-secondary">Reply</span>
                                     {% endif %}
                                 </h5>
                                 <small data-toggle="tooltip" data-placement="top" data-delay="500"
@@ -172,46 +159,51 @@
                                 </small>
                             </div>
                             {% if comment.reply_to %}
-                                <p class="alert alert-dark reply-body">
-                                    {{ comment.reply_to.author }}:<br>
+                                <div class="alert alert-info reply-body" role="alert">
+                                    <h6 class="alert-heading">{{ comment.reply_to.author }}:</h6>
                                     {{ comment.reply_to.html_content|safe }}
-                                </p>
+                                </div>
                             {% endif %}
                             <p class="mb-1">{{ comment.html_content|safe }}</p>
                             <div class="float-right">
-                                <a class="btn btn-light btn-sm"
-                                   href="{{ url_for('blog.reply_comment', pk=pk) }}">Reply</a>
+                                <a class="btn btn-primary btn-sm"
+                                   href="{{ url_for('blog.reply_comment', pk=comment.pk) }}">Reply</a>
                                 {% if current_user.is_authenticated %}
-                                    <a class="btn btn-light btn-sm" href="mailto:{{ comment.email }}">Email</a>
-                                    <form class="inline" method="post"
-                                          action="{{ url_for('admin.delete_comment',
-                                          comment_id=comment.id, next=request.full_path) }}">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Are you sure?')">Delete
-                                        </button>
-                                    </form>
+                                    <a class="btn btn-info btn-sm" href="mailto:{{ comment.email }}">Email</a>
+                                    <button data-id="{{ comment.pk }}" data-href="{{ url_for('admin.comment', pk=comment.pk) }}"
+                                            class="btn btn-danger btn-sm d-inline delete-item" type="button">Delete
+                                    </button>
                                 {% endif %}
                             </div>
                         </li>
                     {% endfor %}
                 </ul>
+                <!-- comment pagination -->
+                <br>
+                <div class="pagination justify-content-center">
+                    {{ render_pagination(comment_pagination, fragment='#comments') }}
+                </div>
                 {% else %}
                 <div class="tip"><h5>No comments.</h5></div>
                 {% endif %}
             </div>
         </div>
-        <!-- comment pagination -->
-        {% if comment_pagination.items %}
-        <div class="page-footer">
-            {{ render_pagination(comment_pagination, fragment='#comments') }}
-        </div>
-        {% endif %}
+
     </div>
     {% endif %}
 {% endblock main %}
 
 {% block scripts %}
+    <script src="{{ url_for('static', filename='js/jquery.toc.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script type="text/javascript">
+        $('.rm-filter').on('click', function (event) {
+
+            location.href = "/";
+            return false;
+        });
+    // 生成csrf令牌
+    var csrf_token = "{{ csrf_token() }}";
+    var default_error_message = 'Server error, please try again later';
+    </script>
 {% endblock %}
