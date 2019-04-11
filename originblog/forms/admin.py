@@ -1,7 +1,7 @@
 from flask_mongoengine.wtf import model_form
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, BooleanField, ValidationError, TextAreaField, \
-    IntegerField, RadioField, SelectField
+    IntegerField, RadioField, SelectField, DateTimeField
 from wtforms.validators import DataRequired, Length, Email, URL, Optional, Regexp
 
 from originblog.models import Post, User
@@ -11,8 +11,7 @@ ROLES = [(i, i) for i in BlogSettings.ROLE_PERMISSION_MAP]
 
 
 class MetaUserForm(FlaskForm):
-    username = StringField('Username', validators=[
-        DataRequired(), Length(1, 20),
+    username = StringField('Username', validators=[DataRequired(), Length(1, 20),
         Regexp('^[a-zA-Z0-9]*$', message='The username should contain only a-z, A-Z, 0-9.')])
     email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
     email_confirmed = BooleanField('Is Email confirmed.')
@@ -46,7 +45,6 @@ class MetaUserForm(FlaskForm):
 class PostForm(FlaskForm):
     """定义文章编辑表单"""
     title = StringField('Title', validators=[DataRequired(), Length(1, 60)])
-    # TODO:slug = StringField('Slug', validators=[Optional(), Length(0, 230)])
     weight = IntegerField('Weight', default=10)
     raw_content = TextAreaField('Content', validators=[DataRequired()])
     abstract = TextAreaField('Abstract', validators=[Optional(), Length(0, 255)])
@@ -60,16 +58,21 @@ class PostForm(FlaskForm):
     #     self.category.choices = [(category.id, category.name)
     #                              for category in Category.query.order_by(Category.name).all()]
 
-    # def validate_slug(self, field):
-    #     """验证是否有已重复的slug"""
-    #     posts = Post.objects.filter(slug=field.data)
-    #     if posts.count() > 0:
-    #         if not self.post_id.data or str(posts[0].id) != self.post_id.data:
-    #             raise ValidationError('slug already in use')
-
 
 # 使用flask-mongoengine从模型直接生成表单
-MetaPostForm = model_form(Post, exclude=['slug', 'author', 'html_content', 'update_time', 'from_admin'])
+# MetaPostForm = model_form(Post, exclude=['slug', 'author', 'html_content', 'update_time', 'from_admin'])
+class MetaPostForm(PostForm):
+    slug = StringField('Slug', validators=[Optional(), Length(0, 250),
+        Regexp('^[-a-z0-9]*$', message='The slug should contain only a-z, dash, 0-9.')])
+    pub_time = DateTimeField('Publish Time', validators=[DataRequired()])
+    can_comment = BooleanField('Can Comment', default=True)
+
+    def validate_slug(self, field):
+        """验证是否有已重复的slug"""
+        posts = Post.objects.filter(slug=field.data)
+        if posts.count() > 0:
+            if not self.post_id.data or str(posts[0].id) != self.post_id.data:
+                raise ValidationError('slug already in use')
 
 
 class WidgetForm(FlaskForm):

@@ -30,8 +30,12 @@ class AdminIndex(MethodView):
                 'count': {'$sum': '$visit_count'}
             }}
         )
+        # 将聚合操作返回的可迭代游标对象转换成列表
+        read_count = list(read_count)
+        recent_posts = Post.objects.filter(type='post').limit(10)
+        recent_comments = Comment.objects.limit(10)
         return render_template('admin/admin_index.html', posts=post_count, comments=comment_count, users=user_count,
-                               reads=read_count)
+                               reads=read_count, recent_posts=recent_posts, recent_comments=recent_comments)
 
 
 class Posts(MethodView):
@@ -194,12 +198,20 @@ class MetaPosts(MethodView):
 
     def get(self, post_type='post'):  # TODO：对文章内容进行搜索
         """获取所有文章"""
+        filter_rule = request.args.get('filter', 'all')
+        if filter_rule == 'all':
+            filter_posts = Post.objects
+        elif filter_rule == 'post':
+            filter_posts = Post.objects.filter(type='post')
+        elif filter_rule == 'page':
+            filter_posts = Post.objects.filter(type='page')
+        else:
+            filter_posts = Post.objects
+
         page = request.args.get('page', default=1, type=int)
         per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
-        post_query = Post.objects.filter(type=post_type).order_by('-update_time', '-weight')
-
-        pagination = post_query.paginate(page, per_page)
-        return render_template('admin/manage_post.html', pagination=pagination)
+        pagination = filter_posts.order_by('-update_time', '-weight').paginate(page, per_page)
+        return render_template('admin/manage_content.html', pagination=pagination)
 
     def post(self):
         """增加新文章"""
@@ -207,6 +219,7 @@ class MetaPosts(MethodView):
 
         if form.validate_on_submit():
             title = form.title.data
+            slug = form.slug.data
             abstract = form.abstract.data
             raw_content = form.raw_content.data
             pub_time = form.pub_time.data
@@ -217,6 +230,7 @@ class MetaPosts(MethodView):
             type = form.type.data
             post = Post(
                 title=title,
+                slug=slug,
                 abstract=abstract,
                 pub_time=pub_time,
                 raw_content=raw_content,
@@ -259,9 +273,6 @@ class MetaPostItem(MethodView):
     def get(self, slug, form=None):
         """获取文章内容与编辑表单"""
         post = Post.objects.get_or_404(slug=slug)
-        # 只有管理员或文章作者才有权限修改文章内容
-        if not current_user.is_admin and post.author != current_user._get_current_object():
-            abort(403)
 
         if not form:
             form = MetaPostForm()
@@ -271,11 +282,11 @@ class MetaPostItem(MethodView):
             form.raw_content.data = post.raw_content
             form.pub_time = post.pub_time
             form.category.data = post.category
-            form.tag.data = ' '.join(post.tags)
+            form.tags.data = ' '.join(post.tags)
             form.can_comment = post.can_comment
             form.type.data = post.type
 
-        return render_template('admin/edit_post.html', form=form)  # TODO:模板是否可改为new_posyt.html
+        return render_template('admin/edit_post.html',slug=slug, form=form)  # TODO:模板是否可改为new_posyt.html
 
     def post(self, slug):
         """修改文章内容"""
@@ -287,7 +298,7 @@ class MetaPostItem(MethodView):
             post.raw_content = form.raw_content.data
             post.pub_time = form.pub_time.data
             post.category = form.category.data
-            post.tags = form.tag.data.split() if form.tags.data else None
+            post.tags = form.tags.data.split() if form.tags.data else None
             post.weight = form.weight.data
             post.can_comment = form.can_comment.data
             post.type = form.type.data
@@ -554,9 +565,9 @@ class PostStatistics(MethodView):
         filter_rule = request.args.get('filter', 'all')
         if filter_rule == 'all':
             filter_statistics = PostStatistic.objects
-        elif filter_rule == 'posts':
+        elif filter_rule == 'post':
             filter_statistics = PostStatistic.objects.filter(post_type='post')
-        elif filter_rule == 'pages':
+        elif filter_rule == 'page':
             filter_statistics = PostStatistic.objects.filter(post_type='page')
         else:
             filter_statistics = PostStatistic.objects
@@ -636,3 +647,9 @@ def new_page():
 def new_widget():
     form = WidgetForm()
     return render_template('admin/new_widget.html', form=form)
+
+@admin_bp.route('/meta/posts/new_content')
+@admin_required
+def new_content():
+    form = MetaPostForm()
+    return render_template('admin/new_content.html', form=form)

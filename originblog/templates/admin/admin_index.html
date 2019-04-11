@@ -73,7 +73,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">READS</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {% if reads.count %}{{ reads.count }}{% else %}0{% endif %}</div>
+                                {% if reads %}{{ reads[0].count }}{% else %}0{% endif %}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-comments fa-2x text-gray-300"></i>
@@ -114,6 +114,22 @@
                         <dt>Blog Keywords:</dt>
                         <dd>{{ blog_meta.keywords }}</dd>
                     </dl>
+                </div>
+            </div>
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Posts</h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_posts %}
+                    <ul>
+                        {% for post in recent_posts %}
+                        <li>{{ moment(post.pub_time).format('LL') }}——<a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                        <p>No posts yet.</p>
+                    {% endif %}
                 </div>
             </div>
 
@@ -195,8 +211,26 @@
                     </dl>
                 </div>
             </div>
-
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Comments</h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_comments %}
+                    <ul>
+                        {% for comment in recent_comments %}
+                        <li class="d-inline">{{ moment(comment.pub_time).format('LL') }}——<a href="{{ url_for('blog.show_post', slug=comment_slug) }}#comment">{{ comment.html_content|safe|truncate }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                        <p>No comments yet.</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-
     </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
 {% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'admin/base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+
+{% block title %}
+    All Posts
+{% endblock title %}
+
+{% block main %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            All Post
+            <small class="text-muted">{{ pagination.total }}</small>
+            <span class="float-right"><a class="btn btn-primary btn-sm"
+                                         href="{{ url_for('admin.new_content') }}">New Post</a></span>
+        </h1>
+    </div>
+    <ul class="nav nav-pills" style="margin-bottom: 10px">
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#">Filter</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'all' %}active{% endif %}"
+               href="{{ url_for('admin.meta_posts', filter='all') }}">All</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'post' %}active{% endif %}"
+               href="{{ url_for('admin.meta_posts', filter='post') }}">Post</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'page' %}active{% endif %}"
+               href="{{ url_for('admin.meta_posts', filter='page') }}">Page</a>
+        </li>
+    </ul>
+    {% if pagination.items %}
+        <table class="table table-bordered shadow">
+            <thead>
+            <tr>
+                <th>No.</th>
+                <th>Title</th>
+                <th>Weight</th>
+                <th>Category</th>
+                <th>Tags</th>
+                <th>Comments</th>
+                <th>Words</th>
+                <th>Publish</th>
+                <th>Update</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            {% for post in pagination.items %}
+                <tr id="{{ post.id }}">
+                    <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINBLOG_MANAGE_POST_PER_PAGE) }}</td>
+                    <td><a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></td>
+                    <td>{{ post.weight }}</td>
+                    <td>
+                        <a href="{{ url_for('blog.index', category=post.category) }}">{{ post.category }}</a>
+                    </td>
+                    <td>
+                        {% for tag in post.tags %}
+                            <a href="{{ url_for('blog.index', tag=tag) }}" class="fa fa-tag">
+                                <span class="label label-default">{{ tag }}</span>
+                            </a>
+                            &nbsp;
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('blog.show_post', slug=post.slug) }}#comment">{{ post.comments_count }}</a>
+                    </td>
+                    <td>{{ post.html_content|length }}</td>
+                    <td>{{ moment(post.pub_time).format('LL') }}</td>
+                    <td>{{ moment(post.update_time).format('LL') }}</td>
+                    <td>
+                        <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
+                                class="btn btn-warning btn-sm d-inline switch-comment" type="button">
+                            {% if post.can_comment %}Disabled{% else %}Enable{% endif %} Comment
+                        </button>
+                        <button class="btn btn-info btn-sm d-inline" type="button"><a class="text-white"
+                                href="{{ url_for('admin.meta_post', slug=post.slug) }}">Edit</a></button>
+                        <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
+                                class="btn btn-danger btn-sm d-inline delete-item" type="button">Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div class="pagination">
+            {{ render_pagination(pagination) }}
+        </div>
+    {% else %}
+        <div class="tip">
+            <h5>No posts</h5>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // 生成csrf令牌
+        var csrf_token = "{{ csrf_token() }}";
+        var default_error_message = 'Server error, please try again later';
+    </script>
+    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
+{% endblock %}

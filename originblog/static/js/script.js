@@ -103,7 +103,7 @@ function handleComment(e) {
     });
 }
 
-// 发送DELETE方法ajax请求
+// 发送DELETE方法ajax请求的通用函数
 function deleteRequest(e) {
     var $el = $(e.target);
     var id = $el.data('id');
