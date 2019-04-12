@@ -64,7 +64,7 @@ class Posts(MethodView):
             abstract = form.abstract.data
             weight = form.weight.data
             raw_content = form.raw_content.data
-            category = form.category.data
+            category = form.category.data if form.category.data else None
             tags = form.tags.data.split() if form.tags.data else None
             type = form.type.data
             post = Post(
@@ -138,7 +138,7 @@ class PostItem(MethodView):
             post.abstract = form.abstract.data
             post.weight = form.weight.data
             post.raw_content = form.raw_content.data
-            post.category = form.category.data
+            post.category = form.category.data if form.category.data else None
             post.tags = form.tags.data.split() if form.tags.data else None
             post.type = form.type.data
             # 修改文章包括标题不会更改slug，以确保链接的永久
@@ -227,7 +227,7 @@ class MetaPosts(MethodView):
             abstract = form.abstract.data
             raw_content = form.raw_content.data
             pub_time = form.pub_time.data
-            category = form.category.data
+            category = form.category.data if form.category.data else None
             tags = form.tag.data.split() if form.tags.data else None
             weight = form.weight.data
             can_comment = form.can_comment.data
@@ -301,7 +301,7 @@ class MetaPostItem(MethodView):
             post.abstract = form.abstract.data
             post.raw_content = form.raw_content.data
             post.pub_time = form.pub_time.data
-            post.category = form.category.data
+            post.category = form.category.data if form.category.data else None
             post.tags = form.tags.data.split() if form.tags.data else None
             post.weight = form.weight.data
             post.can_comment = form.can_comment.data
@@ -628,6 +628,7 @@ admin_bp.add_url_rule('/posts/statistics/<slug>', view_func=PostStatisticItem.as
 @permission_required('POST')
 def new_post():
     form = PostForm()
+    form.type.data = 'post'
     return render_template('admin/new_post.html', form=form)
 
 

@@ -51,5 +51,4 @@
         var csrf_token = "{{ csrf_token() }}";
         var default_error_message = 'Server error, please try again later';
     </script>
-    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
 {% endblock %}

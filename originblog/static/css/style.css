@@ -26,6 +26,10 @@
     color: red;
 }
 
+.form-error {
+    color: red;
+}
+
 .comments {
     margin: 20px 0;
 }

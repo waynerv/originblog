@@ -122,9 +122,9 @@
                 </div>
                 <div class="card-body">
                     {% if recent_posts %}
-                    <ul>
+                    <ul class="list-group list-group-flush">
                         {% for post in recent_posts %}
-                        <li>{{ moment(post.pub_time).format('LL') }}——<a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></li>
+                        <li class="list-group-item">{{ moment(post.pub_time).fromNow(refresh=True) }} <strong>{{ post.author.name }}</strong> Published: <a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></li>
                         {% endfor %}
                     </ul>
                     {% else %}
@@ -217,9 +217,9 @@
                 </div>
                 <div class="card-body">
                     {% if recent_comments %}
-                    <ul>
+                    <ul class="list-group list-group-flush">
                         {% for comment in recent_comments %}
-                        <li class="d-inline">{{ moment(comment.pub_time).format('LL') }}——<a href="{{ url_for('blog.show_post', slug=comment_slug) }}#comment">{{ comment.html_content|safe|truncate }}</a></li>
+                        <li class="list-group-item">{{ moment(comment.pub_time).fromNow(refresh=True) }} <strong>{{ comment.author }}</strong> Commented: <a href="{{ url_for('blog.show_post', slug=comment.post_slug) }}#comments">{{ comment.html_content|safe|striptags|truncate }}</a></li>
                         {% endfor %}
                     </ul>
                     {% else %}
@@ -229,8 +229,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
-
-{% block scripts %}
-    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
 {% endblock %}

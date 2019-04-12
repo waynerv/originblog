@@ -9,8 +9,8 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">
             All Post
-            <small class="text-muted">{{ pagination.total }}</small>
-            <span class="float-right"><a class="btn btn-primary btn-sm"
+            <small class="text-muted ml-2">{{ pagination.total }}</small>
+            <span class="float-right ml-2"><a class="btn btn-primary btn-sm"
                                          href="{{ url_for('admin.new_post') }}">New Post</a></span>
         </h1>
     </div>
@@ -40,14 +40,14 @@
                     </td>
                     <td>
                         {% for tag in post.tags %}
-                            <a href="{{ url_for('blog.index', tag=tag) }}" class="fa fa-tag">
-                                <span class="label label-default">{{ tag }}</span>
+                            <a href="{{ url_for('blog.index', tag=tag) }}" class="badge badge-pill badge-primary">
+                                {{ tag }}
                             </a>
                             &nbsp;
                         {% endfor %}
                     </td>
                     <td>
-                        <a href="{{ url_for('blog.show_post', slug=post.slug) }}#comment">{{ post.comments_count }}</a>
+                        <a href="{{ url_for('blog.show_post', slug=post.slug) }}#comments">{{ post.comments_count }}</a>
                     </td>
                     <td>{{ post.html_content|length }}</td>
                     <td>{{ moment(post.pub_time).format('LL') }}</td>
@@ -82,5 +82,4 @@
         var csrf_token = "{{ csrf_token() }}";
         var default_error_message = 'Server error, please try again later';
     </script>
-    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
 {% endblock %}

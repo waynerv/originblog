@@ -209,7 +209,7 @@ class Post(db.Document):
 
     def reviewed_comments(self):
         """返回已审核通过的评论列表"""
-        return [comment for comment in self.comments if comment.reviewed is True]
+        return [comment for comment in self.comments if comment.status == 'approved']
 
     @property
     def comments_count(self):

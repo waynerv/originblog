@@ -1,7 +1,7 @@
 from flask_mongoengine.wtf import model_form
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, BooleanField, ValidationError, TextAreaField, \
-    IntegerField, RadioField, SelectField, DateTimeField
+    IntegerField, RadioField, SelectField, DateTimeField, HiddenField
 from wtforms.validators import DataRequired, Length, Email, URL, Optional, Regexp
 
 from originblog.models import Post, User
@@ -11,9 +11,9 @@ ROLES = [(i, i) for i in BlogSettings.ROLE_PERMISSION_MAP]
 
 
 class MetaUserForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(1, 20),
+    username = StringField('* Username', validators=[DataRequired(), Length(1, 20),
         Regexp('^[a-zA-Z0-9]*$', message='The username should contain only a-z, A-Z, 0-9.')])
-    email = StringField('Email', validators=[DataRequired(), Length(1, 255), Email()])
+    email = StringField('* Email', validators=[DataRequired(), Length(1, 255), Email()])
     email_confirmed = BooleanField('Is Email confirmed.')
     role = SelectField('Role', choices=ROLES)
     name = StringField('Name', validators=[Length(1, 128)])
@@ -44,13 +44,13 @@ class MetaUserForm(FlaskForm):
 
 class PostForm(FlaskForm):
     """定义文章编辑表单"""
-    title = StringField('Title', validators=[DataRequired(), Length(1, 60)])
+    title = StringField('* Title', validators=[DataRequired(), Length(1, 60)])
     weight = IntegerField('Weight', default=10)
-    raw_content = TextAreaField('Content', validators=[DataRequired()])
+    raw_content = TextAreaField('* Content', validators=[DataRequired()])
     abstract = TextAreaField('Abstract', validators=[Optional(), Length(0, 255)])
     category = StringField('Category', validators=[Optional(), Length(0, 64)])
     tags = StringField('Tags(separate with space)', validators=[Optional(), Length(0, 64)])
-    type = RadioField('Type', choices=[('post', 'post'), ('page', 'page')], default='post')
+    type = HiddenField(default='post')
     submit = SubmitField('Submit')
 
     # def __init__(self, *args, **kwargs):
@@ -64,8 +64,9 @@ class PostForm(FlaskForm):
 class MetaPostForm(PostForm):
     slug = StringField('Slug', validators=[Optional(), Length(0, 250),
         Regexp('^[-a-z0-9]*$', message='The slug should contain only a-z, dash, 0-9.')])
-    pub_time = DateTimeField('Publish Time', validators=[DataRequired()])
+    pub_time = DateTimeField('* Publish Time', validators=[DataRequired()])
     can_comment = BooleanField('Can Comment', default=True)
+    type = RadioField('Type', choices=[('post', 'post'), ('page', 'page')], default='post')
 
     def validate_slug(self, field):
         """验证是否有已重复的slug"""
@@ -77,8 +78,8 @@ class MetaPostForm(PostForm):
 
 class WidgetForm(FlaskForm):
     """定义首页组件表单"""
-    title = StringField('Title', validators=[DataRequired(), Length(1, 20)])
-    content = TextAreaField('Content', validators=[DataRequired(), Length(1, 255)])
+    title = StringField('* Title', validators=[DataRequired(), Length(1, 20)])
+    content = TextAreaField('* Content', validators=[DataRequired(), Length(1, 255)])
     content_type = RadioField('Content Type', choices=[('markdown', 'markdown'), ('html', 'html')], default='markdown')
     priority = IntegerField(default=10000)
     submit = SubmitField('Submit')

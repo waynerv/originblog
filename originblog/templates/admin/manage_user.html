@@ -9,7 +9,7 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">
             All Users
-            <small class="text-muted">{{ pagination.total }}</small>
+            <small class="text-muted ml-2">{{ pagination.total }}</small>
         </h1>
     </div>
     <ul class="nav nav-pills" style="margin-bottom: 10px">
@@ -54,8 +54,8 @@
                     <td><a href="{{ url_for('user.index', username=user.username) }}">{{ user.username }}</a></td>
                     <td>{{ user.name }}</td>
                     <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
-                    <td><a href="{{ user.homepage }}">{{ user.homepage }}</a></td>
-                    <td>{{ moment(user.create_time).format('LL') }}</td>
+                    <td>{% if user.homepage %}<a href="{{ user.homepage }}">{{ user.homepage }}</a>{% endif %}</td>
+                    <td>{{ moment(user.create_time).format('LLL') }}</td>
                     <td>{{ user.posts_count }}</td>
                     <td>{{ user.role.role_name }}</td>
                     <td>
@@ -84,5 +84,4 @@
         var csrf_token = "{{ csrf_token() }}";
         var default_error_message = 'Server error, please try again later';
     </script>
-    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
 {% endblock %}

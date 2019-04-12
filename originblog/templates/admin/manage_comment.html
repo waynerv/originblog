@@ -9,7 +9,7 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">
             All Comments
-            <small class="text-muted">{{ pagination.total }}</small>
+            <small class="text-muted ml-2">{{ pagination.total }}</small>
         </h1>
     </div>
     <ul class="nav nav-pills" style="margin-bottom: 10px">
@@ -66,7 +66,7 @@
                     <td><a href="{{ comment.homepage }}">{{ comment.homepage }}</a></td>
                     <td><a href="{{ url_for('blog.show_post', slug=comment.post_slug) }}">{{ comment.post_title }}</a>
                     </td>
-                    <td>{{ comment.html_content|safe|truncate }}</td>
+                    <td>{{ comment.html_content|safe|striptags|truncate(80) }}</td>
                     <td>{{ moment(comment.pub_time).format('LL') }}</td>
                     <td id="{{ comment.id }}status">{{ comment.status }}</td>
                     <td>
@@ -105,5 +105,4 @@
         var csrf_token = "{{ csrf_token() }}";
         var default_error_message = 'Server error, please try again later';
     </script>
-    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
 {% endblock %}

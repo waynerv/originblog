@@ -2,7 +2,7 @@
 {% from 'bootstrap/form.html' import render_field %}
 
 {% block custom_head %}
-    <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.5.1/dist/easymde.min.css">
 {% endblock %}
 
 {% block title %}New Widget{% endblock title %}
@@ -17,23 +17,28 @@
         {{ render_field(form.priority) }}
         {{ render_field(form.content_type) }}
         {{ form.content.label }}
-        {{ form.content(id="easymde") }}
         {% if form.content.errors %}
             {% for message in form.content.errors %}
-            <small class="error">{{ message }}</small><br>
+                <small class="form-error">{{ message }}</small><br>
             {% endfor %}
         {% endif %}
+        {{ form.content(id="easymde") }}
         {{ form.submit(class_="btn btn-primary") }}
     </form>
     <br>
 {% endblock %}
 
 {% block scripts %}
-    <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easymde@2.5.1/dist/easymde.min.js"></script>
     <script>
-    let easyMDE = new EasyMDE({element: $('#easymde')[0]});
-    $('#submit').click(function(){
-      $('#easymde').text(easyMDE.value());
-    });
+        let easyMDE = new EasyMDE({
+            element: $('#easymde')[0],
+            autoDownloadFontAwesome: false,
+            placeholder: 'This field cannot be empty',
+            spellChecker: false
+        });
+        $('#submit').click(function () {
+            $('#easymde').text(easyMDE.value());
+        });
     </script>
 {% endblock %}

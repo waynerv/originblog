@@ -9,7 +9,7 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">
             Statistics
-            <small class="text-muted">{{ pagination.total }}</small>
+            <small class="text-muted ml-2">{{ pagination.total }}</small>
         </h1>
     </div>
     <ul class="nav nav-pills" style="margin-bottom: 10px">
@@ -75,5 +75,4 @@
         var csrf_token = "{{ csrf_token() }}";
         var default_error_message = 'Server error, please try again later';
     </script>
-    {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.js')) }}
 {% endblock %}
