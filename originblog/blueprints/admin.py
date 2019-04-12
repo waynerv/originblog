@@ -241,7 +241,7 @@ class MetaPosts(MethodView):
                 category=category,
                 tags=tags,
                 weight=weight,
-                can_commen=can_comment,
+                can_comment=can_comment,
                 type=type
             )
             post.author = current_user._get_current_object()  # TODO:如何修改文章作者，是否有必要
@@ -267,7 +267,7 @@ class MetaPosts(MethodView):
                 'page': 'blog.show_page'
             }
             return redirect(url_for(endpoints[post.type], slug=post.slug))
-        return render_template('admin/new_post.html', form=form)
+        return render_template('admin/new_content.html', form=form)
 
 
 class MetaPostItem(MethodView):

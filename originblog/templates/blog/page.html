@@ -1,32 +1,22 @@
 {% extends 'base.html' %}
 
 {% from 'bootstrap/pagination.html' import render_pagination %}
-{% from 'bootstrap/form.html' import render_form %}
-
-{% block custom_head %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css" />
-{% endblock %}
+{% from 'bootstrap/form.html' import render_field %}
 
 {% block title %}{{ post.title }}{% endblock title %}
 
 {% block header %}
-    <header class="masthead" style="background-image: url({{ blog_meta.bg_post }})">
+    <header class="masthead" style="background-image: url({{ url_for('static',filename=blog_meta.bg_about) }})">
         <div class="overlay"></div>
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-md-10 mx-auto">
                     <div class="page-heading">
                         <h1>{{ post.title }}</h1>
+                        <hr class="small">
                         <span class="meta">Posted by
                             <a href="{{ url_for('user.index', username=post.author.username) }}">{{ post.author.name }}</a>
                             on {{ moment(post.pub_time).format('YYYY/MM/DD, h:mm a') }}</span>
-                        <p class="meta">category: <a
-                                href="{{ url_for('blog.index', category=post.category) }}">{{ post.category }}</a>
-                        </p>
-                        <p class="meta">Tags:
-                            {% for tag in post.tags %}
-                                <a href="{{ url_for('blog.index', tag=tag) }}">{{ tag }}</a>{% endfor %}
-                        </p>
                     </div>
                 </div>
             </div>
@@ -35,143 +25,30 @@
 {% endblock %}
 
 {% block main %}
-    <div class="page-header">
-        <span class="float-left">
-        {% if current_user.is_authenticated %}
-            <a class="btn btn-info btn-sm" href="{{ url_for('admin.edit_post', slug=slug) }}">Edit</a>
-            <form class="inline" method="post"
-                  action="{{ url_for('admin.delete_post', post_id=post.id, next=url_for('blog.index')) }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-danger btn-sm"
-                        onclick="return confirm('Are you sure?')">Delete
-                </button>
-            </form>
-        {% endif %}
-        </span>
-    </div>
-    <article>
-        <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <!-- main content -->
-                <article>
+
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+
+            <!-- main content -->
+            <article id="main-content">
                 {{ post.html_content|safe }}
-                </article>
-                <hr>
-            </div>
-        </div>
-    </article>
+            </article>
 
-    {% if post.can_comment %}
-    <!-- comment form and list -->
-    <div class="comments" id="comments">
-        <!-- comment header -->
-        <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <h3>{{ comment_pagination.total }} Comments
-                    <small>
-                        <a href="{{ url_for('blog.show_post', slug=post.slug, page=comment_pagination.pages or 1) }}#comments">
-                            latest
-                        </a>
-                    </small>
-                {% if current_user.is_authenticated %}
-                    <form class="float-right" method="post"
-                          action="{{ url_for('admin.set_comment', post_id=post.id, next=request.full_path) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-warning btn-sm">
-                            {% if post.can_comment %}Disabled{% else %}Enable{% endif %} Comment
-                        </button>
-                    </form>
-                {% endif %}
-                </h3>
-            </div>
-        </div>
-        <!-- comment form -->
-        <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                {% if post.can_comment %}
-                    {% if request.args.get('reply') %}
-                    <div class="alert alert-dark">
-                        Reply to<strong>{{ request.args.get('author') }}</strong>:
-                        <a class="float-right" href="{{ url_for('blog.show_post', post_id=post.id) }}">Cancel</a>
-                    </div>
-                    {% endif %}
-                    <div id="comment-form">
-                        {{ render_form(form, action=request.full_path) }}
-                    </div>
-                {% else %}
-                    <div class="tip">
-                        <h5>Comment disabled.</h5>
-                    </div>
-                {% endif %}
-            </div>
+            <!-- comment form and list -->
+            {% include 'blog/_comment.html' %}
+
         </div>
 
-        <!-- comment list -->
-        <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                {% if comment_pagination.items %}
-                <ul class="list-group">
-                    {% for comment in comment_pagination.items %}
-                        <li class="list-group-item list-group-item-action flex-column">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">
-                                    <a href="{% if comment.homepage %}{{ comment.homepage }}{% else %}#{% endif %}"
-                                       target="_blank">
-                                        {{ comment.author }}
-                                    </a>
-                                    {% if comment.from_post_author %}
-                                        <span class="badge badge-primary">Author</span>
-                                    {% endif %}
-                                    {% if comment.reply_to %}
-                                        <span class="badge badge-light">Reply</span>
-                                    {% endif %}
-                                </h5>
-                                <small data-toggle="tooltip" data-placement="top" data-delay="500"
-                                       data-timestamp="{{ comment.pub_time.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-                                    {{ moment(comment.pub_time).fromNow(refresh=True) }}
-                                </small>
-                            </div>
-                            {% if comment.reply_to %}
-                                <p class="alert alert-dark reply-body">
-                                    {{ comment.reply_to.author }}:<br>
-                                    {{ comment.reply_to.html_content|safe }}
-                                </p>
-                            {% endif %}
-                            <p class="mb-1">{{ comment.html_content|safe }}</p>
-                            <div class="float-right">
-                                <a class="btn btn-light btn-sm"
-                                   href="{{ url_for('blog.reply_comment', pk=pk) }}">Reply</a>
-                                {% if current_user.is_authenticated %}
-                                    <a class="btn btn-light btn-sm" href="mailto:{{ comment.email }}">Email</a>
-                                    <form class="inline" method="post"
-                                          action="{{ url_for('admin.delete_comment',
-                                          comment_id=comment.id, next=request.full_path) }}">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Are you sure?')">Delete
-                                        </button>
-                                    </form>
-                                {% endif %}
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <div class="tip"><h5>No comments.</h5></div>
-                {% endif %}
-            </div>
-        </div>
-        <!-- comment pagination -->
-        {% if comment_pagination.items %}
-        <div class="page-footer">
-            {{ render_pagination(comment_pagination, fragment='#comments') }}
-        </div>
-        {% endif %}
     </div>
-    {% endif %}
+
 {% endblock main %}
 
 {% block scripts %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.toc.js') }}"></script>
+    <script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js"></script>
+    <script type="text/javascript">
+        // 生成csrf令牌
+        var csrf_token = "{{ csrf_token() }}";
+        var default_error_message = 'Server error, please try again later';
+    </script>
 {% endblock %}

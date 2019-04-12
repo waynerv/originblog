@@ -37,24 +37,24 @@
                     <dt>Social Network:</dt>
                     <dd>
                         {% if user.social_networks['github']['url'] %}
-                            <a href='{{ user.social_networks["github"]["url"] }}'><i class="fa fa-github fa-lg"></i></a>
+                            <a href='{{ user.social_networks["github"]["url"] }}'><i class="fab fa-github fa-lg"></i></a>
                         {% endif %}
                         {% if user.social_networks['twitter']['url'] %}
                             <a href='{{ user.social_networks["twitter"]["url"] }}'><i
-                                    class="fa fa-twitter fa-lg"></i></a>
+                                    class="fab fa-twitter fa-lg"></i></a>
                         {% endif %}
                         {% if user.social_networks['weibo']['url'] %}
-                            <a href='{{ user.social_networks["weibo"]["url"] }}'><i class="fa fa-weibo fa-lg"></i></a>
+                            <a href='{{ user.social_networks["weibo"]["url"] }}'><i class="fab fa-weibo fa-lg"></i></a>
                         {% endif %}
                         {% if user.social_networks['facebook']['url'] %}
-                            <a href='{{ user.social_networks["facebook"]["url"] }}'><i class="fa fa-facebook fa-lg"></i></a>
+                            <a href='{{ user.social_networks["facebook"]["url"] }}'><i class="fab fa-facebook fa-lg"></i></a>
                         {% endif %}
                         {% if user.social_networks['linkedin']['url'] %}
-                            <a href='{{ user.social_networks["linkedin"]["url"] }}'><i class="fa fa-linkedin fa-lg"></i></a>
+                            <a href='{{ user.social_networks["linkedin"]["url"] }}'><i class="fab fa-linkedin fa-lg"></i></a>
                         {% endif %}
                         {% if user.social_networks['weixin']['url'] %}
                             <a id="btn_weixin" href='{{ user.social_networks["weixin"]["url"] }}'><i
-                                    class="fa fa-weixin fa-lg"></i></a>
+                                    class="fab fa-weixin fa-lg"></i></a>
                             <!-- display weixin qrcode -->
                             <div id="weixin" class="hidden">
                                 <br>
@@ -68,7 +68,7 @@
                     <dt>Homepage:</dt>
                     <dd>
                         {% if user.homepage %}
-                            <a href="{{ user.homepage }}"><i class="fa fa-home fa-lg"></i>{{ user.homepage }}</a>
+                            <a href="{{ user.homepage }}"><i class="fas fa-home"></i>{{ user.homepage }}</a>
                         {% else %}
                             Not provided.
                         {% endif %}
@@ -78,8 +78,9 @@
         </div>
 
         <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="col-lg-8 col-md-10 mx-auto" id="article">
                 <h3>Articles</h3>
+                <hr>
                 <ul>
                     {% for post in pagination.items %}
                         {% if post %}
@@ -90,20 +91,18 @@
                     {% endfor %}
                 </ul>
                 <!-- pagination -->
-                <ul class="pagination">
-                    {% if pagination.has_prev %}
-                        <li class="next">
-                            <a href="{{ url_for('user.index', username=user.username, page=pagination.prev_num) }}">Previous
-                                Posts</a>
-                        </li>
-                    {% endif %}
+                <div class="clearfix">
                     {% if pagination.has_next %}
-                        <li class="next">
-                            <a href="{{ url_for('user.index', username=user.username, page=pagination.next_num) }}">Older
-                                Posts</a>
-                        </li>
+                        <a class="btn btn-primary float-right ml-2"
+                           href="{{ url_for('user.index', username=user.username, page=pagination.next_num) }}#article">Older Posts &rarr;
+                        </a>
                     {% endif %}
-                </ul>
+                    {% if pagination.has_prev %}
+                        <a class="btn btn-primary float-right"
+                           href="{{ url_for('user.index', username=user.username, page=pagination.prev_num) }}#article">Previous Posts
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

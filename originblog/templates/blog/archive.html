@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
 
 {% block title %}{{ blog_meta.name }}{% endblock %}
 
@@ -21,11 +22,13 @@
 
 {% block main %}
     <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="col-lg-8 col-md-10 mx-auto" id="post-list">
             {% for (year, posts) in data.items() %}
             <div class="row">
-                <h3>{{ year }}</h3>
-                <hr>
+                <div class="col">
+                    <h3 class="text-center">{{ year }}</h3>
+                    <hr>
+                </div>
             </div>
             <div class="row">
                 {% for post in posts %}
@@ -42,9 +45,8 @@
             </div>
             {% endfor %}
 
-            <div class="row">
-                {% from 'macros.html' import render_entire_pagination %}
-                {{ render_entire_pagination(pagination, 'blog.archive') }}
+            <div class="row justify-content-center">
+                {{ render_pagination(pagination, 'blog.archive', fragment='post-list') }}
             </div>
         </div>
     </div>

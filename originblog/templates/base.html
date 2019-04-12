@@ -79,14 +79,14 @@
                         <a class="nav-link" href="{{ url_for('blog.archive') }}">Archive</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="about.html">About</a>
+                        <a class="nav-link" href="{{ url_for('blog.show_page', slug=blog_meta.index_nav1.lower()) }}">{{ blog_meta.index_nav1 }}</a>
                     </li>
                     {% if not current_user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.login') }}">Sign in</a>
+                            <a class="nav-link" href="{{ url_for('auth.login', next=request.full_path) }}">Sign in</a>
                         </li>
                     {% else %}
                         <li class="dropdown nav-item">

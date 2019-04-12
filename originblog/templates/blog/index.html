@@ -23,6 +23,7 @@
 {% block main %}
     <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
+            <!-- Post List-->
             {% for post in pagination.items %}
                 {% if post %}
                     <div class="post-preview">
@@ -32,7 +33,7 @@
                             </h2>
                         </a>
                         <p class="post-subtitle">
-                            {{ post.abstract|safe }}
+                            {{ post.abstract|safe|striptags|truncate }}
                         </p>
                         <p class="post-meta">Posted by
                             <a href="{{ url_for('user.index', username=post.author.username) }}">{{ post.author.name }}</a>
@@ -58,7 +59,7 @@
             <!-- Pagination -->
             <div class="clearfix">
                 {% if pagination.has_next %}
-                <a class="btn btn-primary float-right" href="{{ url_for('blog.index', page=pagination.next_num) }}
+                <a class="btn btn-primary float-right ml-2" href="{{ url_for('blog.index', page=pagination.next_num) }}
                     {%- if cur_category %}&category={{ cur_category }}{% endif %}
                     {%- if cur_keywords %}&keywords={{ cur_keywords }}{% endif %}
                     {%- if cur_tag %}&tag={{ cur_tag }}{% endif %}">Older Posts &rarr;
@@ -75,7 +76,7 @@
         </div>
 
         <!--include sidebar template -->
-        {% include 'blog/index_sidebar.html' %}
+        {% include 'blog/_index_sidebar.html' %}
 
     </div>
 
