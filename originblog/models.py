@@ -18,8 +18,8 @@ from originblog.settings import Operations
 
 # 获取博客配置
 COMMENT_STATUS = BlogSettings.COMMENT_STATUS
-GAVATAR_CDN_BASE = BlogSettings.GAVATAR_CDN_BASE
-GAVATAR_DEFAULT_IMAGE = BlogSettings.GAVATAR_DEFAULT_IMAGE
+GRAVATAR_CDN_BASE = BlogSettings.GRAVATAR_CDN_BASE
+GRAVATAR_DEFAULT_IMAGE = BlogSettings.GRAVATAR_DEFAULT_IMAGE
 SOCIAL_NETWORKS = BlogSettings.SOCIAL_NETWORKS
 ROLE_PERMISSION_MAP = BlogSettings.ROLE_PERMISSION_MAP
 
@@ -269,29 +269,26 @@ class Comment(db.Document):
     md_content = db.StringField(required=True)
     html_content = db.StringField(required=True)
     pub_time = db.DateTimeField()
-    update_time = db.DateTimeField()  # TODO:评论发布后不应可以修改，考虑删除该字段
     reply_to = db.ReferenceField('self')
     status = db.StringField(choices=COMMENT_STATUS, default='pending')
     from_post_author = db.BooleanField(default=False)
     from_admin = db.BooleanField(default=False)
-    gavatar_id = db.StringField(default='00000000000')
+    gravatar_id = db.StringField(default='00000000000')
 
     def clean(self):
         """保存到数据库前更新时间戳,生成头像id，并将markdown文本转换为html"""
-        if self.md_content:
-            html_content = markdown2.markdown(self.md_content,
-                                              extras=['code-friendly', 'fenced-code-blocks', 'tables', 'nofollow'])
-            self.html_content = get_clean_html_content(html_content)
+        html_content = markdown2.markdown(self.md_content,
+                                          extras=['code-friendly', 'fenced-code-blocks', 'tables', 'nofollow'])
+        self.html_content = get_clean_html_content(html_content)
 
         if not self.pub_time:
             self.pub_time = datetime.utcnow()
-        self.update_time = datetime.utcnow()
 
         # 根据邮箱签名生成头像，若无邮箱则使用默认头像
         if self.email:
-            self.gavatar_id = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
+            self.gravatar_id = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
 
-    def get_avatar_url(self, base_url=GAVATAR_CDN_BASE, img_size=0, default_img_url=None):
+    def get_avatar_url(self, base_url=GRAVATAR_CDN_BASE, img_size=0, default_img_url=None):
         """通过 gavatar_id 从cdn 获取头像图片的链接。
 
         获取时可传入大小和默认图片参数
@@ -300,15 +297,15 @@ class Comment(db.Document):
         :param default_img_url:  默认图片
         :return: 图片url
         """
-        gavatar_url = base_url + self.gavatar_id
+        gravatar_url = base_url + self.gravatar_id
         params = {}
         if img_size:
             params['s'] = str(img_size)
         if default_img_url:
             params['d'] = default_img_url
         if params:
-            gavatar_url = '{0}?{1}'.format(gavatar_url, urlencode(params))
-        return gavatar_url
+            gravatar_url = '{0}?{1}'.format(gravatar_url, urlencode(params))
+        return gravatar_url
 
     meta = {
         'ordering': ['-update_time']

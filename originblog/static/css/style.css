@@ -31,17 +31,21 @@
 }
 
 .comment-form {
-    margin-top: 30px;
-    margin-bottom: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .reply-body {
     margin-top: 10px;
+    font-size: 15px;
 }
 
 .reply-body p {
     margin: 0;
-    font-size: 15px;
+}
+
+.comment-body p {
+    font-size: 18px;
 }
 
 /*@media only screen and (min-width: 576px) {*/

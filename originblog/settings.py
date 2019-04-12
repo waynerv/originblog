@@ -2,8 +2,8 @@ import os
 
 
 class BlogSettings:
-    GAVATAR_CDN_BASE = 'pending'
-    GAVATAR_DEFAULT_IMAGE = 'pending'
+    GRAVATAR_CDN_BASE = '//cdn.v2ex.com/gravatar/'
+    GRAVATAR_DEFAULT_IMAGE = 'http://7tsygu.com1.z0.glb.clouddn.com/user-avatar.jpg'
     COMMENT_STATUS = ('approved', 'pending', 'spam', 'deleted')
     BLOG_META = {
         'name': 'Origin Blog',

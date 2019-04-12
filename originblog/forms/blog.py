@@ -11,7 +11,6 @@ class CommentForm(FlaskForm):
     homepage = StringField('Homepage', validators=[Optional(), URL(), Length(0, 255)])
     content = TextAreaField('* Comment <span class="badge badge-info">markdown</span>',
                             validators=[DataRequired()])
-    comment_id = HiddenField('comment_id')
     submit = SubmitField('Submit')
 
 
@@ -22,5 +21,4 @@ class UserCommentForm(FlaskForm):
     homepage = HiddenField('Homepage', validators=[Optional(), URL(), Length(0, 255)])
     content = TextAreaField('* Comment <small><span class="badge badge-info">markdown</span></small>',
                             validators=[DataRequired()])
-    comment_id = HiddenField('comment_id')
     submit = SubmitField('Submit')
