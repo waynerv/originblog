@@ -288,13 +288,13 @@ class Comment(db.Document):
         if self.email:
             self.gravatar_id = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
 
-    def get_avatar_url(self, base_url=GRAVATAR_CDN_BASE, img_size=0, default_img_url=None):
+    def get_avatar_url(self, base_url=GRAVATAR_CDN_BASE, img_size=44, default_img_url='retro'):
         """通过 gavatar_id 从cdn 获取头像图片的链接。
 
         获取时可传入大小和默认图片参数
         :param base_url: cdn地址
-        :param img_size: 需要的图片大小
-        :param default_img_url:  默认图片
+        :param img_size: 需要的图片大小,默认为44
+        :param default_img_url: 没有匹配头像时的默认图片
         :return: 图片url
         """
         gravatar_url = base_url + self.gravatar_id

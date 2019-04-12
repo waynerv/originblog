@@ -103,7 +103,7 @@
                                 <a class="dropdown-item" href="{{ url_for('user.edit_profile') }}">
                                     <span class="fas fa-fw fa-cog"></span> Settings
                                 </a>
-                                {% if current_user.can('MODERATE') %}
+                                {% if current_user.can('POST') %}
                                     <a class="dropdown-item" href="{{ url_for('admin.index') }}">
                                         <span class="fas fa-fw fa-tachometer-alt"></span> Dashboard
                                     </a>
