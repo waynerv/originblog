@@ -142,17 +142,16 @@ def reply_comment(pk, post_type):
 @blog_bp.route('/archive')
 def archive():
     """按时间归档文章"""
-    page = request.args.get('page', default=1, type=int)
-    per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
-    pagination = Post.objects.filter(type='post').order_by('-pub_time').only('title', 'slug', 'pub_time').paginate(page, per_page)
-    posts = pagination.items
-    # 按年份分组当页posts
+    posts = Post.objects.filter(type='post').order_by('-pub_time').only('title', 'slug', 'pub_time')
+    # 按月份分组当页posts
     data = {}
     years = list(set([post.pub_time.year for post in posts]))
     for year in years:
-        post_items = [post for post in posts if post.pub_time.year == year]
-        data[year] = post_items
-    return render_template('blog/archive.html', pagination=pagination, data=data)
+        months = reversed(list(set([post.pub_time.month for post in posts if post.pub_time.year == year])))
+        for month in months:
+            post_items = [post for post in posts if post.pub_time.month == month]
+            data[(year, month)] = post_items
+    return render_template('blog/archive.html', data=data)
 
 
 @blog_bp.route('/sitemap.xml/')

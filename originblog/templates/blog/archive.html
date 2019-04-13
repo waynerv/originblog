@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% from 'bootstrap/pagination.html' import render_pagination %}
 
-{% block title %}{{ blog_meta.name }}{% endblock %}
+{% block title %}Archive{% endblock %}
 
 {% block header %}
     <header class="masthead" style="background-image: url({{ url_for('static',filename=blog_meta.bg_about) }})">
@@ -10,7 +10,7 @@
             <div class="row">
                 <div class="col-lg-8 col-md-10 mx-auto">
                     <div class="page-heading">
-                        <h1>{{ blog_meta.name }}</h1>
+                        <h1>Archive</h1>
                         <hr class="small">
                         <span class="subheading">{{ blog_meta.subtitle }} <a href="{{ url_for('blog.index') }}"><i class="fa fa-rss"></i></a></span>
                     </div>
@@ -23,31 +23,21 @@
 {% block main %}
     <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto" id="post-list">
-            {% for (year, posts) in data.items() %}
-            <div class="row">
+            {% for (date, posts) in data.items() %}
+            <div class="row mb-3">
                 <div class="col">
-                    <h3 class="text-center">{{ year }}</h3>
-                    <hr>
+                    <h3>{{ date[0] }}年{{ date[1] }}月（{{ posts|length }}）</h3>
+                    <ul class="list-group list-group-flush">
+                    {% for post in posts %}
+                        <li class="list-group-item list-group-item-action">
+                            <a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a>&nbsp;
+                            <span class="text-muted">{{ moment(post.pub_time).format('YYYY-MM-DD') }}</span>
+                        </li>
+                    {% endfor %}
+                    </ul>
                 </div>
-            </div>
-            <div class="row">
-                {% for post in posts %}
-                <div class="col-sm-6 col-md-4">
-                    <div class="thumbnail">
-                        <!-- <img src="..." alt="..."> -->
-                        <div class="caption">
-                            <h3><a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></h3><hr>
-                            <p><strong>Date: </strong>{{ moment(post.pub_time).format('YYYY/MM/DD, h:mm a') }}</p>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
             </div>
             {% endfor %}
-
-            <div class="row justify-content-center">
-                {{ render_pagination(pagination, 'blog.archive', fragment='post-list') }}
-            </div>
         </div>
     </div>
     <hr>
