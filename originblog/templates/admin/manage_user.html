@@ -10,6 +10,8 @@
         <h1 class="h3 mb-0 text-gray-800">
             All Users
             <small class="text-muted ml-2">{{ pagination.total }}</small>
+            <span class="float-right ml-2"><a class="btn btn-primary btn-sm"
+                 href="{{ url_for('admin.add_user') }}">Add User</a></span>
         </h1>
     </div>
     <ul class="nav nav-pills" style="margin-bottom: 10px">
@@ -62,7 +64,8 @@
                         <button class="btn btn-info btn-sm d-inline" type="button"><a class="text-white"
                                 href="{{ url_for('admin.meta_user', pk=user.id) }}">Edit</a></button>
                         <button data-id="{{ user.id }}" data-href="{{ url_for('admin.meta_user', pk=user.id) }}"
-                                class="btn btn-danger btn-sm d-inline delete-item" type="button">Delete
+                                data-toggle="modal" data-target="#confirm-delete"
+                                class="btn btn-danger btn-sm d-inline" type="button">Delete
                         </button>
                     </td>
                 </tr>

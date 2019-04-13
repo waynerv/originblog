@@ -5,7 +5,7 @@
 
 {% block custom_head %}
     <link crossorigin="anonymous" integrity="sha384-snvkDYLVttT3SBWz8WVvdGfmManlusUoAT3Agqco/8yBV7/tlflWJCUmP2O9f9wF" href="https://lib.baomitu.com/highlight.js/9.15.6/styles/github.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
+    <link crossorigin="anonymous" integrity="sha384-p1+tzRdXcglS+PrR+shfL55KoHugzlLLtjkBKwCZaAqOruyk5rBEQYtiTaK9XewD" href="https://lib.baomitu.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block title %}{{ post.title }}{% endblock title %}
@@ -93,6 +93,50 @@
         {% include "blog/_post_sidebar.html" %}
     </div>
 
+    <!-- Delete Modal-->
+    {% if current_user.is_admin %}
+    <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Delete Confirm</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Are you sure you want to delete this item?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Cancel</button>
+                    <button data-id="" data-href="" type="button" data-dismiss="modal"
+                            class="btn btn-danger btn-sm delete-item">Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="delete-post" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Confirm</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Are you sure you want to delete this post?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Cancel</button>
+                    <button data-id="" data-href="" type="button" data-dismiss="modal"
+                            class="btn btn-danger btn-sm delete-post">Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Custom Toast-->
     <div id="toast"></div>
 
@@ -101,7 +145,7 @@
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/jquery.toc.js') }}"></script>
     <script crossorigin="anonymous" integrity="sha384-CWWTkjyKvLwc1j/u6LmdJiGCWFkQtH9MxBpmgzrFFwMhF5qM2u/FzXrhV3nUfs0l" src="https://lib.baomitu.com/highlight.js/9.15.6/highlight.min.js"></script>
-    <script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js"></script>
+    <script crossorigin="anonymous" integrity="sha384-Q6Xvzp61V1VxmzdSD4aLWzCkE8LEFwvgbwBSi/IWxZ1x8EY2f6QxMtzUAvKDsTwz" src="https://lib.baomitu.com/social-share.js/1.0.16/js/social-share.min.js"></script>
     <script type="text/javascript">
         hljs.initHighlightingOnLoad();
         $('.rm-filter').on('click', function (event) {

@@ -3,7 +3,8 @@
     <div class="sidebar-header">
         <a class="btn btn-info btn-sm" href="{{ url_for('admin.post', slug=post.slug) }}">Edit</a>
         <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
-                class="btn btn-danger btn-sm d-inline delete-post" type="button">Delete
+                data-toggle="modal" data-target="#delete-post"
+                class="btn btn-danger btn-sm d-inline" type="button">Delete
         </button>
     </div>
     {% endif %}

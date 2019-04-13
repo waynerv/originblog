@@ -104,13 +104,14 @@ function handleComment(e) {
 }
 
 // 发送DELETE方法ajax请求的通用函数
-function deleteRequest(e) {
+function deleteItem(e) {
     var $el = $(e.target);
-    var id = $el.data('id');
+    //注意下面不能直接使用jQuery的data()获取，因为同一元素通过data()获取的值不会改变
+    var id = $el.attr('data-id');
 
     $.ajax({
         type: 'DELETE',
-        url: $el.data('href'),
+        url: $el.attr('data-href'),
         success: function (data) {
             $('#'+id).remove();
             toast(data.message);
@@ -150,6 +151,22 @@ function deletePost(e) {
 // 绑定事件到按钮
 $(document).on('click', '.switch-comment', switchComment.bind(this));
 $(document).on('click', '.handle-comment', handleComment.bind(this));
-$(document).on('click', '.delete-item', deleteRequest.bind(this));
+$(document).on('click', '.delete-item', deleteItem.bind(this));
 $(document).on('click', '.delete-all', deleteAll.bind(this));
 $(document).on('click', '.delete-post', deletePost.bind(this));
+
+// 多个删除按钮共用一个模态框
+$('#confirm-delete').on('show.bs.modal', function (e) {
+    $('.delete-item').attr('data-id', $(e.relatedTarget).data('id'));
+    $('.delete-item').attr('data-href', $(e.relatedTarget).data('href'));
+});
+
+$('#delete-all').on('show.bs.modal', function (e) {
+    $('.delete-all').attr('data-id', $(e.relatedTarget).data('id'));
+    $('.delete-all').attr('data-href', $(e.relatedTarget).data('href'));
+});
+
+$('#delete-post').on('show.bs.modal', function (e) {
+    $('.delete-post').attr('data-id', $(e.relatedTarget).data('id'));
+    $('.delete-post').attr('data-href', $(e.relatedTarget).data('href'));
+});

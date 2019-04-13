@@ -78,8 +78,7 @@ class User(db.Document, UserMixin):
     create_time = db.DateTimeField(default=datetime.utcnow, required=True)
     last_login = db.DateTimeField(default=datetime.utcnow, required=True)
     email_confirmed = db.BooleanField(default=False)
-    # is_superuser = db.BooleanField(default=False)
-    role = db.ReferenceField('Role')
+    role = db.ReferenceField('Role')  # TODO:角色被删除后的级联行为，目前角色不可删除
     bio = db.StringField(max_length=200)
     homepage = db.StringField(max_length=255)
     social_networks = db.DictField(default=SOCIAL_NETWORKS)
@@ -153,7 +152,7 @@ class User(db.Document, UserMixin):
     @property
     def is_admin(self):
         """检查用户是否拥有管理员权限"""
-        return self.role.role_name == 'admin'
+        return self.role and self.role.role_name == 'admin'
 
     @property
     def is_active(self):

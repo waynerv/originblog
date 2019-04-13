@@ -37,7 +37,8 @@
                         <button class="btn btn-info btn-sm d-inline" type="button"><a class="text-white"
                                 href="{{ url_for('admin.widget', pk=widget.pk) }}">Edit</a></button>
                         <button data-id="{{ widget.id }}" data-href="{{ url_for('admin.widget', pk=widget.pk) }}"
-                                class="btn btn-danger btn-sm d-inline delete-item" type="button">Delete
+                                data-toggle="modal" data-target="#confirm-delete"
+                                class="btn btn-danger btn-sm d-inline" type="button">Delete
                         </button>
                     </td>
                 </tr>
