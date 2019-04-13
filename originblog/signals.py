@@ -1,6 +1,7 @@
 from blinker import Namespace
 from flask import request, url_for
 from mongoengine import DoesNotExist
+from threading import Thread
 
 from originblog.models import Tracker, PostStatistic
 from originblog.settings import BlogSettings
@@ -30,7 +31,7 @@ def on_post_visited(sender, post, **kwargs):
     try:
         post_statistic = PostStatistic.objects.get(post=post)
     except DoesNotExist:
-        post_statistic = PostStatistic(post=post)
+        post_statistic = PostStatistic(post=post, post_type=post.type)
         from random import randint
         post_statistic.verbose_count_base = randint(500, 5000)
         post_statistic.save()
@@ -39,7 +40,7 @@ def on_post_visited(sender, post, **kwargs):
 
 
 @post_published.connect
-def on_post_published(sender, post, post_type):
+def on_post_published(sender, post):
     """对文章进行SEO优化
 
     文章发布后，将链接地址提交到百度站长平台，以被收录进搜索结果
@@ -52,7 +53,9 @@ def on_post_published(sender, post, post_type):
     post_url = url_for(endpoints[post_type], slug=post.slug, _external=True)
     baidu_url = BlogSettings.SEARCH_ENGINE_SUBMIT_URLS['baidu']
     if baidu_url:
-        result = submit_url_to_baidu(baidu_url, post_url)
-        print(result.status_code, result.text)
+        # 异步发送网络请求
+        thr = Thread(target=submit_url_to_baidu, args=(baidu_url, post_url))
+        thr.start()
+        return thr
     else:
         print('Not ready to submit urls yet')

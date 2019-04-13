@@ -12,7 +12,6 @@ from originblog.forms.admin import PostForm, WidgetForm, MetaPostForm, MetaUserF
 from originblog.forms.auth import RegisterForm
 from originblog.models import Post, Comment, PostStatistic, Widget, Tracker, User, Role
 from originblog.signals import post_published
-from originblog.utils import redirect_back
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -85,12 +84,12 @@ class Posts(MethodView):
                 post.save()
 
             # 初始化文章的统计数据
-            post_statistic = PostStatistic(post=post)
+            post_statistic = PostStatistic(post=post, post_type=post.type)
             post_statistic.verbose_count_base = random.randint(500, 5000)
             post_statistic.save()
 
             # 发送文章发布的信号
-            post_published.send(current_app._get_current_object(), post=post, post_type=post.type)
+            post_published.send(current_app._get_current_object(), post=post)
 
             flash('Post published.', 'success')
             # 跳转到对应端点
@@ -244,7 +243,7 @@ class MetaPosts(MethodView):
                 can_comment=can_comment,
                 type=type
             )
-            post.author = current_user._get_current_object()  # TODO:如何修改文章作者，是否有必要
+            post.author = current_user._get_current_object()
             # 保存文章到数据库时，注意处理slug相同的情况
             try:
                 post.save()
@@ -253,12 +252,12 @@ class MetaPosts(MethodView):
                 post.save()
 
             # 初始化文章的统计数据
-            post_statistic = PostStatistic(post=post)
+            post_statistic = PostStatistic(post=post, post_type=post.type)
             post_statistic.verbose_count_base = random.randint(500, 5000)
             post_statistic.save()
 
             # 发送文章发布的信号
-            post_published.send(current_app._get_current_object(), post=post, post_type=post.type)
+            post_published.send(current_app._get_current_object(), post=post)
 
             flash('Post published.', 'success')
             # 跳转到对应端点

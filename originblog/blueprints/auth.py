@@ -30,7 +30,7 @@ def login():
                 return redirect_back()
             flash('Invalid username or password.', 'warning')
         else:
-            flash('No account.', 'warning')
+            flash('Invalid username or password.', 'warning')
     return render_template('auth/signin.html', form=form)
 
 

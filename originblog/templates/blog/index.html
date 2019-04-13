@@ -33,7 +33,7 @@
                             </h2>
                         </a>
                         <p class="post-subtitle">
-                            {{ post.abstract|safe|striptags|truncate }}
+                            {{ post.abstract|striptags|truncate }}
                         </p>
                         <p class="post-meta">Posted by
                             <a href="{{ url_for('user.index', username=post.author.username) }}">{{ post.author.name }}</a>

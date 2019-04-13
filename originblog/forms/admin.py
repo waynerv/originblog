@@ -78,7 +78,7 @@ class MetaPostForm(PostForm):
 
 class WidgetForm(FlaskForm):
     """定义首页组件表单"""
-    title = StringField('* Title', validators=[DataRequired(), Length(1, 20)])
+    title = StringField('* Title', validators=[DataRequired(), Length(1, 64)])
     content = TextAreaField('* Content', validators=[DataRequired(), Length(1, 255)])
     content_type = RadioField('Content Type', choices=[('markdown', 'markdown'), ('html', 'html')], default='markdown')
     priority = IntegerField(default=10000)

@@ -207,6 +207,12 @@ class Post(db.Document):
         """根据标题自动生成标题别名"""
         self.slug = slugify(title)
 
+    def get_abstract(self, count, suffix='...'):
+        """使用正则表达式从html中提取摘要内容"""
+        plain_content = re.sub(r'<.*?>', '', self.html_content)
+        abstract = ''.join(plain_content.split())[0:count]
+        return abstract + suffix
+
     def reviewed_comments(self):
         """返回已审核通过的评论列表"""
         return [comment for comment in self.comments if comment.status == 'approved']
@@ -230,7 +236,7 @@ class Post(db.Document):
         self.html_content = get_clean_html_content(self.html_content)
         # 若未设置摘要，自动截取正文作为摘要
         if not self.abstract:
-            self.abstract = self.html_content[:140]
+            self.abstract = self.get_abstract(140)
 
     def to_dict(self):
         """把类的对象转化为 dict 类型的数据，将对象序列化"""
@@ -319,10 +325,6 @@ class PostStatistic(db.Document):
     verbose_count_base = db.IntField(default=0)
     post_type = db.StringField(max_length=64, default='post')
 
-    def clean(self):
-        if not self.post_type:
-            self.post_type = self.post.type
-
 
 class Tracker(db.Document):
     post = db.ReferenceField(Post, reverse_delete_rule=db.CASCADE)  # 与文章级联删除
@@ -331,7 +333,6 @@ class Tracker(db.Document):
     create_time = db.DateTimeField(default=datetime.utcnow)
 
     meta = {
-        'indexes': ['ip'],
         'ordering': ['-create_time']
     }
 
