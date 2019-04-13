@@ -4,6 +4,7 @@
 {% from 'bootstrap/form.html' import render_field %}
 
 {% block custom_head %}
+    <link crossorigin="anonymous" integrity="sha384-snvkDYLVttT3SBWz8WVvdGfmManlusUoAT3Agqco/8yBV7/tlflWJCUmP2O9f9wF" href="https://lib.baomitu.com/highlight.js/9.15.6/styles/github.min.css" rel="stylesheet">
     <link href="https://cdn.bootcss.com/social-share.js/1.0.16/css/share.min.css" rel="stylesheet">
 {% endblock %}
 
@@ -99,8 +100,10 @@
 
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/jquery.toc.js') }}"></script>
+    <script crossorigin="anonymous" integrity="sha384-CWWTkjyKvLwc1j/u6LmdJiGCWFkQtH9MxBpmgzrFFwMhF5qM2u/FzXrhV3nUfs0l" src="https://lib.baomitu.com/highlight.js/9.15.6/highlight.min.js"></script>
     <script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js"></script>
     <script type="text/javascript">
+        hljs.initHighlightingOnLoad();
         $('.rm-filter').on('click', function (event) {
 
             location.href = "/";

@@ -36,7 +36,8 @@ class ChangeEmailForm(FlaskForm):
 
 
 class DeleteAccountForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(1, 20)])
+    username = StringField('Username', validators=[DataRequired(), Length(1, 20)],
+                           render_kw={'placeholder':'Please type in the username of your account to confirm.'})
     submit = SubmitField()
 
     def validate_username(self, field):

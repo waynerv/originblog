@@ -3,6 +3,10 @@
 {% from 'bootstrap/pagination.html' import render_pagination %}
 {% from 'bootstrap/form.html' import render_field %}
 
+{% block custom_head %}
+    <link crossorigin="anonymous" integrity="sha384-snvkDYLVttT3SBWz8WVvdGfmManlusUoAT3Agqco/8yBV7/tlflWJCUmP2O9f9wF" href="https://lib.baomitu.com/highlight.js/9.15.6/styles/github.min.css" rel="stylesheet">
+{% endblock %}
+
 {% block title %}{{ post.title }}{% endblock title %}
 
 {% block header %}
@@ -47,9 +51,9 @@
 {% endblock main %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='js/jquery.toc.js') }}"></script>
-    <script src="https://cdn.bootcss.com/social-share.js/1.0.16/js/social-share.min.js"></script>
+    <script crossorigin="anonymous" integrity="sha384-CWWTkjyKvLwc1j/u6LmdJiGCWFkQtH9MxBpmgzrFFwMhF5qM2u/FzXrhV3nUfs0l" src="https://lib.baomitu.com/highlight.js/9.15.6/highlight.min.js"></script>
     <script type="text/javascript">
+        hljs.initHighlightingOnLoad();
         // 生成csrf令牌
         var csrf_token = "{{ csrf_token() }}";
         var default_error_message = 'Server error, please try again later';

@@ -7,7 +7,7 @@
     <div class="card w-100 bg-light">
         <h3 class="card-header">Edit Profile</h3>
         <div class="card-body">
-            {{ render_form(form) }}
+            {{ render_form(form, button_map={'submit':'primary'}) }}
         </div>
     </div>
 {% endblock %}

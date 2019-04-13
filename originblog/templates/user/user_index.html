@@ -77,14 +77,16 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row mt-2">
             <div class="col-lg-8 col-md-10 mx-auto" id="article">
                 <h3>Articles</h3>
                 <hr>
                 <ul>
                     {% for post in pagination.items %}
                         {% if post %}
-                            <li><a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></li>
+                            <li>
+                                <a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a>
+                            </li>
                         {% else %}
                             <p class="post-subtitle">No articles found here</p>
                         {% endif %}

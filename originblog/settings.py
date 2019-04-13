@@ -7,7 +7,7 @@ class BlogSettings:
     COMMENT_STATUS = ('approved', 'pending', 'spam', 'deleted')
     BLOG_META = {
         'name': 'Origin Blog',
-        'subtitle': 'Where everthing begins.',
+        'subtitle': 'Concentration and Perseverance matter.',
         'description': os.getenv('description', 'Oct Blog Description'),
         'owner': os.getenv('owner', 'Waynerv'),
         'keywords': os.getenv('keywords','python,django,flask,docker,MongoDB'),
