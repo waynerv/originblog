@@ -97,8 +97,7 @@ def show_post(slug, post_type='post'):
 
     page = request.args.get('page', default=1, type=int)
     per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
-    comment_pagination = Comment.objects.filter(post_slug=post.slug, status='approved').paginate(page,
-                                                                                                 per_page=per_page)
+    comment_pagination = Comment.objects.filter(post_slug=post.slug, status='approved').paginate(page, per_page)
     # 发送文章被浏览的信号
     post_visited.send(current_app._get_current_object(), post=post)
     # 根据文章类型使用不同的模板

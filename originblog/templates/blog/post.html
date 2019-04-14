@@ -11,7 +11,7 @@
 {% block title %}{{ post.title }}{% endblock title %}
 
 {% block header %}
-    <header class="masthead" style="background-image: url({{ url_for('static', filename=blog_meta.bg_post) }})">
+    <header class="masthead" style="background-image: url({{ url_for('static', filename=blog_meta.bg_post) }})" id="page-top">
         <div class="overlay"></div>
         <div class="container">
             <div class="row">
@@ -93,6 +93,11 @@
         {% include "blog/_post_sidebar.html" %}
     </div>
 
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
     <!-- Delete Modal-->
     {% if current_user.is_admin %}
     <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel"
@@ -156,5 +161,14 @@
     // 生成csrf令牌
     var csrf_token = "{{ csrf_token() }}";
     var default_error_message = 'Server error, please try again later';
+    // Scroll to top button appear
+    $(document).on('scroll', function() {
+    var scrollDistance = $(this).scrollTop();
+        if (scrollDistance > 1000) {
+            $('.scroll-to-top').fadeIn();
+        } else {
+            $('.scroll-to-top').fadeOut();
+        }
+    });
     </script>
 {% endblock %}
