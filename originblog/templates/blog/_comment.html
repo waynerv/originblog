@@ -82,7 +82,7 @@
                                 {% if comment.from_admin %}
                                     <span class="badge badge-warning">Admin</span>
                                 {% endif %}
-                                {% if comment.reply_to %}
+                                {% if reply_filter(comment) %}
                                     <span class="badge badge-secondary">Reply</span>
                                 {% endif %}
                             </h5>
@@ -91,11 +91,18 @@
                                 {{ moment(comment.pub_time).fromNow(refresh=True) }}
                             </small>
                         </div>
-                        {% if comment.reply_to %}
+                        {% if reply_filter(comment) %}
+                            {# 处理回复评论被删除时直接引用所引发的异常 #}
+                            {% if reply_filter(comment, False) %}
                             <div class="alert alert-info reply-body" role="alert">
                                 <h6 class="alert-heading">{{ comment.reply_to.author }}:</h6>
                                 {{ comment.reply_to.html_content|safe }}
                             </div>
+                            {% else %}
+                            <div class="alert alert-info reply-body text-muted" role="alert">
+                                Original comment has been deleted.
+                            </div>
+                            {% endif %}
                         {% endif %}
                         <div class="comment-body">
                             <p>{{ comment.html_content|safe }}</p>

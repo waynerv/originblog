@@ -1,5 +1,6 @@
 import requests
 from urllib.parse import urlparse, urljoin
+from mongoengine import DoesNotExist
 
 from flask import request, redirect, url_for
 
@@ -41,3 +42,11 @@ def submit_url_to_baidu(baidu_url, url):
     """使用request手动提交文章链接到百度站长平台"""
     result = requests.post(baidu_url, data=url)
     return result
+
+
+def reply_filter(comment, flag=True):
+    """在模板中捕获回复的原评论被删除时引发的异常"""
+    try:
+        return comment.reply_to
+    except DoesNotExist:
+        return flag

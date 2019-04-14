@@ -3,9 +3,9 @@ from flask_login import current_user
 from mongoengine.queryset.visitor import Q
 
 from originblog.forms.blog import CommentForm, UserCommentForm
-from originblog.models import Post, Comment, Widget, User
-from originblog.utils import redirect_back
+from originblog.models import Post, Comment, Widget
 from originblog.signals import post_visited
+from originblog.utils import redirect_back, reply_filter
 
 blog_bp = Blueprint('blog', __name__)
 
@@ -107,7 +107,8 @@ def show_post(slug, post_type='post'):
         'page': 'blog/page.html'
     }
 
-    return render_template(templates[post_type], post=post, comment_pagination=comment_pagination, form=form)
+    return render_template(templates[post_type], post=post, comment_pagination=comment_pagination, form=form,
+                           reply_filter=reply_filter)
 
 
 # 为专用页面page注册路由
