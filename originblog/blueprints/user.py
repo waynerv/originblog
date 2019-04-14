@@ -8,11 +8,10 @@ from originblog.settings import Operations
 
 user_bp = Blueprint('user', __name__)
 
-# TODO:用户的个人资料修改，密码、邮箱修改,删除账户，发布的文章列表，发布的评论列表
 
 @user_bp.route('/<username>')
 def index(username):
-    """显示用户个人页面"""
+    """显示用户主页"""
     user = User.objects.get_or_404(username=username)
     posts = Post.objects.filter(type='post', author=user).order_by('-pub_time')
 

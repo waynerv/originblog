@@ -16,17 +16,16 @@ def index():
 
     查询所有已发表的文章，根据分类、标签、关键字搜索等特定查询参数进行筛选分页
     """
-
     # 获取已发表并且权重值大于0的文章的QuerySet，按权重和发表时间排序
     pub_posts = Post.objects.filter(type='post').order_by('-weight', '-pub_time')
     posts = pub_posts.filter(Q(weight__gt=0) | Q(weight=None))
 
-    # 根据查询参数获取特定分类的文章QuerySet
+    # 根据查询参数获取特定分类的文章
     category = request.args.get('category')
     if category:
         posts = posts.filter(category=category)
 
-    # 根据查询参数获取特定标签的文章QuerySet
+    # 根据查询参数获取特定标签的文章
     tag = request.args.get('tag')
     if tag:
         posts = posts.filter(tags=tag)
@@ -55,7 +54,6 @@ def show_post(slug, post_type='post'):
     已登录用户不需要手动填写评论表单的个人信息,通过查询参数reply-to判断是否为评论回复，并进行相应处理
     :param slug: 文章的标题别名
     :param post_type: 显示的文章类型（用来区分专用页面）
-    :return: 渲染模板或提交表单后重定向回原页面
     """
     post = Post.objects.get_or_404(slug=slug)
 
@@ -122,7 +120,6 @@ def reply_comment(pk, post_type):
     以该视图作为中转传递被回复的评论的id。
     在show_post视图中获取查询参数并进行相应处理。
     :param pk: 被回复的comment id
-    :return: 跳转到表单填写页面或返回
     """
     comment = Comment.objects.get_or_404(pk=pk)
     post = Post.objects.get_or_404(slug=comment.post_slug)
@@ -143,7 +140,7 @@ def reply_comment(pk, post_type):
 def archive():
     """按时间归档文章"""
     posts = Post.objects.filter(type='post').order_by('-pub_time').only('title', 'slug', 'pub_time')
-    # 按月份分组当页posts
+    # 按月份分组所有post
     data = {}
     years = list(set([post.pub_time.year for post in posts]))
     for year in years:

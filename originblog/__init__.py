@@ -6,7 +6,7 @@ from flask import Flask, render_template
 from flask_login import current_user
 from flask_wtf.csrf import CSRFError
 
-from originblog.blueprints.admin import admin_bp
+from originblog.blueprints.admin.views import admin_bp
 from originblog.blueprints.auth import auth_bp
 from originblog.blueprints.blog import blog_bp
 from originblog.blueprints.user import user_bp
