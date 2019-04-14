@@ -3,7 +3,7 @@ import os
 
 class BlogSettings:
     GRAVATAR_CDN_BASE = '//cdn.v2ex.com/gravatar/'
-    GRAVATAR_DEFAULT_IMAGE = 'http://7tsygu.com1.z0.glb.clouddn.com/user-avatar.jpg'
+    GRAVATAR_DEFAULT_IMAGE = 'retro'
     COMMENT_STATUS = ('approved', 'pending', 'spam', 'deleted') # TODO:评论的删除方式
     BLOG_META = {
         'name': 'Origin Blog',
@@ -42,7 +42,7 @@ class BlogSettings:
         'admin': ['COMMENT', 'POST', 'MODERATE', 'ADMINISTRATE']
     }
     SEARCH_ENGINE_SUBMIT_URLS = {
-        'baidu': 'https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/form'
+        'baidu': 'https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/form' # TODO:Invalid URL
     }
 
 

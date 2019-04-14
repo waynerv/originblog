@@ -293,7 +293,7 @@ class Comment(db.Document):
         if self.email:
             self.gravatar_id = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
 
-    def get_avatar_url(self, base_url=GRAVATAR_CDN_BASE, img_size=44, default_img_url='retro'):
+    def get_avatar_url(self, base_url=GRAVATAR_CDN_BASE, img_size=44, default_img_url=GRAVATAR_DEFAULT_IMAGE):
         """通过 gavatar_id 从cdn 获取头像图片的链接。
 
         获取时可传入大小和默认图片参数
