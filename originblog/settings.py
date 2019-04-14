@@ -4,15 +4,15 @@ import os
 class BlogSettings:
     GRAVATAR_CDN_BASE = '//cdn.v2ex.com/gravatar/'
     GRAVATAR_DEFAULT_IMAGE = 'http://7tsygu.com1.z0.glb.clouddn.com/user-avatar.jpg'
-    COMMENT_STATUS = ('approved', 'pending', 'spam', 'deleted')
+    COMMENT_STATUS = ('approved', 'pending', 'spam', 'deleted') # TODO:评论的删除方式
     BLOG_META = {
         'name': 'Origin Blog',
         'subtitle': 'Concentration and Perseverance matter.',
-        'description': os.getenv('description', 'Oct Blog Description'),
+        'description': os.getenv('description', 'Origin Blog Description'),
         'owner': os.getenv('owner', 'Waynerv'),
-        'keywords': os.getenv('keywords','python,django,flask,docker,MongoDB'),
+        'keywords': os.getenv('keywords','python,flask,web,MongoDB'),
         'index_nav1': 'About',
-        'index_nav2': 'Donation',
+        'index_nav2': None,
         'bg_home': 'img/home-bg.jpg',
         'bg_post': 'img/post-bg.jpg',
         'bg_about': 'img/about-bg.jpg',
@@ -28,12 +28,12 @@ class BlogSettings:
         'baidu_site_verification': os.getenv('baidu_site_verification', 'yOI4ewdkCY')
     }
     SOCIAL_NETWORKS = {
-        'weibo': {'fa_icon': 'fa fa-weibo', 'url': None},
-        'weixin': {'fa_icon': 'fa fa-weixin', 'url': None},
-        'twitter': {'fa_icon': 'fa fa fa-twitter', 'url': None},
-        'github': {'fa_icon': 'fa fa-github', 'url': None},
-        'facebook': {'fa_icon': 'fa fa-facebook', 'url': None},
-        'linkedin': {'fa_icon': 'fa fa-linkedin', 'url': None},
+        'weibo': {'fa_icon': 'fab fa-weibo', 'url': None},
+        'weixin': {'fa_icon': 'fab fa-weixin', 'url': None},
+        'twitter': {'fa_icon': 'fab fa fa-twitter', 'url': None},
+        'github': {'fa_icon': 'fab fa-github', 'url': None},
+        'facebook': {'fa_icon': 'fab fa-facebook', 'url': None},
+        'linkedin': {'fa_icon': 'fab fa-linkedin', 'url': None},
     }
     ROLE_PERMISSION_MAP = {
         'reader': ['COMMENT'],
@@ -54,11 +54,7 @@ class Operations:
 
 
 class BaseConfig(object):
-    SECRET_KEY = os.getenv('SECRET_KEY', 'secret_key_default')
-
-    CKEDITOR_SERVE_LOCAL = True
-    CKEDITOR_LANGUAGE = 'zh-cn'
-    CKEDITOR_HEIGHT = 300
+    SECRET_KEY = os.getenv('SECRET_KEY', '5ecret_ke9_def@ult')
 
     MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
@@ -69,15 +65,14 @@ class BaseConfig(object):
     ORIGINBLOG_ADMIN_EMAIL = os.getenv('ORIGINBLOG_ADMIN_EMAIL')
     APP_MAIL_SUBJECT_PREFIX = 'From Origin Blog:'
 
-    ORIGINBLOG_POST_PER_PAGE = 10
-    ORIGINBLOG_COMMENT_PER_PAGE = 10
-    ORIGINBLOG_MANAGE_POST_PER_PAGE = 20
-    ORIGINBLOG_MANAGE_COMMENT_PER_PAGE = 20
-    ORIGINBLOG_MANAGE_CATEGORY_PER_PAGE = 10
-    ORIGINBLOG_MANAGE_LINK_PER_PAGE = 10
-
-    # ('theme name', 'display name')
-    ORIGINLOG_THEMES = {'flatly': 'Flatly', 'united': 'United'}
+    APP_POST_PER_PAGE = 10
+    APP_COMMENT_PER_PAGE = 10
+    APP_MANAGE_POST_PER_PAGE = 20
+    APP_MANAGE_COMMENT_PER_PAGE = 20
+    APP_MANAGE_USER_PER_PAGE = 20
+    APP_MANAGE_WIDGET_PER_PAGE = 10
+    APP_MANAGE_STATISTIC_PER_PAGE = 20
+    APP_MANAGE_TRACKER_PER_PAGE = 20
 
 
 class DevelopmentConfig(BaseConfig):
@@ -97,7 +92,9 @@ class TestingConfig(BaseConfig):
 
 
 class ProductionConfig(BaseConfig):
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    MONGODB_SETTINGS = {
+        'db': 'originblog'
+    }
 
 
 config = {

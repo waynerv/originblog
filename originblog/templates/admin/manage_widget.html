@@ -28,7 +28,7 @@
             </thead>
             {% for widget in pagination.items %}
                 <tr id="{{ widget.id }}">
-                    <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINBLOG_MANAGE_POST_PER_PAGE) }}</td>
+                    <td>{{ loop.index + ((pagination.page - 1) * config.APP_MANAGE_WIDGET_PER_PAGE) }}</td>
                     <td>{{ widget.title }}</td>
                     <td>{{ widget.priority }}</td>
                     <td>{{ widget.html_content|safe }}</td>

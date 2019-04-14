@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, url_for, request, flash, redirect, current_app
-from flask_login import login_required, fresh_login_required, current_user, logout_user
+from flask_login import login_required, fresh_login_required, current_user
 
-from originblog.models import User, Post
-from originblog.forms.user import ProfileForm, ChangePasswordForm, ChangeEmailForm, DeleteAccountForm
 from originblog.emails import send_change_email_email
+from originblog.forms.user import ProfileForm, ChangePasswordForm, ChangeEmailForm, DeleteAccountForm
+from originblog.models import User, Post
 from originblog.settings import Operations
 
 user_bp = Blueprint('user', __name__)
@@ -16,7 +16,7 @@ def index(username):
     posts = Post.objects.filter(type='post', author=user).order_by('-pub_time')
 
     page = request.args.get('page', default=1, type=int)
-    per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
+    per_page = current_app.config['APP_POST_PER_PAGE']
     pagination = posts.paginate(page, per_page=per_page)
     return render_template('user/user_index.html', user=user, pagination=pagination)
 

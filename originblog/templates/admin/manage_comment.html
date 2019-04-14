@@ -61,7 +61,7 @@
             </thead>
             {% for comment in pagination.items %}
                 <tr id="{{ comment.id }}">
-                    <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINBLOG_MANAGE_POST_PER_PAGE) }}</td>
+                    <td>{{ loop.index + ((pagination.page - 1) * config.APP_MANAGE_COMMENT_PER_PAGE) }}</td>
                     <td>{{ comment.author }}</td>
                     <td><a href="mailto:{{ comment.email }}">{{ comment.email }}</a></td>
                     <td><a href="{{ comment.homepage }}">{{ comment.homepage }}</a></td>

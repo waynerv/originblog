@@ -44,7 +44,7 @@
             </thead>
             {% for statistic in pagination.items %}
                 <tr id="{{ statistic.id }}">
-                    <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINBLOG_MANAGE_POST_PER_PAGE) }}</td>
+                    <td>{{ loop.index + ((pagination.page - 1) * config.APP_MANAGE_STATISTIC_PER_PAGE) }}</td>
                     <td>
                         <a href="{{ url_for('blog.show_post', slug=statistic.post.slug) }}">{{ statistic.post.title }}</a>
                     </td>

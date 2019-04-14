@@ -40,7 +40,7 @@ def index():
 
     # 从查询参数获取当前页数并对QuerySet分页
     page = request.args.get('page', default=1, type=int)
-    per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
+    per_page = current_app.config['APP_POST_PER_PAGE']
     pagination = posts.paginate(page, per_page=per_page)  # 分页对象
 
     return render_template('blog/index.html', pagination=pagination, widgets=widgets, cur_category=category,
@@ -76,16 +76,19 @@ def show_post(slug, post_type='post'):
         reply_to = request.args.get('replyto')
         if reply_to:
             comment.reply_to = Comment.objects.get_or_404(pk=reply_to)
+        message = 'Thanks, your comment will be published after reviewed.'
         # 管理员和文章作者发布的评论不需要审核
         if current_user.is_authenticated and current_user.username == post.author.username:
             comment.from_post_author = True
             comment.status = 'approved'
+            message = 'Comment published.'
         if current_user.is_admin:
             comment.from_admin = True
             comment.status = 'approved'
+            message = 'Comment published.'
 
         comment.save()
-        flash('Thanks, your comment will be published after reviewed.', 'info')
+        flash(message, 'info')
         # 根据文章类型使用不同的端点
         endpoints = {
             'post': 'blog.show_post',
@@ -94,7 +97,7 @@ def show_post(slug, post_type='post'):
         return redirect(url_for(endpoints[post_type], slug=slug))
 
     page = request.args.get('page', default=1, type=int)
-    per_page = current_app.config['ORIGINBLOG_POST_PER_PAGE']
+    per_page = current_app.config['APP_COMMENT_PER_PAGE']
     comment_pagination = Comment.objects.filter(post_slug=post.slug, status='approved').paginate(page, per_page)
     # 发送文章被浏览的信号
     post_visited.send(current_app._get_current_object(), post=post)
@@ -113,13 +116,14 @@ blog_bp.add_url_rule('/pages/<slug>/', 'show_page', show_post, defaults={'post_t
 
 
 @blog_bp.route('/reply/comment/<pk>', defaults={'post_type': 'post'})
-@blog_bp.route('/reply/<post_type>/comment/<pk>')  # pk会被默认的string converter转换为字符串
+@blog_bp.route('/reply/<post_type>/comment/<pk>')
 def reply_comment(pk, post_type):
     """实现评论的回复功能
 
     以该视图作为中转传递被回复的评论的id。
     在show_post视图中获取查询参数并进行相应处理。
     :param pk: 被回复的comment id
+    :param post_type: 发表评论的文章类型
     """
     comment = Comment.objects.get_or_404(pk=pk)
     post = Post.objects.get_or_404(slug=comment.post_slug)

@@ -49,7 +49,7 @@
             </thead>
             {% for post in pagination.items %}
                 <tr id="{{ post.id }}">
-                    <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINBLOG_MANAGE_POST_PER_PAGE) }}</td>
+                    <td>{{ loop.index + ((pagination.page - 1) * config.APP_MANAGE_POST_PER_PAGE) }}</td>
                     <td><a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></td>
                     <td>{{ post.weight }}</td>
                     <td>

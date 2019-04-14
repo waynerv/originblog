@@ -70,9 +70,16 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('blog.archive') }}">Archive</a>
                     </li>
+                    {% if blog_meta.index_nav1 %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('blog.show_page', slug=blog_meta.index_nav1.lower()) }}">{{ blog_meta.index_nav1 }}</a>
                     </li>
+                    {% endif %}
+                    {% if blog_meta.index_nav2 %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('blog.show_page', slug=blog_meta.index_nav2.lower()) }}">{{ blog_meta.index_nav2 }}</a>
+                    </li>
+                    {% endif %}
                     {% if not current_user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
@@ -152,31 +159,31 @@
                 <div class="col-lg-8 col-md-10 mx-auto">
                     <ul class="list-inline text-center">
                         <li class="list-inline-item">
-                            <a href="#">
+                            <a href="mailto:ampedee@gmail.com">
                                 <span class="fa-stack fa-lg">
                                     <i class="fas fa-circle fa-stack-2x"></i>
-                                    <i class="fab fa-twitter fa-stack-1x fa-inverse"></i>
+                                    <i class="fab fa-google fa-stack-1x fa-inverse"></i>
                                 </span>
                             </a>
                         </li>
                         <li class="list-inline-item">
-                            <a href="#">
-                                <span class="fa-stack fa-lg">
-                                    <i class="fas fa-circle fa-stack-2x"></i>
-                                    <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
-                                </span>
-                            </a>
-                        </li>
-                        <li class="list-inline-item">
-                            <a href="#">
+                            <a href="https://github.com/waynerv">
                                 <span class="fa-stack fa-lg">
                                     <i class="fas fa-circle fa-stack-2x"></i>
                                     <i class="fab fa-github fa-stack-1x fa-inverse"></i>
                                 </span>
                             </a>
                         </li>
+                        <li class="list-inline-item">
+                            <a href="https://weibo.com/u/2198233840/home?wvr=5&lf=reg">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                    <i class="fab fa-weibo fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
                     </ul>
-                    <p class="copyright text-muted">Copyright &copy; Your Website 2019</p>
+                    <p class="copyright text-muted">Copyright &copy; Origin Blog 2019</p>
                 </div>
             </div>
         </div>

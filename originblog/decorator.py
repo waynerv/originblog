@@ -28,6 +28,7 @@ def admin_required(func):
 
 def confirm_required(view):
     """检查访问视图的用户是否已确认账户"""
+
     @wraps(view)
     def wrapped_view(*args, **kwargs):
         if not current_user.confirmed:

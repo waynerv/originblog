@@ -41,9 +41,9 @@
             {% if category and category.name %}
                 {% if category.name == cur_category %}
                     <a href="{{ url_for('blog.index', category=category.name) }}"
-                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center active category-list">{{ category.name }}
-                        <span class="fas fa-times small rm-filter" aria-hidden="true"></span>
-                        <span class="badge badge-light badge-pill">&nbsp;{{ category.count }}&nbsp;</span></a>
+                       class="list-group-item list-group-item-action d-flex align-items-center active category-list">{{ category.name }}
+                        <span class="fas fa-times small rm-filter ml-2" aria-hidden="true"></span>
+                        <span class="badge badge-light badge-pill ml-auto">&nbsp;{{ category.count }}&nbsp;</span></a>
                 {% else %}
                     <a href="{{ url_for('blog.index', category=category.name) }}"
                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center category-list">{{ category.name }}

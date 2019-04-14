@@ -1,4 +1,3 @@
-from flask_mongoengine.wtf import model_form
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, BooleanField, ValidationError, TextAreaField, \
     IntegerField, RadioField, SelectField, DateTimeField, HiddenField

@@ -52,7 +52,7 @@
             </thead>
             {% for user in pagination.items %}
                 <tr id="{{ user.id }}">
-                    <td>{{ loop.index + ((pagination.page - 1) * config.ORIGINBLOG_MANAGE_POST_PER_PAGE) }}</td>
+                    <td>{{ loop.index + ((pagination.page - 1) * config.APP_MANAGE_USER_PER_PAGE) }}</td>
                     <td><a href="{{ url_for('user.index', username=user.username) }}">{{ user.username }}</a></td>
                     <td>{{ user.name }}</td>
                     <td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>

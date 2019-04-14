@@ -39,10 +39,10 @@ class Posts(MethodView):
     """所有文章资源"""
     decorators = [permission_required('POST')]
 
-    def get(self, post_type='post'):  # TODO：对文章内容进行搜索
+    def get(self, post_type='post'):
         """获取所有文章"""
         page = request.args.get('page', default=1, type=int)
-        per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
+        per_page = current_app.config['APP_MANAGE_POST_PER_PAGE']
         post_query = Post.objects.filter(type=post_type).order_by('-update_time', '-weight')
 
         # 没有审阅权限的用户只能获取自己发表的文章
@@ -210,7 +210,7 @@ class MetaPosts(MethodView):
             filter_posts = Post.objects
 
         page = request.args.get('page', default=1, type=int)
-        per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
+        per_page = current_app.config['APP_MANAGE_POST_PER_PAGE']
         pagination = filter_posts.order_by('-update_time', '-weight').paginate(page, per_page)
         return render_template('admin/manage_content.html', pagination=pagination)
 
@@ -332,7 +332,7 @@ class Comments(MethodView):
             filter_comments = Comment.objects
 
         page = request.args.get('page', default=1, type=int)
-        per_page = current_app.config['ORIGINBLOG_MANAGE_COMMENT_PER_PAGE']
+        per_page = current_app.config['APP_MANAGE_COMMENT_PER_PAGE']
         pagination = filter_comments.order_by('-pub_time').paginate(page, per_page)
         return render_template('admin/manage_comment.html', pagination=pagination)
 
@@ -399,7 +399,7 @@ class Users(MethodView):
             filter_users = User.objects
 
         page = request.args.get('page', default=1, type=int)
-        per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
+        per_page = current_app.config['APP_MANAGE_USER_PER_PAGE']
         pagination = filter_users.paginate(page, per_page)
         return render_template('admin/manage_user.html', pagination=pagination)
 
@@ -488,7 +488,7 @@ class Widgets(MethodView):
     def get(self):
         """获取widget列表"""
         page = request.args.get('page', default=1, type=int)
-        per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
+        per_page = current_app.config['APP_MANAGE_WIDGET_PER_PAGE']
         pagination = Widget.objects.paginate(page, per_page)
         return render_template('admin/manage_widget.html', pagination=pagination)
 
@@ -576,7 +576,7 @@ class PostStatistics(MethodView):
             filter_statistics = PostStatistic.objects
 
         page = request.args.get('page', default=1, type=int)
-        per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
+        per_page = current_app.config['APP_MANAGE_STATISTIC_PER_PAGE']
         pagination = filter_statistics.paginate(page, per_page)
         return render_template('admin/manage_statistic.html', pagination=pagination)
 
@@ -588,7 +588,7 @@ class PostStatisticItem(MethodView):
     def get(self, slug):
         """获取指定文章的统计信息和浏览记录"""
         page = request.args.get('page', default=1, type=int)
-        per_page = current_app.config['ORIGINBLOG_MANAGE_POST_PER_PAGE']
+        per_page = current_app.config['APP_MANAGE_TRACKER_PER_PAGE']
 
         post = Post.objects.get_or_404(slug=slug)
         post_statistic = PostStatistic.objects.get_or_404(post=post)
