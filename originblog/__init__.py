@@ -57,10 +57,10 @@ def register_extensions(app):
 def register_template_context(app):
     @app.context_processor
     def make_template_context():
-        if current_user.is_admin:
+        if current_user.can('MODERATE'):
             unread_comments = Comment.objects.filter(status='pending').count()
         else:
-            unread_comments = None
+            unread_comments = 0
 
         blog_meta = BlogSettings.BLOG_META
         # 获取所有文章的标签列表

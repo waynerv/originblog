@@ -20,6 +20,7 @@
             <tr>
                 <th>No.</th>
                 <th>Title</th>
+                <th>Author</th>
                 <th>Weight</th>
                 <th>Category</th>
                 <th>Tags</th>
@@ -34,6 +35,7 @@
                 <tr id="{{ post.id }}">
                     <td>{{ loop.index + ((pagination.page - 1) * config.APP_MANAGE_POST_PER_PAGE) }}</td>
                     <td><a href="{{ url_for('blog.show_post', slug=post.slug) }}">{{ post.title }}</a></td>
+                    <td><a href="{{ url_for('user.index', username=post.author.username) }}">{{ post.author.name }}</a></td>
                     <td>{{ post.weight }}</td>
                     <td>
                         <a href="{{ url_for('blog.index', category=post.category) }}">{{ post.category }}</a>
@@ -50,19 +52,25 @@
                         <a href="{{ url_for('blog.show_post', slug=post.slug) }}#comments">{{ post.comments_count }}</a>
                     </td>
                     <td>{{ post.html_content|length }}</td>
-                    <td>{{ moment(post.pub_time).format('LL') }}</td>
-                    <td>{{ moment(post.update_time).format('LL') }}</td>
+                    <td>{{ moment(post.pub_time).format('LLL') }}</td>
+                    <td>{{ moment(post.update_time).format('LLL') }}</td>
                     <td>
+                        {% if current_user.is_admin or (current_user.can('MODERATE') and not post.from_admin) %}
                         <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
                                 class="btn btn-warning btn-sm d-inline switch-comment" type="button">
                             {% if post.can_comment %}Disabled{% else %}Enable{% endif %} Comment
                         </button>
+                        {% endif %}
+                        {% if current_user.is_admin or current_user == post.author %}
                         <button class="btn btn-info btn-sm d-inline" type="button"><a class="text-white"
                                 href="{{ url_for('admin.post', slug=post.slug) }}">Edit</a></button>
+                        {% endif %}
+                        {% if current_user.is_admin or (current_user.can('MODERATE') and not post.from_admin) or current_user == post.author %}
                         <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
                                 data-toggle="modal" data-target="#confirm-delete"
                                 class="btn btn-danger btn-sm d-inline" type="button">Delete
                         </button>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

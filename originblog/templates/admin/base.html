@@ -87,6 +87,7 @@
             </div>
         </li>
 
+        {% if current_user.can('MODERATE') %}
         <!-- Nav Item - Comments -->
         <li class="nav-item {% if request.endpoint and request.endpoint == 'admin.comments' %}active{% endif %}">
             <a class="nav-link" href="{{ url_for('admin.comments') }}">
@@ -112,10 +113,12 @@
                 </div>
             </div>
         </li>
+        {% endif %}
 
         <!-- Divider -->
         <hr class="sidebar-divider">
 
+        {% if current_user.is_admin %}
         <!-- Heading -->
         <div class="sidebar-heading">
             Meta
@@ -184,6 +187,7 @@
 
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
+        {% endif %}
 
         <!-- Sidebar Toggler (Sidebar) -->
         <div class="text-center d-none d-md-inline">

@@ -68,10 +68,10 @@
                     <td><a href="{{ url_for('blog.show_post', slug=comment.post_slug) }}">{{ comment.post_title }}</a>
                     </td>
                     <td>{{ comment.html_content|safe|striptags|truncate(80) }}</td>
-                    <td>{{ moment(comment.pub_time).format('LL') }}</td>
+                    <td>{{ moment(comment.pub_time).format('LLL') }}</td>
                     <td id="{{ comment.id }}status">{{ comment.status }}</td>
                     <td>
-                        {% if comment.status == 'pending' %}
+                        {% if comment.status == 'pending' and current_user.can('MODERATE') %}
                             <button data-id="{{ comment.id }}" data-href="{{ url_for('admin.comment', pk=comment.id) }}"
                                     data-op="approve"
                                     class="btn btn-info btn-sm d-inline handle-comment {{ comment.id }}button"
@@ -83,10 +83,12 @@
                                     type="button">Spam
                             </button>
                         {% endif %}
+                        {% if current_user.is_admin or (current_user.can('MODERATE') and not comment.from_admin) %}
                         <button data-id="{{ comment.id }}" data-toggle="modal" data-target="#confirm-delete"
                                 data-href="{{ url_for('admin.comment', pk=comment.id) }}"
                                 class="btn btn-danger btn-sm d-inline" type="button">Delete
                         </button>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

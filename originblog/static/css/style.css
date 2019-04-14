@@ -1,4 +1,4 @@
-
+/* main style */
 body {
   /*font-family: 'Lora', 'Times New Roman', serif;*/
   font-family: "lucida grande", "lucida sans unicode", lucida, helvetica, "STHeiti Light", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
@@ -31,6 +31,17 @@ h6 {
     margin-bottom: 10px;
 }
 
+a {
+  color: #404040;
+}
+
+.post-preview > a {
+  color: #404040;
+}
+
+.post-preview > .post-meta > a {
+  color: #404040;
+}
 
 .page-header {
     margin-top: 45px;

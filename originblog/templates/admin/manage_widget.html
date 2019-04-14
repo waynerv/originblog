@@ -32,7 +32,7 @@
                     <td>{{ widget.title }}</td>
                     <td>{{ widget.priority }}</td>
                     <td>{{ widget.html_content|safe }}</td>
-                    <td>{{ moment(widget.pub_time).format('LL') }}</td>
+                    <td>{{ moment(widget.pub_time).format('LLL') }}</td>
                     <td>
                         <button class="btn btn-info btn-sm d-inline" type="button"><a class="text-white"
                                 href="{{ url_for('admin.widget', pk=widget.pk) }}">Edit</a></button>

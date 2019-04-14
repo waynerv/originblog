@@ -53,13 +53,13 @@
                             <a href='{{ user.social_networks["linkedin"]["url"] }}'><i class="fab fa-linkedin fa-lg"></i></a>
                         {% endif %}
                         {% if user.social_networks['weixin']['url'] %}
-                            <a id="btn_weixin" href='{{ user.social_networks["weixin"]["url"] }}'><i
+                            <a id="btn_weixin" href='#'><i
                                     class="fab fa-weixin fa-lg"></i></a>
                             <!-- display weixin qrcode -->
-                            <div id="weixin" class="hidden">
+                            <div id="weixin" class="d-none">
                                 <br>
-                                <img src="{{ user.social_networks["weixin"]["url"] }}?imageView/2/w/150" title="weixin"
-                                     alt="weixin qrcode">
+                                <img src="{{ user.social_networks["weixin"]["url"] }}" title="weixin"
+                                     height="200" width="200" alt="weixin qrcode">
                             </div>
                         {% endif %}
                     </dd>
@@ -113,10 +113,10 @@
 {% block scripts %}
     <script type="text/javascript">
         $('#btn_weixin').on('click', function (event) {
-            if ($('#weixin').hasClass('hidden'))
-                $('#weixin').removeClass('hidden');
+            if ($('#weixin').hasClass('d-none'))
+                $('#weixin').removeClass('d-none');
             else
-                $('#weixin').addClass('hidden');
+                $('#weixin').addClass('d-none');
             return false
         })
     </script>

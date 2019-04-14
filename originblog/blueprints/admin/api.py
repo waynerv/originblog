@@ -74,6 +74,8 @@ class Posts(MethodView):
                 type=type
             )
             post.author = current_user._get_current_object()
+            if post.author.is_admin:
+                post.from_admin = True
             # 保存文章到数据库时，注意处理slug相同的情况
             try:
                 post.save()

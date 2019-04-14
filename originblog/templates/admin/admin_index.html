@@ -190,12 +190,6 @@
                             {% if current_user.social_networks['weixin']['url'] %}
                                 <a id="btn_weixin" href='{{ current_user.social_networks["weixin"]["url"] }}'><i
                                         class="fab fa-weixin fa-lg"></i></a>
-                                <!-- display weixin qrcode -->
-                                <div id="weixin" class="hidden">
-                                    <br>
-                                    <img src="{{ current_user.social_networks["weixin"]["url"] }}?imageView/2/w/150" title="weixin"
-                                         alt="weixin qrcode">
-                                </div>
                             {% endif %}
                         </dd>
                     </dl>
