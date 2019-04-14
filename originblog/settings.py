@@ -59,8 +59,8 @@ class BaseConfig(object):
     MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    MAIL_USE_SSL = True
-    MAIL_PORT = 465
+    MAIL_USE_TLS = True
+    MAIL_PORT = 587
     MAIL_DEFAULT_SENDER = ('kaka', os.getenv('MAIL_USERNAME'))
     ORIGINBLOG_ADMIN_EMAIL = os.getenv('ORIGINBLOG_ADMIN_EMAIL')
     APP_MAIL_SUBJECT_PREFIX = 'From Origin Blog:'
