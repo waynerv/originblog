@@ -81,9 +81,17 @@ def register_error_handler(app):
     def bad_request(e):
         return render_template('errors/400.html'), 400
 
+    @app.errorhandler(401)
+    def bad_request(e):
+        return render_template('errors/401.html'), 401
+
     @app.errorhandler(CSRFError)
     def bad_request(e):
         return render_template('errors/400.html', description=e.description), 400
+
+    @app.errorhandler(403)
+    def page_not_find(e):
+        return render_template('errors/403.html'), 403
 
     @app.errorhandler(404)
     def page_not_find(e):
