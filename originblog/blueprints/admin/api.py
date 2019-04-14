@@ -12,6 +12,7 @@ from originblog.forms.admin import PostForm, WidgetForm, MetaPostForm, MetaUserF
 from originblog.forms.auth import RegisterForm
 from originblog.models import Post, Comment, PostStatistic, Widget, Tracker, User, Role
 from originblog.signals import post_published
+from originblog.emails import send_new_comment_email, send_new_reply_email
 
 
 class AdminIndex(MethodView):
@@ -353,10 +354,14 @@ class CommentItem(MethodView):
     def patch(self, pk):  # pk为Comment模型的主键，默认为Comment.id(即_id)
         """更改评论审核状态"""
         comment = Comment.objects.get_or_404(pk=pk)
+        post = Post.objects.get_or_404(slug=comment.post_slug)
         data = request.get_json()
         if data['operation'] == 'approve':
             comment.status = 'approved'
             message = 'Comment approved.'
+            send_new_comment_email(post)
+            if comment.reply_to:
+                send_new_reply_email(comment.reply_to)
         elif data['operation'] == 'spam':
             comment.status = 'spam'
             message = 'Spam marked.'
