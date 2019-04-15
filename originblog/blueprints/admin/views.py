@@ -16,7 +16,7 @@ admin_bp.add_url_rule('/posts/<slug>', view_func=PostItem.as_view('post'), metho
 
 admin_bp.add_url_rule('/pages', view_func=Posts.as_view('pages'), methods=['GET', 'POST'],
                       defaults={'post_type': 'page'})
-admin_bp.add_url_rule('/pages/<slug>', view_func=Posts.as_view('page'), methods=['GET', 'POST', 'PATCH', 'DELETE'])
+admin_bp.add_url_rule('/pages/<slug>', view_func=PostItem.as_view('page'), methods=['GET', 'POST', 'PATCH', 'DELETE'])
 
 admin_bp.add_url_rule('/meta/posts', view_func=MetaPosts.as_view('meta_posts'), methods=['GET', 'POST'])
 admin_bp.add_url_rule('/meta/posts/<slug>', view_func=MetaPostItem.as_view('meta_post'), methods=['GET', 'POST'])
@@ -55,7 +55,7 @@ def add_user():
 def new_page():
     form = PostForm()
     form.type.data = 'page'
-    return render_template('admin/new_post.html', form=form)
+    return render_template('admin/new_page.html', form=form)
 
 
 @admin_bp.route('/widgets/new_widget')
@@ -65,8 +65,8 @@ def new_widget():
     return render_template('admin/new_widget.html', form=form)
 
 
-@admin_bp.route('/meta/posts/new_content')
+@admin_bp.route('/meta/posts/new_article')
 @admin_required
-def new_content():
+def new_article():
     form = MetaPostForm()
-    return render_template('admin/new_content.html', form=form)
+    return render_template('admin/new_article.html', form=form)

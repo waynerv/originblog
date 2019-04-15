@@ -1,0 +1,46 @@
+{% extends 'admin/base.html' %}
+{% from 'bootstrap/form.html' import render_field %}
+
+{% block custom_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.5.1/dist/easymde.min.css">
+{% endblock %}
+
+{% block title %}Edit Page{% endblock title %}
+
+{% block main %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Edit Page</h1>
+    </div>
+    <form action="{{ url_for('admin.page', slug=slug) }}" method="post">
+        {{ form.hidden_tag() }}
+        {{ render_field(form.title) }}
+        {{ render_field(form.weight) }}
+        {{ render_field(form.abstract) }}
+        {{ render_field(form.category) }}
+        {{ render_field(form.tags) }}
+        {{ form.raw_content.label }}
+        {% if form.raw_content.errors %}
+            {% for message in form.raw_content.errors %}
+                <small class="form-error">{{ message }}</small><br>
+            {% endfor %}
+        {% endif %}
+        {{ form.raw_content(id="easymde") }}
+        {{ form.submit(class_="btn btn-primary") }}
+    </form>
+    <br>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/easymde@2.5.1/dist/easymde.min.js"></script>
+    <script>
+        let easyMDE = new EasyMDE({
+            element: $('#easymde')[0],
+            autoDownloadFontAwesome: false,
+            placeholder: 'This field cannot be empty',
+            spellChecker: false
+        });
+        $('#submit').click(function(){
+          $('#easymde').text(easyMDE.value());
+        });
+    </script>
+{% endblock %}

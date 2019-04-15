@@ -5,15 +5,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.5.1/dist/easymde.min.css">
 {% endblock %}
 
-{% block title %}Edit Post{% endblock title %}
+{% block title %}New Article{% endblock title %}
 
 {% block main %}
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Edit Post</h1>
+        <h1 class="h3 mb-0 text-gray-800">New Article</h1>
     </div>
-    <form action="{{ url_for('admin.meta_post', slug=slug) }}" method="post">
+    <form action="{{ url_for('admin.meta_posts') }}" method="post">
         {{ form.csrf_token }}
         {{ render_field(form.title) }}
+        {{ render_field(form.slug) }}
         {{ render_field(form.weight) }}
         {{ render_field(form.abstract) }}
         {{ render_field(form.category) }}

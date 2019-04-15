@@ -107,8 +107,8 @@ def show_post(slug, post_type='post'):
         'page': 'blog/page.html'
     }
 
-    return render_template(templates[post_type], post=post, comment_pagination=comment_pagination, form=form,
-                           reply_filter=reply_filter)
+    return render_template(templates.get(post_type, 'blog/post.html'), post=post, comment_pagination=comment_pagination,
+                           form=form, reply_filter=reply_filter)
 
 
 # 为专用页面page注册路由

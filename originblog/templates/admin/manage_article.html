@@ -2,18 +2,35 @@
 {% from 'bootstrap/pagination.html' import render_pagination %}
 
 {% block title %}
-    All Posts
+    All Articles
 {% endblock title %}
 
 {% block main %}
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">
-            All Posts
+            All Articles
             <small class="text-muted ml-2">{{ pagination.total }}</small>
             <span class="float-right ml-2"><a class="btn btn-primary btn-sm"
-                href="{{ url_for('admin.new_post') }}">New Post</a></span>
+                                         href="{{ url_for('admin.new_article') }}">New Article</a></span>
         </h1>
     </div>
+    <ul class="nav nav-pills" style="margin-bottom: 10px">
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#">Filter</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'all' %}active{% endif %}"
+               href="{{ url_for('admin.meta_posts', filter='all') }}">All</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'post' %}active{% endif %}"
+               href="{{ url_for('admin.meta_posts', filter='post') }}">Post</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('filter', 'all') == 'page' %}active{% endif %}"
+               href="{{ url_for('admin.meta_posts', filter='page') }}">Page</a>
+        </li>
+    </ul>
     {% if pagination.items %}
         <table class="table table-bordered shadow">
             <thead>
@@ -55,22 +72,16 @@
                     <td>{{ moment(post.pub_time).format('LLL') }}</td>
                     <td>{{ moment(post.update_time).format('LLL') }}</td>
                     <td>
-                        {% if current_user.is_admin or (current_user.can('MODERATE') and not post.from_admin) %}
                         <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
                                 class="btn btn-warning btn-sm d-inline switch-comment" type="button">
                             {% if post.can_comment %}Disabled{% else %}Enable{% endif %} Comment
                         </button>
-                        {% endif %}
-                        {% if current_user.is_admin or current_user == post.author %}
                         <button class="btn btn-info btn-sm d-inline" type="button"><a class="text-white"
-                                href="{{ url_for('admin.post', slug=post.slug) }}">Edit</a></button>
-                        {% endif %}
-                        {% if current_user.is_admin or (current_user.can('MODERATE') and not post.from_admin) or current_user == post.author %}
+                                href="{{ url_for('admin.meta_post', slug=post.slug) }}">Edit</a></button>
                         <button data-id="{{ post.id }}" data-href="{{ url_for('admin.post', slug=post.slug) }}"
                                 data-toggle="modal" data-target="#confirm-delete"
                                 class="btn btn-danger btn-sm d-inline" type="button">Delete
                         </button>
-                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

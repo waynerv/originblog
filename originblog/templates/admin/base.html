@@ -167,20 +167,20 @@
             </div>
         </li>
 
-        <!-- Nav Item - Posts Collapse Menu -->
-        <li class="nav-item {% if request.endpoint and request.endpoint in ['admin.new_content', 'admin.meta_posts', 'admin.meta_post'] %}active{% endif %}">
+        <!-- Nav Item - Articles Collapse Menu -->
+        <li class="nav-item {% if request.endpoint and request.endpoint in ['admin.new_article', 'admin.meta_posts', 'admin.meta_post'] %}active{% endif %}">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFour"
                aria-expanded="true" aria-controls="collapseTwo">
                 <i class="fas fa-fw fa-database"></i>
-                <span>Contents</span>
+                <span>Articles</span>
             </a>
             <div id="collapseFour" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Manage Contents:</h6>
-                    <a class="collapse-item {% if request.endpoint and request.endpoint == 'admin.new_content' %}active{% endif %}"
-                       href="{{ url_for('admin.new_content') }}">New Post</a>
+                    <a class="collapse-item {% if request.endpoint and request.endpoint == 'admin.new_article' %}active{% endif %}"
+                       href="{{ url_for('admin.new_article') }}">New Article</a>
                     <a class="collapse-item {% if request.endpoint and request.endpoint == 'admin.meta_posts' %}active{% endif %}"
-                       href="{{ url_for('admin.meta_posts') }}">All Posts</a>
+                       href="{{ url_for('admin.meta_posts') }}">All Articles</a>
                 </div>
             </div>
         </li>

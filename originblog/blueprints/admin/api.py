@@ -51,7 +51,11 @@ class Posts(MethodView):
             post_query = post_query.filter(author=current_user._get_current_object())
 
         pagination = post_query.paginate(page, per_page)
-        return render_template('admin/manage_post.html', pagination=pagination)
+        templates = {
+            'post': 'admin/manage_post.html',
+            'page': 'admin/manage_page.html'
+        }
+        return render_template(templates.get(post_type, 'admin/manage_post.html'), pagination=pagination)
 
     def post(self):
         """增加新文章"""
@@ -99,7 +103,11 @@ class Posts(MethodView):
                 'page': 'blog.show_page'
             }
             return redirect(url_for(endpoints[post.type], slug=post.slug))
-        return render_template('admin/new_post.html', form=form)
+        templates = {
+            'post': 'admin/new_post.html',
+            'page': 'admin/new_page.html'
+        }
+        return render_template(templates.get(form.type.data, 'admin/new_post.html'), form=form)
 
 
 class PostItem(MethodView):
@@ -123,7 +131,11 @@ class PostItem(MethodView):
             form.tags.data = ' '.join(post.tags)
             form.type.data = post.type
 
-        return render_template('admin/edit_post.html', slug=slug, form=form)
+        templates = {
+            'post': 'admin/edit_post.html',
+            'page': 'admin/edit_page.html'
+        }
+        return render_template(templates.get(post.type, 'admin/edit_post.html'), slug=slug, form=form)
 
     def post(self, slug):
         """修改文章内容"""
@@ -215,7 +227,7 @@ class MetaPosts(MethodView):
         page = request.args.get('page', default=1, type=int)
         per_page = current_app.config['APP_MANAGE_POST_PER_PAGE']
         pagination = filter_posts.order_by('-update_time', '-weight').paginate(page, per_page)
-        return render_template('admin/manage_content.html', pagination=pagination)
+        return render_template('admin/manage_article.html', pagination=pagination)
 
     def post(self):
         """增加新文章"""
@@ -267,7 +279,7 @@ class MetaPosts(MethodView):
                 'page': 'blog.show_page'
             }
             return redirect(url_for(endpoints[post.type], slug=post.slug))
-        return render_template('admin/new_content.html', form=form)
+        return render_template('admin/new_article.html', form=form)
 
 
 class MetaPostItem(MethodView):
@@ -284,19 +296,19 @@ class MetaPostItem(MethodView):
             form.abstract.data = post.abstract
             form.weight.data = post.weight
             form.raw_content.data = post.raw_content
-            form.pub_time = post.pub_time
+            form.pub_time.data = post.pub_time
             form.category.data = post.category
             form.tags.data = ' '.join(post.tags)
-            form.can_comment = post.can_comment
+            form.can_comment.data = post.can_comment
             form.type.data = post.type
 
-        return render_template('admin/edit_post.html', slug=slug, form=form)
+        return render_template('admin/edit_article.html', slug=slug, form=form)
 
     def post(self, slug):
         """修改文章内容"""
         form = MetaPostForm()
         if form.validate_on_submit():
-            post = Post.objects.get_or_404(slug)
+            post = Post.objects.get_or_404(slug=slug)
             post.title = form.title.data
             post.abstract = form.abstract.data
             post.raw_content = form.raw_content.data
