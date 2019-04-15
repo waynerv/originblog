@@ -194,7 +194,7 @@
     <script crossorigin="anonymous" integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o" src="https://lib.baomitu.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom scripts for this template -->
-    <script crossorigin="anonymous" integrity="sha384-5wvDEKtdpg/AAUpUHtcjYKVs1qv2V/UFPCN2FNvgePyaKmpBjW+LrboDEuS5ssBe" src="https://lib.baomitu.com/moment.js/2.24.0/moment-with-locales.min.js"></script>
+    {{ moment.include_moment(local_js="https://lib.baomitu.com/moment.js/2.24.0/moment-with-locales.min.js") }}
     <script src="{{ url_for('static', filename='js/clean-blog.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 

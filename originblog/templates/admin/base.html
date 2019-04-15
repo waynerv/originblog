@@ -412,7 +412,7 @@
     <script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
 
     <!-- Page level custom scripts -->
-     <script crossorigin="anonymous" integrity="sha384-5wvDEKtdpg/AAUpUHtcjYKVs1qv2V/UFPCN2FNvgePyaKmpBjW+LrboDEuS5ssBe" src="https://lib.baomitu.com/moment.js/2.24.0/moment-with-locales.min.js"></script>
+    {{ moment.include_moment(local_js="https://lib.baomitu.com/moment.js/2.24.0/moment-with-locales.min.js") }}
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
     {% block scripts %}
