@@ -1,6 +1,8 @@
 import random
-from originblog.models import User, Post, Comment, Widget, Role
+
 from faker import Faker
+
+from originblog.models import User, Post, Comment, Widget, Role
 
 fake = Faker('zh_CN')
 
@@ -49,6 +51,7 @@ def fake_comment(count=500):
         comment.save()
 
     salt = int(count * 0.1)
+    # pending
     for i in range(salt):
         comment = Comment(
             author=fake.name(),
@@ -61,6 +64,7 @@ def fake_comment(count=500):
         )
         comment.save()
 
+    # From author
     for i in range(salt):
         comment = Comment(
             author=fake.name(),
@@ -74,6 +78,7 @@ def fake_comment(count=500):
         )
         comment.save()
 
+    # Reply
     for i in range(salt):
         comment = Comment(
             author=fake.name(),

@@ -30,6 +30,7 @@ def load_user(username):
 
 class Guest(AnonymousUserMixin):
     """为匿名用户创建专门的类，以便实现对角色和权限的检验"""
+
     @property
     def is_admin(self):
         return False

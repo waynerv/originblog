@@ -1,9 +1,8 @@
-import requests
 from urllib.parse import urlparse, urljoin
-from mongoengine import DoesNotExist
 
+import requests
 from flask import request, redirect, url_for
-
+from mongoengine import DoesNotExist
 
 
 def redirect_back(default='blog.index', **kwargs):

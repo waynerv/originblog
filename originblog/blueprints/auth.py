@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import login_user, current_user, login_required, logout_user, login_fresh, confirm_login
 
+from originblog.emails import send_confirm_email, send_reset_password_email
 from originblog.forms.auth import LoginForm, RegisterForm, ForgetPasswordForm, ResetPasswordForm
 from originblog.models import User
-from originblog.utils import redirect_back
 from originblog.settings import Operations
-from originblog.emails import send_confirm_email, send_reset_password_email
+from originblog.utils import redirect_back
 
 auth_bp = Blueprint('auth', __name__)
 

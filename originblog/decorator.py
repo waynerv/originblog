@@ -31,7 +31,7 @@ def confirm_required(view):
 
     @wraps(view)
     def wrapped_view(*args, **kwargs):
-        if not current_user.confirmed:
+        if not current_user.email_confirmed:
             message = Markup(
                 'Please confirm your account first.'
                 'Not receive the email?'

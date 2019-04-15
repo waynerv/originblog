@@ -1,7 +1,8 @@
+from threading import Thread
+
 from blinker import Namespace
 from flask import request, url_for
 from mongoengine import DoesNotExist
-from threading import Thread
 
 from originblog.models import Tracker, PostStatistic
 from originblog.settings import BlogSettings

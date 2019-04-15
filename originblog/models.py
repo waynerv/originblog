@@ -326,6 +326,7 @@ class PostStatistic(db.Document):
 
 
 class Tracker(db.Document):
+    """记录访客信息"""
     post = db.ReferenceField(Post, reverse_delete_rule=db.CASCADE)  # 与文章级联删除
     ip = db.StringField()
     user_agent = db.StringField()
@@ -337,7 +338,7 @@ class Tracker(db.Document):
 
 
 class Widget(db.Document):
-    """在主页显示文本内容的小组件"""
+    """在主页显示文本内容的widget"""
     title = db.StringField(default='widget')
     raw_content = db.StringField()
     html_content = db.StringField()

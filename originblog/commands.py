@@ -50,7 +50,7 @@ def register_command(app):
     @click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True,
                   help='The password used to login.')
     def init(username, email, password):
-        """创建唯一管理员账户"""
+        """创建超级管理员账户"""
         admin_role = Role.objects.filter(role_name='admin').first()
         admin = User.objects.filter(role=admin_role).first()
         if admin:

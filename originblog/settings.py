@@ -4,13 +4,13 @@ import os
 class BlogSettings:
     GRAVATAR_CDN_BASE = '//cdn.v2ex.com/gravatar/'
     GRAVATAR_DEFAULT_IMAGE = 'retro'
-    COMMENT_STATUS = ('approved', 'pending', 'spam', 'deleted') # TODO:评论的删除方式
+    COMMENT_STATUS = ('approved', 'pending', 'spam', 'deleted')  # TODO:评论的删除方式
     BLOG_META = {
         'name': 'Origin Blog',
         'subtitle': 'Concentration and Perseverance matter.',
         'description': os.getenv('description', 'Origin Blog Description'),
         'owner': os.getenv('owner', 'Waynerv'),
-        'keywords': os.getenv('keywords','python,flask,web,MongoDB'),
+        'keywords': os.getenv('keywords', 'python,flask,web,MongoDB'),
         'index_nav1': 'About',
         'index_nav2': None,
         'bg_home': 'img/home-bg.jpg',
@@ -22,7 +22,7 @@ class BlogSettings:
         'allow_donate': True,
         'donate_message': '如果觉得文章对您有价值，请作者喝杯咖啡吧',
         'donate_img_url': 'img/post-sample-image.jpg',
-        'dispaly_wechat':True,
+        'dispaly_wechat': True,
         'wechat_message': '欢迎通过微信与我联系',
         'wechat_img_url': 'img/post-sample-image.jpg',
         'baidu_site_verification': os.getenv('baidu_site_verification', 'yOI4ewdkCY')
@@ -42,9 +42,8 @@ class BlogSettings:
         'admin': ['COMMENT', 'POST', 'MODERATE', 'ADMINISTRATE']
     }
     SEARCH_ENGINE_SUBMIT_URLS = {
-        'baidu': 'https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/form' # TODO:Invalid URL
+        'baidu': 'https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/form'  # TODO:Invalid URL
     }
-
 
 
 class Operations:
