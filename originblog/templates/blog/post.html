@@ -71,7 +71,7 @@
                 <div class="col">
                     <p>{{ blog_meta.donate_message }}</p>
                     <a id="btn-donate"><i class="fa fa-yen-sign"></i> | <i class="fa fa-dollar-sign"></i><br></a>
-                    <img id="img-donate" class="img-fluid" src="{{ url_for('static', filename=blog_meta.donate_img_url) }}" title="Donate" alt="donate qrcode">
+                    <img id="img-donate" class="img-fluid" height="400" width="400" src="{{ url_for('static', filename=blog_meta.donate_img_url) }}" title="Donate" alt="donate qrcode">
                 </div>
             </div>
             {% endif %}
@@ -80,7 +80,7 @@
             <div class="row">
                 <div class="col">
                     <p>{{ blog_meta.wechat_message }} <i class="fab fa-weixin" aria-hidden="true"></i></p>
-                    <img class="img-fluid" src="{{ url_for('static', filename=blog_meta.wechat_img_url) }}" title="wechat" alt="wechat qrcode">
+                    <img class="img-fluid" height="400" width="400" src="{{ url_for('static', filename=blog_meta.wechat_img_url) }}" title="wechat" alt="wechat qrcode">
                 </div>
             </div>
             {% endif %}

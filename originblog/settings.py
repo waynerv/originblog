@@ -13,18 +13,18 @@ class BlogSettings:
         'keywords': os.getenv('keywords', 'python,flask,web,MongoDB'),
         'index_nav1': 'About',
         'index_nav2': None,
-        'bg_home': 'img/home-bg.jpg',
-        'bg_post': 'img/post-bg.jpg',
-        'bg_about': 'img/about-bg.jpg',
+        'bg_home': 'img/home-bg.webp',
+        'bg_post': 'img/post-bg.webp',
+        'bg_about': 'img/about-bg.webp',
         'display_copyright': True,
         'copyright_message': '注：转载本文，请与作者联系',
         'allow_share': True,
         'allow_donate': True,
         'donate_message': '如果觉得文章对您有价值，请作者喝杯咖啡吧',
-        'donate_img_url': 'img/post-sample-image.jpg',
+        'donate_img_url': 'img/post-sample-image.webp',
         'dispaly_wechat': True,
         'wechat_message': '欢迎通过微信与我联系',
-        'wechat_img_url': 'img/post-sample-image.jpg',
+        'wechat_img_url': 'img/contact-bg.webp',
         'baidu_site_verification': os.getenv('baidu_site_verification', 'yOI4ewdkCY')
     }
     SOCIAL_NETWORKS = {
