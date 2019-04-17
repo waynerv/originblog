@@ -42,7 +42,7 @@ class BlogSettings:
         'admin': ['COMMENT', 'POST', 'MODERATE', 'ADMINISTRATE']
     }
     SEARCH_ENGINE_SUBMIT_URLS = {
-        'baidu': 'https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/form'  # TODO:Invalid URL
+        'baidu': os.getenv('baidu_submit_url', 'https://developer.mozilla.org')
     }
 
 
@@ -53,15 +53,15 @@ class Operations:
 
 
 class BaseConfig(object):
-    SECRET_KEY = os.getenv('SECRET_KEY', '5ecret_ke9_def@ult')
+    SECRET_KEY = os.getenv('SECRET_KEY', '5ecr07_ke9_def@u1t')
 
     MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    MAIL_USE_TLS = True
-    MAIL_PORT = 587
-    MAIL_DEFAULT_SENDER = ('kaka', os.getenv('MAIL_USERNAME'))
-    ORIGINBLOG_ADMIN_EMAIL = os.getenv('ORIGINBLOG_ADMIN_EMAIL')
+    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', True)
+    MAIL_PORT = os.getenv('MAIL_PORT', 587)
+    MAIL_DEFAULT_SENDER = ('admin', os.getenv('MAIL_USERNAME'))
+    ORIGINBLOG_ADMIN_EMAIL = os.getenv('ORIGINBLOG_ADMIN_EMAIL', 'originblog@admin.com')
     APP_MAIL_SUBJECT_PREFIX = 'From Origin Blog:'
 
     APP_POST_PER_PAGE = 10
@@ -92,7 +92,11 @@ class TestingConfig(BaseConfig):
 
 class ProductionConfig(BaseConfig):
     MONGODB_SETTINGS = {
-        'db': 'originblog'
+        'db': os.getenv('DB_NAME', 'originblog'),
+        'host': os.getenv('MONGO_HOST', 'localhost'),
+        'port': os.getenv('MONGO_PORT', 27017),
+        'username': os.getenv('MONGODB_ADMINUSERNAME', 'originblog'),
+        'password': os.getenv('MONGODB_ADMINPASSWORD', 'PASSWORD')
     }
 
 

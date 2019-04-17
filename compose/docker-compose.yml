@@ -1,0 +1,54 @@
+version: '3'
+services:
+  blog_app:
+    container_name: blog_app
+    restart: always
+    image: originblog:0.1
+#    volumes:
+#      - blog-static:/usr/src/app/originblog/static
+    env_file: docker.env
+    networks:
+      - webnet
+      - backend
+    environment:
+      MONGODB_ADMINUSERNAME: originblog
+      MONGODB_ADMINPASSWORD: PASSWORD
+
+  mongo:
+    container_name: mongodb
+    restart: always
+    image: mongo:4.0.8
+    volumes:
+      - blog_data:/data/db
+      # if you wish to setup additional user accounts specific per DB or with different roles you can use following entry point
+      - "../mongodb/entrypoint/:/docker-entrypoint-initdb.d/"
+    networks:
+      - backend
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  nginx-proxy:
+    container_name: nginx
+    restart: always
+    build: ../nginx
+    ports:
+      - "80:80"
+#    volumes:
+#      - blog-static:/usr/share/nginx/html/static:ro
+#      - ../nginx/nginx.conf:/etc/nginx/nginx.conf
+#      - ../nginx/originblog.conf:/etc/nginx/conf.d/originblog.conf
+    networks:
+      - webnet
+    depends_on:
+      - blog_app
+
+#volumes:
+#  blog-static:
+
+networks:
+  webnet:
+  backend:
+
+volumes:
+  blog_data:

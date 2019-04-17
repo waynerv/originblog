@@ -61,11 +61,12 @@ def register_command(app):
             click.echo('Creating new Administrator...')
             admin = User(
                 username=username,
-                name='test_administrator',
+                name='administrator',
                 email=email
             )
             admin.set_password(password)
             admin.role = admin_role
+            admin.email_confirmed = True
             admin.save()
 
         click.echo('Done.')

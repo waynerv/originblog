@@ -5,7 +5,6 @@ verify_ssl = true
 
 [dev-packages]
 watchdog = "*"
-python-dotenv = "*"
 faker = "*"
 
 [packages]
@@ -16,14 +15,14 @@ flask-mail = "*"
 flask-moment = "*"
 bootstrap-flask = "*"
 unidecode = "*"
-cryptography = "*"
-faker = "==1.0.4"
 pyyaml = "==5.1"
 mongoengine = "*"
 flask-mongoengine = "*"
 markdown2 = "*"
 bleach = "*"
 requests = "*"
+python-dotenv = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.6"
