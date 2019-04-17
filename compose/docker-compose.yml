@@ -1,16 +1,17 @@
 version: '3'
 services:
   blog_app:
-    container_name: blog_app
+    container_name: blog
     restart: always
     image: originblog:0.1
-#    volumes:
-#      - blog-static:/usr/src/app/originblog/static
+    volumes:
+      - blog_static:/usr/src/app/originblog/static
     env_file: docker.env
     networks:
       - webnet
       - backend
     environment:
+      # 部署时注意修改密码
       MONGODB_ADMINUSERNAME: originblog
       MONGODB_ADMINPASSWORD: PASSWORD
 
@@ -20,7 +21,7 @@ services:
     image: mongo:4.0.8
     volumes:
       - blog_data:/data/db
-      # if you wish to setup additional user accounts specific per DB or with different roles you can use following entry point
+      # 注意挂载目录的脚本中含有需要修改的密码
       - "../mongodb/entrypoint/:/docker-entrypoint-initdb.d/"
     networks:
       - backend
@@ -34,17 +35,12 @@ services:
     build: ../nginx
     ports:
       - "80:80"
-#    volumes:
-#      - blog-static:/usr/share/nginx/html/static:ro
-#      - ../nginx/nginx.conf:/etc/nginx/nginx.conf
-#      - ../nginx/originblog.conf:/etc/nginx/conf.d/originblog.conf
+    volumes:
+      - blog_static:/usr/share/nginx/html/static:ro
     networks:
       - webnet
     depends_on:
       - blog_app
-
-#volumes:
-#  blog-static:
 
 networks:
   webnet:
@@ -52,3 +48,4 @@ networks:
 
 volumes:
   blog_data:
+  blog_static:

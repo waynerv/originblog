@@ -2,12 +2,13 @@ import os
 
 
 class BlogSettings:
+    # 博客内容配置
     GRAVATAR_CDN_BASE = '//cdn.v2ex.com/gravatar/'
     GRAVATAR_DEFAULT_IMAGE = 'retro'
     COMMENT_STATUS = ('approved', 'pending', 'spam', 'deleted')  # TODO:评论的删除方式
     BLOG_META = {
-        'name': 'Origin Blog',
-        'subtitle': 'Concentration and Perseverance matter.',
+        'name': os.getenv('name', 'Origin Blog'),
+        'subtitle': os.getenv('subtitle', 'Concentration and Perseverance matter.'),
         'description': os.getenv('description', 'Origin Blog Description'),
         'owner': os.getenv('owner', 'Waynerv'),
         'keywords': os.getenv('keywords', 'python,flask,web,MongoDB'),
@@ -53,17 +54,22 @@ class Operations:
 
 
 class BaseConfig(object):
+    # 程序密钥
     SECRET_KEY = os.getenv('SECRET_KEY', '5ecr07_ke9_def@u1t')
 
+    # 发送邮件相关配置
     MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', True)
     MAIL_PORT = os.getenv('MAIL_PORT', 587)
-    MAIL_DEFAULT_SENDER = ('admin', os.getenv('MAIL_USERNAME'))
-    ORIGINBLOG_ADMIN_EMAIL = os.getenv('ORIGINBLOG_ADMIN_EMAIL', 'originblog@admin.com')
+    MAIL_DEFAULT_SENDER = ('Admin', os.getenv('MAIL_USERNAME'))
     APP_MAIL_SUBJECT_PREFIX = 'From Origin Blog:'
 
+    # 管理员邮件地址，以此邮箱可注册为管理员
+    ORIGINBLOG_ADMIN_EMAIL = os.getenv('ORIGINBLOG_ADMIN_EMAIL', 'originblog@admin.com')
+
+    # 内容分页配置
     APP_POST_PER_PAGE = 10
     APP_COMMENT_PER_PAGE = 10
     APP_MANAGE_POST_PER_PAGE = 20
@@ -75,7 +81,7 @@ class BaseConfig(object):
 
 
 class DevelopmentConfig(BaseConfig):
-    # 配置mongod实例的连接
+    # 连接mongod实例的配置
     MONGODB_SETTINGS = {
         'db': 'originblog',
         # 'host': '192.168.1.35',
@@ -91,6 +97,7 @@ class TestingConfig(BaseConfig):
 
 
 class ProductionConfig(BaseConfig):
+    # 部署环境需要使用用户密码连接
     MONGODB_SETTINGS = {
         'db': os.getenv('DB_NAME', 'originblog'),
         'host': os.getenv('MONGO_HOST', 'localhost'),

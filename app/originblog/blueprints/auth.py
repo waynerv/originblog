@@ -3,7 +3,7 @@ from flask_login import login_user, current_user, login_required, logout_user, l
 
 from originblog.emails import send_confirm_email, send_reset_password_email
 from originblog.forms.auth import LoginForm, RegisterForm, ForgetPasswordForm, ResetPasswordForm
-from originblog.models import User
+from originblog.models import User, Role
 from originblog.settings import Operations
 from originblog.utils import redirect_back
 
@@ -61,6 +61,9 @@ def register():
             email=email
         )
         user.set_password(password)
+        # 如果是第一次注册，初始化数据库
+        if not Role.objects.first():
+            Role.init()
         user.save()
 
         token = user.generate_token(Operations.CONFIRM)
