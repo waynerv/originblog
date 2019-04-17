@@ -17,7 +17,7 @@ def send_mail(subject, to, template, **kwargs):
     app = current_app._get_current_object()  # 获取被代理的真实对象
     message = Message(subject=current_app.config['APP_MAIL_SUBJECT_PREFIX'] + subject, recipients=[to])
     message.body = render_template(template + '.txt', **kwargs)
-    message.body = render_template(template + '.html', **kwargs)
+    message.html = render_template(template + '.html', **kwargs)
     thr = Thread(target=_send_async_mail, args=(app, message))
     thr.start()
     return thr
