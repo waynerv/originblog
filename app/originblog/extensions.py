@@ -4,6 +4,7 @@ from flask_mail import Mail
 from flask_moment import Moment
 from flask_mongoengine import MongoEngine
 from flask_wtf import CSRFProtect
+from mongoengine import DoesNotExist
 
 db = MongoEngine()
 mail = Mail()
@@ -23,7 +24,7 @@ def load_user(username):
     from originblog.models import User
     try:
         user = User.objects.get(username=username)
-    except User.DoesNotExists:
+    except DoesNotExist:
         user = None
     return user
 
