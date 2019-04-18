@@ -40,7 +40,7 @@ OriginBlog 的开发目标是打造一个轻量、美观且易扩展的博客系
 
 ### 从源码运行
 
-1. 安装 MongoDB(4.0+) 并启动服务器实例。
+1. 安装 MongoDB 并启动服务器实例。
 2. 切换到项目根目录下的 `app` 文件夹。
 3. 创建虚拟环境并根据 `Pipfile` 或 `requirements.txt` 安装依赖（推荐使用 Pipenv）。
 4. （可选）在当前目录创建 `.env` 配置文件，根据 `./originblog/settings.py` 文件中的配置项修改应用配置。
@@ -111,7 +111,7 @@ $ (sudo) docker-compose up -d
 
 容器首次启动需要30秒左右，然后你就可以在浏览器中通过 `http://localhost:80` 访问OriginBlog 了。
 
-除了数据库用户密码以外，应用程序使用的环境变量还可以在 `docker.env` 文件中修改。
+除了数据库用户密码以外，应用程序使用的环境变量可以在 `docker.env` 文件中修改。
 
 示例:
 
@@ -144,6 +144,11 @@ subtitle=Concentration and Perseverance matter.
 description=Origin Blog Description
 keywords=python,flask,web,MongoDB
 owner=Waynerv
+bg_home=https://主页背景图.jpg
+bg_post=https://文章背景图.jpg
+bg_about=https://关于背景图.jpg
+donate_img_url=https://捐赠二维码.jpg
+wechat_img_url=https://微信二维码.jpg
 ```
 
 更多配置项参见 `./originblog/settings.py` 。
@@ -231,15 +236,16 @@ $ (sudo) docker-compose down
 
 ### 后端
 
-- Flask
+- Flask(1.0.2)
   - flask-login
   - flask-mail
   - Flask-WTF
   - bootstrap-flask
   - flask-mongoengine
   - flask-moment
-- WTForms
+- MongoDB(4.0.8)
 - mongoengine
+- WTForms
 - markdown2
 - bleach
 
