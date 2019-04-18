@@ -1,7 +1,5 @@
 import os
 
-from flask import url_for
-
 
 class BlogSettings:
     # 博客内容配置
@@ -59,12 +57,12 @@ class BaseConfig(object):
     # 程序密钥
     SECRET_KEY = os.getenv('SECRET_KEY', '5ecr07_ke9_def@u1t')
 
-    # 发送邮件相关配置
+    # 发送邮件相关配置,此处使用了SendGrid
     MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', True)
-    MAIL_PORT = os.getenv('MAIL_PORT', 587)
+    MAIL_USE_TLS = True
+    MAIL_PORT = 587
     MAIL_DEFAULT_SENDER = ('Admin', os.getenv('MAIL_USERNAME'))
     APP_MAIL_SUBJECT_PREFIX = 'From Origin Blog:'
 
@@ -103,7 +101,7 @@ class ProductionConfig(BaseConfig):
     MONGODB_SETTINGS = {
         'db': os.getenv('DB_NAME', 'originblog'),
         'host': os.getenv('MONGO_HOST', 'localhost'),
-        'port': os.getenv('MONGO_PORT', 27017),
+        'port': 27017,
         'username': os.getenv('MONGODB_ADMINUSERNAME', 'originblog'),
         'password': os.getenv('MONGODB_ADMINPASSWORD', 'PASSWORD')
     }
