@@ -160,7 +160,7 @@ def sitemap():
     """Generate sitemap.xml. Makes a list of urls and date modified."""
     pages = []
 
-    posts = Post.objects.filter(is_draft=False)
+    posts = Post.objects
     for post in posts:
         post_type = post.type
         endpoints = {
@@ -168,10 +168,10 @@ def sitemap():
             'page': 'blog.show_page'
         }
         pages.append((url_for(endpoints[post_type], slug=post.slug, _external=True),
-                      post.update_time.datetime().data().isoformat(), 'weekly', '0.8'))
+                      post.update_time.date(), 'weekly', '0.8'))
 
     sitemap_xml = render_template('blog/sitemap.xml', pages=pages)
     response = make_response(sitemap_xml)
-    response.header['Content-Type'] = 'application/xml'
+    response.headers['Content-Type'] = 'application/xml'
 
     return response
