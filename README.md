@@ -14,6 +14,7 @@ OriginBlog 的开发目标是打造一个轻量、美观且易扩展的博客系
 - 提供功能齐全的后台管理页面
 - 使用 Restful 风格 API 管理后台资源
 - 通过配置文件与环境变量即可修改博客基本设置
+- 提供基础的SEO优化：生成站点地图，自动向搜索引擎提交新内容地址
 - 支持 Docker + Nginx + Gunicorn + MongoDB 快速部署
 
 ## Demo
@@ -117,8 +118,7 @@ $ (sudo) docker-compose up -d
 
 ```
 # MongoDB的连接配置，谨慎修改
-MONGO_HOST=mongo 
-MONGO_PORT=27017
+MONGO_HOST=mongo
 DB_NAME=originblog
 
 # Flask使用的密钥，应使用随机生成值
@@ -128,8 +128,7 @@ SECRET_KEY=random_value1231
 MAIL_SERVER=xxxx
 MAIL_USERNAME=xxxx
 MAIL_PASSWORD=xxxx
-MAIL_USE_TLS=True
-MAIL_PORT=xxxx
+
 
 # 以此邮箱注册将赋予管理员角色
 ORIGINBLOG_ADMIN_EMAIL=xxxx
