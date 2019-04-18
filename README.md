@@ -1,6 +1,6 @@
 # OriginBlog
 
-[OriginBlog](https://github.com/flyhigher139/OctBlog) 是一个由 [Flask](http://flask.pocoo.org/) 和 [MongoDB](https://www.mongodb.org/) 驱动的博客项目。
+[OriginBlog](https://github.com/waynerv/originblog) 是一个由 [Flask](http://flask.pocoo.org/) 和 [MongoDB](https://www.mongodb.org/) 驱动的博客项目。
 
 OriginBlog 的开发目标是打造一个轻量、美观且易扩展的博客系统，它具有以下特性：
 
@@ -263,8 +263,6 @@ MIT
 
 本项目将持续添加新特性并完善修复现有功能。
 
-<<<<<<< HEAD
 - [ ] 优化后台编辑页面的表单布局
 - [ ] 向管理后台添加内容搜索功能
 - [ ] 使用前端框架实现前后端分离
->>>>>>> 90da1b733c0aaa41cf201e0caba867cd43b90842
