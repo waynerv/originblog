@@ -1,41 +1,50 @@
 # OriginBlog
 
-[OriginBlog](https://github.com/flyhigher139/OctBlog) 是一个由 [Flask](http://flask.pocoo.org/) 和 [MongoDB](https://www.mongodb.org/) 驱动的博客系统。
+[OriginBlog](https://github.com/flyhigher139/OctBlog) 是一个由 [Flask](http://flask.pocoo.org/) 和 [MongoDB](https://www.mongodb.org/) 驱动的博客项目。
 
-OriginBlog的目标是打造一个轻量、美观且易扩展的博客系统，它具有以下特性：
+OriginBlog 的开发目标是打造一个轻量、美观且易扩展的博客系统，它具有以下特性：
 
-- 支持多用户
-- 基于角色的权限访问控制，可自定义角色
-- 文章、个人页面、分类、标签、首页组件等博客功能
-- 以 Markdown 作为主要内容编辑格式
-- 可对所有资源进行编辑的后台管理页面
+- 支持多用户，允许用户发表文章、参与后台管理
+- 基于角色进行权限访问控制，可自定义角色
+- 提供文章、评论、个人页面、分类、标签、归档等通用功能
+- 支持自定义首页组件
+- 支持通过权重排序或隐藏文章
+- 自动根据文章内容生成可跳转目录
+- 以 Markdown 作为主要编辑格式，支持代码高亮
+- 提供功能齐全的后台管理页面
 - 使用 Restful 风格 API 管理后台资源
 - 通过配置文件与环境变量即可修改博客基本设置
-- 支持自定义首页插件
-- 自动根据文章内容生成目录
-- 支持通过权重排序或隐藏文章
-- 支持 Docker 快速部署
+- 支持 Docker + Nginx + Gunicorn + MongoDB 快速部署
 
 ## Demo
 
 [Origin Blog](shallwecode.top)
 
+[首页](http://pp0zvba2e.bkt.clouddn.com/2019-04-18%2011-06-38%20%E7%9A%84%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png)
+
+[文章详情页](http://pp0zvba2e.bkt.clouddn.com/2019-04-18%2011-10-33%20%E7%9A%84%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png)
+
+[后台主页](http://pp0zvba2e.bkt.clouddn.com/2019-04-18%2011-07-41%20%E7%9A%84%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png)
+
+[后台管理页](http://pp0zvba2e.bkt.clouddn.com/2019-04-18%2011-08-29%20%E7%9A%84%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png)
+
 ## 运行
 
 ### 从源码运行
 
-1. 切换到项目根目录下的 `app` 文件夹。
-2. 根据 `Pipfile` 或 `requirements.txt` 创建虚拟环境并安装依赖（推荐使用 pipenv）。
-3. （可选）在当前目录创建 `.env` 配置文件，根据 `./originblog/settings.py` 文件中的配置项修改应用配置。
-4. 安装 MongoDB 并启动服务器实例。
+1. 安装 MongoDB(4.0+) 并启动服务器实例。
+2. 切换到项目根目录下的 `app` 文件夹。
+3. 创建虚拟环境并根据 `Pipfile` 或 `requirements.txt` 安装依赖（推荐使用 Pipenv）。
+4. （可选）在当前目录创建 `.env` 配置文件，根据 `./originblog/settings.py` 文件中的配置项修改应用配置。
 5. 在虚拟环境下，运行 `flask run` 命令以调试模式启动应用。
 
+开发环境下可使用 `flask forge` 命令生成测试数据，`flask initdb` 命令清空数据库。
 
-### 通过 docker 运行（推荐）
+### 通过 Docker 运行（推荐）
 
-推荐使用 docker 运行项目，项目中还包括了 MongoDB、Nginx 和 gunicorn 等部署环境下的配置文件，通过 docker 可以做到自动化快速部署。
+推荐使用 Docker 运行项目，仓库中还包含了 MongoDB、Nginx 和 Gunicorn 在部署环境下的配置文件，通过 Docker 可以做到自动化快速部署。
 
-使用前请确保你已经正确安装 docker 与 docker-compose 。（建议配置国内的加速镜像源）
+使用前请确保已经正确安装 docker 与 docker-compose 。（建议配置国内的加速镜像源）
 
 #### 首次运行
 
@@ -48,7 +57,7 @@ $ (sudo) docker build app/ -t originblog:0.1
 # 该命令将根据 app/ 文件夹下的 Dockerfile 构建镜像
 ```
 
-默认的 gunicorn 运行参数可在 Dockerfile 中修改，然后重新构建镜像。
+默认的 Gunicorn 运行参数可在 Dockerfile 中修改，然后重新构建镜像。
 
 你也可以直接从 DockerHub 拉取已构建好的镜像（视网络状况）：
 
@@ -56,24 +65,24 @@ $ (sudo) docker build app/ -t originblog:0.1
 $ (sudo) docker pull waynerv/octblog:0.1
 ```
 
-**2\. 修改运行容器的配置文件（可跳过）**
+**2\. 修改编排容器的配置文件（可跳过）**
 
 - 修改 `docker-compose.yml`
 
-切换到项目根目录下的 `compose` 文件夹。出于安全考虑，你需要对文件夹中 `docker-compose.yml` 文件中的环境变量进行适当修改（开发环境也可直接运行），以下是修改项：
+切换到项目根目录下的 `compose` 文件夹。出于安全考虑，你需要对 `docker-compose.yml` 文件中的环境变量进行适当修改（开发环境可跳过以下步骤），以下是修改项：
 
 - `MONGODB_ADMINUSERNAME`：应用程序连接 MongoDB 的用户名
 - `MONGODB_ADMINPASSWORD`：应用程序连接 MongoDB 的密码
 - `MONGO_INITDB_ROOT_USERNAME`：MongoDB 的用户管理员用户名
 - `MONGO_INITDB_ROOT_PASSWORD`：MongoDB 的用户管理员密码
 
-后两项配置为开启 MongoDB 验证机制所需参数，创建**用户管理员**后才可以启用验证并为数据库创建用户和分配权限。
+注：后两项配置为开启 MongoDB 认证机制所需参数，创建**用户管理员**后才可以启用授权认证并为数据库创建用户和分配权限。
 
 - 修改 MongoDB 运行脚本
 
 若修改了以上配置，还需要对根目录下 `mongodb/entrypoint/init_user.sh` 脚本文件中对应的共4项用户名和密码进行修改，该数据库脚本为应用程序创建专门的用户。
 
-以上敏感配置项在部署环境下应在使用后删除。MongoDB 容器与应用间的通讯与外部请求隔离在不同的网络环境，但建议仍然开启 MongoDB 的验证机制以提高安全性。
+以上敏感配置项在部署环境下应在使用后删除。MongoDB 和应用容器间的通讯与外部网络请求隔离在不同的网络环境，但建议仍然开启 MongoDB 的验证机制以提高安全性。
 
 - 修改 Nginx 配置
 
@@ -94,7 +103,7 @@ $ (sudo) docker-compose up -d
 
 容器首次启动需要30秒左右，然后你就可以在浏览器中通过 `http://localhost:80` 访问OriginBlog 了。
 
-除了数据库用户密码以外，应用程序使用的环境变量都可以在 `docker.env` 文件中修改。
+除了数据库用户密码以外，应用程序使用的环境变量还可以在 `docker.env` 文件中修改。
 
 示例:
 
@@ -137,7 +146,7 @@ owner=Waynerv
 
 ```bash
 $ (sudo) docker exec -it blog ash
-# orginblog 运行在alpine(一个极简linux)环境中,ash=alpine shell
+# orginblog 运行在alpine(一个极简Linux)环境中,ash=alpine shell
 ```
 
 #### 首次运行后
@@ -168,13 +177,13 @@ $ (sudo) docker-compose down
 
 #### 1\. 创建管理员账户
 
-以 `ORIGINBLOG_ADMIN_EMAIL` 环境配置值为邮箱注册的用户将成为管理员。
+以 `ORIGINBLOG_ADMIN_EMAIL` 环境参数值为邮箱注册的用户将成为管理员。
 
 开发环境下可使用 `Role` 模型的 `init` 方法重置角色权限，然后运行 `flask init` 注册管理员用户。
 
 #### 2\. 进入博客后台
 
-登录后通过首页右上角 `USER` 下拉菜单的 `Dashboard` 即可进入管理后台。
+登录后通过首页右上角 `USER` 下拉菜单的 `Dashboard` 进入管理后台。
 
 在博客后台可执行发布文章、审核评论、添加用户、增加首页组件、查看统计数据等管理功能。
 
@@ -188,17 +197,29 @@ $ (sudo) docker-compose down
 
 你可以通过修改 `app/originblog/settings.py` 文件，修改 `.env` 文件或者直接添加环境参数来修改博客的各项配置。
 
-注意 `docker.env` 配置文件仅在使用 docker-compose 运行容器时生效。
+注意 `docker.env` 配置文件仅在使用 docker-compose 运行容器时有效。
 
 ## 解释
 
-权重用于排序文章，每篇文章的默认权重为10，如果文章的权重大于10则优先显示，如果权重为负，则文章不会显示在首页。
+权重:
 
-配置文件
+权重用于排序文章，每篇文章的默认权重为10，如果文章的权重大于10将在首页优先显示；如果权重为负，文章不会在首页显示。
 
-MongoDB的验证
+配置文件:
+
+博客所使用的配置项在 `app/originblog/settings.py` 文件中定义，并在未设置环境参数时使用默认值。以源码运行时创建 `app/.env` 文件添加环境参数。以 Docker 运行时修改 `compose/docker.env` 文件添加环境参数。
+
+为何使用 MongoDB:
+
+参见[Thinking in Documents](https://www.mongodb.com/blog/post/thinking-documents-part-1?jmp=docs)
+
+为何在部署时需要启用 MongoDB 的授权认证:
+
+参见[MongoDB数据库未授权访问漏洞](https://help.aliyun.com/knowledge_detail/112025.html)
 
 ## 依赖
+
+所有依赖均基于当前（2019.4）发布的最新版本。
 
 ### 后端
 
@@ -231,3 +252,9 @@ MongoDB的验证
 MIT
 
 ## 更新计划
+
+本博客项目将持续添加新特性并完善修复现有功能。
+
+- [] 优化后台编辑页面的表单布局
+- [] 向管理后台添加内容搜索功能
+- [] 使用前端框架实现前后端分离
