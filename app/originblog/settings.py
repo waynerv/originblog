@@ -1,4 +1,5 @@
 import os
+from originblog.utils import get_boolean_from_env, get_int_from_env
 
 
 class BlogSettings:
@@ -61,8 +62,8 @@ class BaseConfig(object):
     MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    MAIL_USE_TLS = True
-    MAIL_PORT = 587
+    MAIL_USE_TLS = get_boolean_from_env('MAIL_USE_TLS', 'True')
+    MAIL_PORT = get_int_from_env('MAIL_PORT', 587)
     MAIL_DEFAULT_SENDER = ('Admin', os.getenv('MAIL_USERNAME'))
     APP_MAIL_SUBJECT_PREFIX = 'From Origin Blog:'
 
@@ -101,7 +102,7 @@ class ProductionConfig(BaseConfig):
     MONGODB_SETTINGS = {
         'db': os.getenv('DB_NAME', 'originblog'),
         'host': os.getenv('MONGO_HOST', 'localhost'),
-        'port': 27017,
+        'port': get_int_from_env('MONGO_PORT', 27017),
         'username': os.getenv('MONGODB_ADMINUSERNAME', 'originblog'),
         'password': os.getenv('MONGODB_ADMINPASSWORD', 'PASSWORD')
     }

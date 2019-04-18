@@ -1,3 +1,4 @@
+import os
 from urllib.parse import urlparse, urljoin
 
 import requests
@@ -49,3 +50,16 @@ def reply_filter(comment, flag=True):
         return comment.reply_to
     except DoesNotExist:
         return flag
+
+def get_boolean_from_env(key, default=''):
+    """从环境变量中获取布尔值"""
+    return os.getenv(key, default).lower() not in ('false', '0', 'no')
+
+
+def get_int_from_env(key, default=0):
+    """从环境变量中获取整型"""
+    try:
+        return int(os.getenv(key, default))
+    except ValueError:
+        return default
+
