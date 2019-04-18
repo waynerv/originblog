@@ -20,11 +20,19 @@ OriginBlog 的开发目标是打造一个轻量、美观且易扩展的博客系
 
 [Origin Blog](http://shallwecode.top)
 
+首页
+
 ![首页](http://pp0zvba2e.bkt.clouddn.com/2019-04-18%2011-06-38%20%E7%9A%84%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png)
+
+文章详情页
 
 ![文章详情页](http://pp0zvba2e.bkt.clouddn.com/2019-04-18%2011-10-33%20%E7%9A%84%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png)
 
+后台主页
+
 ![后台主页](http://pp0zvba2e.bkt.clouddn.com/2019-04-18%2011-07-41%20%E7%9A%84%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png)
+
+后台管理页
 
 ![后台管理页](http://pp0zvba2e.bkt.clouddn.com/2019-04-18%2011-08-29%20%E7%9A%84%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png)
 
@@ -62,12 +70,12 @@ $ (sudo) docker build app/ -t originblog:0.1
 你也可以直接从 DockerHub 拉取已构建好的镜像（视网络状况）：
 
 ```bash
-$ (sudo) docker pull waynerv/octblog:0.1
+$ (sudo) docker pull waynerv/originblog:0.1
 ```
 
 **2\. 修改编排容器的配置文件（可跳过）**
 
-- 修改 `docker-compose.yml`
+a. 修改 `docker-compose.yml`
 
 切换到项目根目录下的 `compose` 文件夹。出于安全考虑，你需要对 `docker-compose.yml` 文件中的环境变量进行适当修改（开发环境可跳过以下步骤），以下是修改项：
 
@@ -78,13 +86,13 @@ $ (sudo) docker pull waynerv/octblog:0.1
 
 注：后两项配置为开启 MongoDB 认证机制所需参数，创建**用户管理员**后才可以启用授权认证并为数据库创建用户和分配权限。
 
-- 修改 MongoDB 运行脚本
+b. 修改 MongoDB 运行脚本
 
 若修改了以上配置，还需要对根目录下 `mongodb/entrypoint/init_user.sh` 脚本文件中对应的共4项用户名和密码进行修改，该数据库脚本为应用程序创建专门的用户。
 
 以上敏感配置项在部署环境下应在使用后删除。MongoDB 和应用容器间的通讯与外部网络请求隔离在不同的网络环境，但建议仍然开启 MongoDB 的验证机制以提高安全性。
 
-- 修改 Nginx 配置
+c. 修改 Nginx 配置
 
 部署环境下还需要修改项目根目录下 `nginx/project.conf` 文件，对 Nginx 的映射域名进行修改：
 
@@ -253,8 +261,8 @@ MIT
 
 ## 更新计划
 
-本博客项目将持续添加新特性并完善修复现有功能。
+本项目将持续添加新特性并完善修复现有功能。
 
-- [] 优化后台编辑页面的表单布局
-- [] 向管理后台添加内容搜索功能
-- [] 使用前端框架实现前后端分离
+- [X] 优化后台编辑页面的表单布局
+- [X] 向管理后台添加内容搜索功能
+- [X] 使用前端框架实现前后端分离
