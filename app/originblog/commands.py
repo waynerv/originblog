@@ -24,6 +24,7 @@ def register_command(app):
 
         click.echo('Generating the administrator...')
         fake_admin()
+        click.echo('Administrator username: admin  password:123456789')
 
         click.echo(f'Generating {widget} widgets...')
         fake_widget(widget)

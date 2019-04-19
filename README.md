@@ -47,7 +47,7 @@ OriginBlog 的开发目标是打造一个轻量、美观且易扩展的博客系
 4. （可选）在当前目录创建 `.env` 配置文件，根据 `./originblog/settings.py` 文件中的配置项修改应用配置。
 5. 在虚拟环境下，运行 `flask run` 命令以调试模式启动应用。
 
-开发环境下可使用 `flask forge` 命令生成测试数据，`flask initdb` 命令清空数据库。
+开发环境下可使用 `flask forge` 命令生成测试数据（含管理员账户），`flask initdb` 命令清空数据库。
 
 ### 通过 Docker 运行（推荐）
 
@@ -68,7 +68,7 @@ $ (sudo) docker build app/ -t originblog:0.1
 
 默认的 Gunicorn 运行参数可在 Dockerfile 中修改，然后重新构建镜像。
 
-你也可以直接从 DockerHub 拉取已构建好的镜像（视网络状况）：
+（可选）你也可以直接从 DockerHub 仓库拉取已构建好的镜像：
 
 ```bash
 $ (sudo) docker pull waynerv/originblog:0.1
@@ -95,7 +95,7 @@ b. 修改 MongoDB 运行脚本
 
 c. 修改 Nginx 配置
 
-部署环境下还需要修改项目根目录下 `nginx/project.conf` 文件，对 Nginx 的映射域名进行修改：
+部署环境下还需要修改项目根目录下 `nginx/project.conf` 文件，对 Nginx 的转发配置进行修改，如：
 
 ```bash
 server_name localhost;
@@ -110,7 +110,7 @@ server_name localhost;
 $ (sudo) docker-compose up -d
 ```
 
-容器首次启动需要30秒左右，然后你就可以在浏览器中通过 `http://localhost:80` 访问OriginBlog 了。
+容器首次启动需要30秒左右，然后你就可以在浏览器中通过 `http://localhost:80` 或映射的域名访问OriginBlog 了。
 
 除了数据库用户密码以外，应用程序使用的环境变量可以在 `docker.env` 文件中修改。
 
@@ -212,7 +212,7 @@ $ (sudo) docker-compose down
 
 你可以通过修改 `app/originblog/settings.py` 文件，修改 `.env` 文件或者直接添加环境参数来修改博客的各项配置。
 
-注意 `docker.env` 配置文件仅在使用 docker-compose 运行容器时有效。
+注意 `docker.env` 配置文件仅在使用 `docker-compose` 运行容器时有效。
 
 ## 解释
 
@@ -222,7 +222,8 @@ $ (sudo) docker-compose down
 
 配置文件:
 
-博客所使用的配置项在 `app/originblog/settings.py` 文件中定义，并在未设置环境参数时使用默认值。以源码运行时创建 `app/.env` 文件添加环境参数。以 Docker 运行时修改 `compose/docker.env` 文件添加环境参数。
+博客所使用的配置项在 `app/originblog/settings.py` 中定义，并在未提供环境参数时使用默认值。以源码运行时创建 `app/.env` 文件添加环境参数。以 Docker 运行时修改 `compose/docker.env` 文件添加环境参数。
+添加环境参数后需要重启应用（或使用 `docker-compose up` 重起容器）使新的配置生效。
 
 为何使用 MongoDB:
 
@@ -234,7 +235,7 @@ $ (sudo) docker-compose down
 
 ## 依赖
 
-所有依赖均基于当前（2019.4）发布的最新版本。
+所有依赖均基于当前（2019.4）发布的最新稳定版本。
 
 ### 后端
 

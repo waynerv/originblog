@@ -170,3 +170,7 @@ $('#delete-post').on('show.bs.modal', function (e) {
     $('.delete-post').attr('data-id', $(e.relatedTarget).data('id'));
     $('.delete-post').attr('data-href', $(e.relatedTarget).data('href'));
 });
+
+// 向文章正文中的图片和表格添加样式
+$('#main-content img').addClass('img-fluid');
+$('#main-content table').addClass('table table-bordered small');
