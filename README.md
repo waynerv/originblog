@@ -119,7 +119,7 @@ $ (sudo) docker-compose up -d
 ```
 # MongoDB的连接配置，谨慎修改
 MONGO_HOST=mongo
-#MONGO_PORT=27017
+MONGO_PORT=27017
 DB_NAME=originblog
 
 # Flask使用的密钥，应使用随机生成值
@@ -129,8 +129,8 @@ SECRET_KEY=random_value1231
 MAIL_SERVER=xxxx
 MAIL_USERNAME=xxxx
 MAIL_PASSWORD=xxxx
-#MAIL_USE_TLS=True
-#MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_PORT=587
 
 
 # 以此邮箱注册将赋予管理员角色
@@ -138,7 +138,7 @@ ORIGINBLOG_ADMIN_EMAIL=xxxx
 
 # SEO相关配置
 baidu_submit_url=xxxx
-baidu_site_verificatio=xxxx
+baidu_site_verification=xxxx
 
 # 博客内容配置
 name=Waynerv's Blog
