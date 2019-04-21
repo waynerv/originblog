@@ -22,7 +22,7 @@ services:
     volumes:
       - blog_data:/data/db
       # 注意挂载目录的脚本中含有需要修改的密码
-      - "../mongodb/entrypoint/:/docker-entrypoint-initdb.d/"
+      - "../mongodb/entrypoint/:/docker-entrypoint-initdb.d/:ro"
     networks:
       - backend
     environment:

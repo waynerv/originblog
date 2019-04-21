@@ -77,7 +77,7 @@ def register():
 @login_required
 def confirm(token):
     """通过令牌确认账户"""
-    if current_user.confirmed:
+    if current_user.email_confirmed:
         return redirect(url_for('blog.index'))
 
     if current_user.validate_token(token, Operations.CONFIRM):

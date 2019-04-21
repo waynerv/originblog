@@ -17,6 +17,8 @@ OriginBlog 的开发目标是打造一个轻量、美观且易扩展的博客系
 - 提供基础的SEO优化功能：生成站点地图，自动向搜索引擎提交新链接
 - 支持 Docker + Nginx + Gunicorn + MongoDB 快速部署
 
+[完整功能列表](http://naotu.baidu.com/file/86cddd33c1c8e4bc35ff2ea6c5bdbafe?token=c11cf29d5fc1c9a6)
+
 ## Demo
 
 [Origin Blog](http://shallwecode.top)
