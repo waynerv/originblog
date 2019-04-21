@@ -11,6 +11,7 @@ flask-moment==0.7.0
 flask-mongoengine==0.9.5
 flask-wtf==0.14.2
 flask==1.0.2
+gunicorn==19.9.0
 idna==2.8
 itsdangerous==1.1.0
 jinja2==2.10.1
@@ -23,7 +24,7 @@ pyyaml==5.1
 requests==2.21.0
 six==1.12.0
 unidecode==1.0.23
-urllib3==1.24.1
+urllib3==1.24.2
 webencodings==0.5.1
-werkzeug==0.15.2
+werkzeug==0.14.1
 wtforms==2.2.1
