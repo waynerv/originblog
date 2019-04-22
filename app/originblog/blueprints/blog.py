@@ -146,7 +146,7 @@ def archive():
     posts = Post.objects.filter(type='post').order_by('-pub_time').only('title', 'slug', 'pub_time')
     # 按月份分组所有post
     data = {}
-    years = list(set([post.pub_time.year for post in posts]))
+    years = reversed(list(set([post.pub_time.year for post in posts])))
     for year in years:
         months = reversed(list(set([post.pub_time.month for post in posts if post.pub_time.year == year])))
         for month in months:
