@@ -240,7 +240,7 @@ class MetaPosts(MethodView):
             raw_content = form.raw_content.data
             pub_time = form.pub_time.data
             category = form.category.data if form.category.data else None
-            tags = form.tag.data.split() if form.tags.data else None
+            tags = form.tags.data.split() if form.tags.data else None
             weight = form.weight.data
             can_comment = form.can_comment.data
             type = form.type.data
