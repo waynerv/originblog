@@ -586,11 +586,11 @@ class PostStatistics(MethodView):
         """获取文章统计信息列表"""
         filter_rule = request.args.get('filter', 'all')
         if filter_rule == 'all':
-            filter_statistics = PostStatistic.objects
+            filter_statistics = PostStatistic.objects.order_by('-pk')
         elif filter_rule == 'post':
-            filter_statistics = PostStatistic.objects.filter(post_type='post')
+            filter_statistics = PostStatistic.objects.filter(post_type='post').order_by('-pk')
         elif filter_rule == 'page':
-            filter_statistics = PostStatistic.objects.filter(post_type='page')
+            filter_statistics = PostStatistic.objects.filter(post_type='page').order_by('-pk')
         else:
             filter_statistics = PostStatistic.objects
 
