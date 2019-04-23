@@ -11,7 +11,7 @@
     {% if post %}
     <meta name="title" content="{{ post.title }}">
     <meta name="description" content="{{ post.abstract }}">
-    <meta name="author" content="{{ post.author.username }}">
+    <meta name="author" content="{{ post.author.name }}">
     <meta name="keywords" content="{{ post.tags|join(',') }}">
     {% else %}
     <meta name="title" content="{{ blog_meta.name }}">
