@@ -28,7 +28,7 @@ services:
     volumes:
       - ./backend:/backend
     environment:
-      DATABASE_URL: 'mysql://root:changthis@mysql:3306/originblog'
+      DATABASE_URL: 'mysql+pymysql://root:changthis@mysql:3306/originblog'
     depends_on:
       - mysql
 

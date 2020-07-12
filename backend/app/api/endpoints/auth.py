@@ -6,10 +6,10 @@ from app.db.session import get_db
 from app.core import security
 from app.core.auth import authenticate_user, sign_up_new_user
 
-auth_router = r = APIRouter()
+auth_router = router = APIRouter()
 
 
-@r.post("/token")
+@router.post("/token")
 async def login(
     db=Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ):
@@ -36,7 +36,7 @@ async def login(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@r.post("/signup")
+@router.post("/signup")
 async def signup(
     db=Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ):

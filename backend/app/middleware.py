@@ -1,7 +1,7 @@
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 
-from app import settings
+from app.core.config import settings
 from app.database.session import Session
 
 

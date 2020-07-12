@@ -2,31 +2,31 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 import typing as t
 
-from backend.app.schemas import user
-from backend.app.models import user
+from app.schemas.user import UserBase, UserOut, UserCreate, UserEdit
+from app.models.user import User
 from app.core.security import get_password_hash
 
 
 def get_user(db: Session, user_id: int):
-    user = db.query(user.User).filter(user.User.id == user_id).first()
+    user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
 
-def get_user_by_email(db: Session, email: str) -> user.UserBase:
-    return db.query(user.User).filter(user.User.email == email).first()
+def get_user_by_email(db: Session, email: str) -> UserBase:
+    return db.query(User).filter(User.email == email).first()
 
 
 def get_users(
-    db: Session, skip: int = 0, limit: int = 100
-) -> t.List[user.UserOut]:
-    return db.query(user.User).offset(skip).limit(limit).all()
+        db: Session, skip: int = 0, limit: int = 100
+) -> t.List[UserOut]:
+    return db.query(User).offset(skip).limit(limit).all()
 
 
-def create_user(db: Session, user: user.UserCreate):
+def create_user(db: Session, user: UserCreate):
     hashed_password = get_password_hash(user.password)
-    db_user = user.User(
+    db_user = User(
         first_name=user.first_name,
         last_name=user.last_name,
         email=user.email,
@@ -50,8 +50,8 @@ def delete_user(db: Session, user_id: int):
 
 
 def edit_user(
-    db: Session, user_id: int, user: user.UserEdit
-) -> user.User:
+        db: Session, user_id: int, user: UserEdit
+) -> User:
     db_user = get_user(db, user_id)
     if not db_user:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
