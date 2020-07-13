@@ -12,7 +12,7 @@ from app.crud.user import (
 from app.schemas.user import UserCreate, UserEdit, User, UserOut
 from app.core.auth import get_current_active_user, get_current_active_superuser
 
-users_router = router = APIRouter()
+router = APIRouter()
 
 
 @router.get(

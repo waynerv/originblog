@@ -4,14 +4,14 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from httpx import HTTPError
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from starlette.responses import UJSONResponse
+from starlette.responses import JSONResponse
 
-from app.utils.exceptions import CustomError
+from app.utils.exception import CustomError
 
 
 def register_error_handlers(app):
     @app.exception_handler(StarletteHTTPException)
-    def handle_http_error(request, exc) -> UJSONResponse:
+    def handle_http_error(request, exc) -> JSONResponse:
         """
         Handle HTTPExceptions.
 
@@ -23,10 +23,10 @@ def register_error_handlers(app):
             'status': exc.status_code,
             'detail': None
         }
-        return UJSONResponse(content, status_code=exc.status_code)
+        return JSONResponse(content, status_code=exc.status_code)
 
     @app.exception_handler(HTTPError)
-    def handle_httpx_response_error(request, exc) -> UJSONResponse:
+    def handle_httpx_response_error(request, exc) -> JSONResponse:
         """
         Handle httpx response HTTPExceptions.
 
@@ -45,10 +45,10 @@ def register_error_handlers(app):
             'status': exc.response.status_code,
             'detail': str(exc)
         }
-        return UJSONResponse(content, status_code=exc.response.status_code)
+        return JSONResponse(content, status_code=exc.response.status_code)
 
     @app.exception_handler(RequestValidationError)
-    def handle_validation_error(request, exc) -> UJSONResponse:
+    def handle_validation_error(request, exc) -> JSONResponse:
         """
         Handle pydantic parser errors.
 
@@ -61,14 +61,14 @@ def register_error_handlers(app):
             'status': 422,
             'detail': jsonable_encoder(exc.errors())
         }
-        return UJSONResponse(content, status_code=422)
+        return JSONResponse(content, status_code=422)
 
     @app.exception_handler(CustomError)
-    def handle_custom_error(request, exc) -> UJSONResponse:
+    def handle_custom_error(request, exc) -> JSONResponse:
         """
         Handle custom errors.
 
         Ensures a JSON response including all error messages produced from raised exceptions.
         """
         content = exc.to_dict()
-        return UJSONResponse(content, status_code=exc.status_code)
+        return JSONResponse(content, status_code=exc.status_code)

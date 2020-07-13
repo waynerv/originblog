@@ -25,6 +25,8 @@ services:
       dockerfile: Dockerfile
     command: python app/main.py
     tty: true
+    ports:
+      - "8888:8888"
     volumes:
       - ./backend:/backend
     environment:
