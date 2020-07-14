@@ -4,9 +4,6 @@ from fastapi import FastAPI, Depends
 import uvicorn
 
 from app.core.config import settings
-from app.core.auth import get_current_active_user
-
-from app.core.config import settings
 from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI(
@@ -24,7 +21,7 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 # Routers
-app.include_router(api_router, prefix='/api',dependencies=[Depends(get_current_active_user)])
+app.include_router(api_router, prefix='/api')
 
 # 注册异常处理器、中间件
 register_error_handlers(app)

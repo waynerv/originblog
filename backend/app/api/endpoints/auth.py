@@ -2,14 +2,15 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, status
 from datetime import timedelta
 
-from app.db.session import get_db
+from app.api.dependencies.db_helper import get_db
 from app.core import security
 from app.core.auth import authenticate_user
+from app.schemas.auth import AccessToken
 
 router = APIRouter()
 
 
-@router.post("/access-token")
+@router.post("/access-token", response_model=AccessToken)
 async def login(
         db=Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ):
