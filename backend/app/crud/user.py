@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 import typing as t
 
-from app.schemas.user import UserBase, UserOut, UserCreate, UserEdit
+from app.schemas.user import UserBase, UserOut, UserCreate, UserUpdate
 from app.models.user import User
 from app.core.security import get_password_hash
 
@@ -50,7 +50,7 @@ def delete_user(db: Session, user_id: int):
 
 
 def edit_user(
-        db: Session, user_id: int, user: UserEdit
+        db: Session, user_id: int, user: UserUpdate
 ) -> User:
     db_user = get_user(db, user_id)
     if not db_user:

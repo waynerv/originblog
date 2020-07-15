@@ -1,34 +1,21 @@
-from pydantic import BaseModel
-import typing as t
+from pydantic import BaseModel, Field
 
 
 class UserBase(BaseModel):
-    email: str
-    is_active: bool = True
-    is_superuser: bool = False
-    first_name: str = None
-    last_name: str = None
+    email: str = Field(..., title='邮箱', max_length=64)
+    name: str = Field(..., title='姓名', max_length=64)
+    avatar: str = Field(..., title='头像地址', max_length=128)
 
 
-class UserOut(UserBase):
+class UserUpdate(UserBase):
+    password: str = Field(None, title='密码', max_length=16)
+
+
+class UserCreate(UserUpdate):
     pass
 
 
-class UserCreate(UserBase):
-    password: str
-
-    class Config:
-        orm_mode = True
-
-
-class UserEdit(UserBase):
-    password: t.Optional[str] = None
-
-    class Config:
-        orm_mode = True
-
-
-class User(UserBase):
+class UserOut(UserBase):
     id: int
 
     class Config:

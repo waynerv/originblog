@@ -10,7 +10,7 @@ from app.schemas.auth import AccessToken
 router = APIRouter()
 
 
-@router.post("/access-token", response_model=AccessToken)
+@router.post("/auth/access-token", response_model=AccessToken)
 async def login(
         db=Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ):
