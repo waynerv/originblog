@@ -3,9 +3,6 @@ from app.crud.user import get_user_by_email, create_user
 from app.core import security
 
 
-
-
-
 def authenticate_user(db, email: str, password: str):
     user = get_user_by_email(db, email)
     if not user:
