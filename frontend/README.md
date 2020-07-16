@@ -64,3 +64,67 @@ function Home() {
 ```jsx
 <Redirect from='/view' to='/view/history'/>
 ```
+## 状态管理
+基于antd的form组件，使用mobx和mobx-react进行管理数据。
+### 登录功能
+创建新的stores数据管理文件夹，stores下添加Auth.js管理用户信息；
+创建models文件夹管理接口和数据操作具体逻辑的实现。
+```
+src
+  components
+  + models
+    + index.js
+  public
+  pages
+  + stores
+    + Auth.js
+```
+### AJAX的封装
+```js
+function Post (url, data, onsucceed, onfaill) {
+   let xhr = new XMLHttpRequest();
+   xhr.withCredentials = true;
+   xhr.open("POST", url, true);
+   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+   xhr.onload = function() {
+     if(xhr.status>=200 && xhr.status<300 || xhr.status===304){
+      onsucceed(JSON.parse(xhr.responseText))
+    }else {
+       onfaill()
+     }
+    }
+   xhr.send(data);
+ }
+```
+
+在使用时会报错“TypeError cannot read property .then of undefined”，使用代码如下：
+```js
+login(username, password) {
+    return new Promise((resolve, reject) => {
+      Post('http://127.0.0.1:4523/mock/349959/api/access-token',{username, password}, ()=>{console.log(username)}, ()=>{console.log('接口异常')})
+      .then(loginedUser=>{
+        resolve(loginedUser)},error=> {
+          reject(error)
+        });
+    });
+  },
+```
+
+解决办法：在封装AJAX时需要return new Promise
+```js
+return new Promise((resolve,reject) =>{
+    let xhr = new XMLHttpRequest();
+  xhr.withCredentials = true;
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhr.onload = function() {
+    if(xhr.status>=200 && xhr.status<300 || xhr.status===304){
+      onsucceed(resolve(JSON.parse(xhr.responseText)))
+    }else {
+      onfaill(err=>reject(err))
+    }
+  }
+  xhr.send(data);
+  }) 
+}
+```

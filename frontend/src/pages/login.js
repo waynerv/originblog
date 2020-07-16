@@ -1,8 +1,11 @@
 import React from 'react';
-import { Form, Input, Button, Checkbox } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import styled from 'styled-components'
+import {useStores} from '../stores';
+import { useHistory } from "react-router-dom";
+import { observer } from 'mobx-react'
 
 const Login = styled.div`
   position: fixed;
@@ -12,17 +15,30 @@ const Login = styled.div`
   bottom: 0;
   background: #001529;
 `
-const StyledForm = styled.div`
+const StyledForm = styled(Form)`
   max-width: 600px;
   margin: 70px auto;
   padding: 50px;
   border-radius: 8px;
   background: #fff;
 `
-  const Component = () => {
-      const onFinish = values => {
-        console.log('Received values of form: ', values);
-      };
+const Component = observer(() => {
+  const history = useHistory();
+  const { AuthStore } = useStores();
+  const onFinish = values => {
+    AuthStore.setUsername(values.username);
+    AuthStore.setPassword(values.password);
+    AuthStore.login().then(()=>{
+      history.push('/view');
+    }).catch((err)=> {
+      console.log(err)
+      message.error('登录失败')
+    })
+  };
+
+  const onFinishFailed= error => {
+    message.error(error)
+  };
   
   return (
     <Login>
@@ -31,6 +47,7 @@ const StyledForm = styled.div`
       className="login-form"
       initialValues={{ remember: true }}
       onFinish={onFinish}
+      onFinishFailed={onFinishFailed}
     >
       <Form.Item
         name="username"
@@ -52,20 +69,16 @@ const StyledForm = styled.div`
       <Form.Item>
         <Button type="primary" htmlType="submit" className="login-form-button">
           登录
-        </Button>&nbsp;&nbsp;&nbsp;&nbsp;
-        <Button type="primary" htmlType="submit" className="forget-password-button">
-            忘记密码
-          </Button>
+        </Button>
       </Form.Item>
       <Form.Item>
-        
-        {/* <a className="login-form-forgot" href="">
+        <a className="login-form-forgot" href="">
           Forgot password
-        </a> */}
+        </a>
       </Form.Item>
     </StyledForm>
   </Login>
   )
-};
+});
 
 export default Component;
