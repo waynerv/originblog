@@ -13,7 +13,7 @@ const Information = lazy(()=> import('./components/Information'));
 function Home() {
   return (
     <>
-      <Nav />
+      <Nav/>
       <main>
         <Suspense fallback={<div>Loading!!</div>}>
           <Switch>
