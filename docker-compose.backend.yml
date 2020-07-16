@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    entrypoint: ['/entrypoint.sh', '--default-authentication-plugin=mysql_native_password']
+    environment:
+      - MYSQL_ROOT_PASSWORD=changthis
+      - MYSQL_DATABASE=originblog
+    volumes:
+      - db_data:/var/lib/msyql:cached
+
+  backend:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    command: python app/main.py
+    tty: true
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./backend:/backend
+    environment:
+      DATABASE_URL: 'mysql+pymysql://root:changthis@mysql:3306/originblog'
+    depends_on:
+      - mysql
+
+volumes:
+  db_data:
