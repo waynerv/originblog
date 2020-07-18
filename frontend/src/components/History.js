@@ -7,7 +7,7 @@ const Component = () => {
       title: 'Title',
       dataIndex: 'name',
       key: 'name',
-      render: text => <a>{text}</a>,
+      render: text => <a href='#'>{text}</a>,
     },
     
     {
@@ -16,6 +16,7 @@ const Component = () => {
       key: 'date',
       render: text => <p>{text}</p>,
     },
+    
     {
       title: 'Tags',
       key: 'tags',
@@ -41,8 +42,8 @@ const Component = () => {
       key: 'action',
       render: (text, record) => (
         <Space size="middle">
-          <a>Edit</a>
-          <a>Delete</a>
+          <a href='#'>Edit</a>
+          <a href='#'>Delete</a>
         </Space>
       ),
     },

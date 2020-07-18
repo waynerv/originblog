@@ -72,7 +72,7 @@ const Component = observer(() => {
         </Button>
       </Form.Item>
       <Form.Item>
-        <a className="login-form-forgot" href="">
+        <a className="login-form-forgot" href="#">
           Forgot password
         </a>
       </Form.Item>

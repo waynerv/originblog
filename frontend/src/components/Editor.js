@@ -1,5 +1,5 @@
-import React, { useImperativeHandle } from 'react';
-import MarkdownIt from 'markdown-it';
+import React from 'react';
+// import MarkdownIt from 'markdown-it';
 import MDEditor from '@uiw/react-md-editor';
 import styled from 'styled-components';
 import { useStores } from '../stores';
@@ -84,12 +84,12 @@ const Component = observer(() => {
       <Textarea name="title" value={PostStore.title} onChange={handSetTitle} placeholder="请输入标题(最多30个字)"/>
       <Summary name="slug" value={PostStore.slug} onChange={handSetSlug} placeholder="请输入英文标题" required/>
       <Summary name="summary" value={PostStore.summary} onChange={handSetSummary} placeholder="请输入摘要"/>
+      <textarea name="content"  value={PostStore.content} hidden readOnly/>
       <MDEditor
         id="msg"
         value={PostStore.content}
         onChange={handSetContent}
         height='90vh'
-        name="content"
       />
       
       {/* <MDEditor.Markdown source={value} /> */}
