@@ -28,7 +28,8 @@ const Component = observer(() => {
   const onFinish = values => {
     AuthStore.setUsername(values.username);
     AuthStore.setPassword(values.password);
-    AuthStore.login().then(()=>{
+    AuthStore.login().then((result)=>{
+      localStorage.setItem('token', result.access_token)
       history.push('/view');
     }).catch((err)=> {
       console.log(err)

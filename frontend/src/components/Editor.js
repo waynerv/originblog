@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 // import MarkdownIt from 'markdown-it';
 import MDEditor from '@uiw/react-md-editor';
 import styled from 'styled-components';
@@ -50,47 +50,69 @@ const Summary = styled.textarea`
 `
 const Component = observer(() => {
   const { PostStore } = useStores()
-  const handSetTitle = (() => PostStore.setTitle())
-  const handSetSlug = (() => PostStore.setSlug())
-  const handSetSummary = (() => PostStore.setSummary())
-  const handSetContent = (() => PostStore.setContent())
-
+  const [ form, setForm ] = useState({title:'', slug: '',summar:''})
   function Check() {
-    if (PostStore.title.length> 30) {
+    if (form.title.length> 30) {
       message.error('标题最多30个字')
     }
-    if(/[^A-Za-z\s]/.test(PostStore.slug)){
+    if(/[^A-Za-z0-9\s]/.test(form.slug)){
       message.error('英文标题必须由字母组成')
     }else return true 
   }
-  const handSubmit = () => {
+
+  function handSubmit(e){
+    e.preventDefault()
     const $ = s => document.querySelector(s)
-    const $form = $('form')
+    const $form = $('#editor')
     const $msg = $('#msg')
-    PostStore.setDom($form)
+    PostStore.setFormData($form)
     if(Check()){
       PostStore.Publish().then((data)=> {
-        console.log('fabuchenggong')
+        console.log(data)
         $msg.innerText = data.msg
       })
       .catch((err)=>{
         console.log(err)
+        console.log('fabushibai')
         $msg.innerText = '接口异常' 
       })
     }
   }
+  
+
   return (
-    <form onSubmit={handSubmit}>
-      <Textarea name="title" value={PostStore.title} onChange={handSetTitle} placeholder="请输入标题(最多30个字)"/>
-      <Summary name="slug" value={PostStore.slug} onChange={handSetSlug} placeholder="请输入英文标题" required/>
-      <Summary name="summary" value={PostStore.summary} onChange={handSetSummary} placeholder="请输入摘要"/>
-      <textarea name="content"  value={PostStore.content} hidden readOnly/>
+    <form id="editor" action='http://127.0.0.1:4523/mock/349959/api/posts'  method='POST' onSubmit={handSubmit}>
+      <Textarea 
+      name="title" 
+      value={form.title} 
+      onChange={e => setForm({...form, title:e.target.value})} placeholder="请输入标题(最多30个字)"
+      />
+      <Summary 
+      name="slug" 
+      value={form.slug} 
+      onChange={e => setForm({...form, slug:e.target.value})} placeholder="请输入英文标题" 
+      required
+      />
+      <Summary 
+      name="summary" 
+      value={form.summary} 
+      onChange={e => setForm({...form, summary:e.target.value})} 
+      placeholder="请输入摘要"
+      />
+      <textarea 
+      name="content"  
+      value={PostStore.content} 
+      hidden readOnly
+      />
+
       <MDEditor
         id="msg"
+        name="content"
         value={PostStore.content}
-        onChange={handSetContent}
+        onChange={() => PostStore.setContent()}
         height='90vh'
       />
+  
       
       {/* <MDEditor.Markdown source={value} /> */}
       <ButtonGloup className="button">
@@ -99,8 +121,7 @@ const Component = observer(() => {
       </ButtonGloup>
     </form>
   );
- 
-  
+
 })
 
 export default Component;
