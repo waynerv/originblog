@@ -131,3 +131,5 @@ return new Promise((resolve,reject) =>{
 
 ### form表单提交信息不包含`<Editor>`组件的内容
 解决办法：插入一个`<textarea name="content" value={PostStore.content} hidden readOnly />`,具体内容的控制是由`<Editor>`组件的`value`和`onChanag`事件控制。
+### form表单提交未进入提交函数
+需要在函数第一行添加`e.preventDefault`
