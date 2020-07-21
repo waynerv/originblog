@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Table,  Space} from 'antd';
+import { Menu, Table,  Space, Button} from 'antd';
 import styled from 'styled-components';
 import { useStores } from '../stores';
 import { observer } from 'mobx-react';
@@ -62,8 +62,8 @@ const Component = observer(() => {
     
     {
       title: '发布日期',
-      dataIndex: 'date',
-      key: 'date',
+      dataIndex: 'created_at',
+      key: 'created_at',
       render: text => <p>{text}</p>,
     },
     
@@ -73,37 +73,22 @@ const Component = observer(() => {
       dataIndex: 'summary',
       render: text => <p>{text}</p>
     },
+    {
+      title: '标签',
+      key: 'tag_names',
+      dataIndex: 'tag_names',
+      render: text => <p>{text}</p>
+    },
         
     {
       title: '操作',
       key: 'action',
       render: (text, record) => (
         <Space size="middle">
-          <a href='#'>Edit</a>
-          <a href='#'>Delete</a>
+          <Button href='#'>编辑</Button>
+          <Button href='#'>删除</Button>
         </Space>
       ),
-    },
-  ];
-  
-  const data = [
-    {
-      key: PostStore.list,
-      title: '九种垂直居中',
-      date: '2020/7/9',
-      summary: '',
-    },
-    {
-      key: '2',
-      title: 'Jim Green',
-      date: 'London No. 1 Lake Park',
-      summary: '',
-    },
-    {
-      key: '3',
-      title: 'Joe Black',
-      date: 'Sidney No. 1 Lake Park',
-      summary: '',
     },
   ];
   
@@ -126,7 +111,7 @@ const Component = observer(() => {
         <Input type="submit" value="查询" />
         <Input type="reset" />
       </Form>
-      <Table columns={columns} dataSource={data} />
+      <Table columns={columns} dataSource={PostStore.list}/>
     </div>
   )
 })

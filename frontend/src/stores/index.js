@@ -15,3 +15,4 @@ export const useStores = () => useContext(context)
 
 Window.AuthStore = AuthStore
 Window.UserStore = UserStore
+Window.PostStore = PostStore
