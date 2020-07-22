@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Depends
 
+from app.api.dependencies.auth import get_current_active_user, get_current_active_superuser
+from app.api.dependencies.db_helper import get_db
 from app.crud.user import (
     edit_user,
 )
 from app.schemas.user import UserUpdate, UserOut
-from app.api.dependencies.auth import get_current_active_user, get_current_active_superuser
-from app.api.dependencies.db_helper import get_db
 
 router = APIRouter()
 

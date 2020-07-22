@@ -1,6 +1,6 @@
 from app.api.routers import api_router
 from app.errorhandlers import register_error_handlers
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 import uvicorn
 
 from app.core.config import settings
@@ -32,4 +32,4 @@ async def root():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", reload=True, port=8888)
+    uvicorn.run("app.main:app", host="0.0.0.0", reload=True, port=8888)

@@ -13,14 +13,14 @@ services:
 
   backend:
     build:
-      context: backend
+      context: .
       dockerfile: Dockerfile
     command: python app/main.py
     tty: true
     ports:
       - "8888:8888"
     volumes:
-      - ./backend:/backend
+      - .:/backend
     environment:
       DATABASE_URL: 'mysql+pymysql://root:changthis@mysql:3306/originblog'
     depends_on:
