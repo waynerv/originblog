@@ -1,15 +1,13 @@
-from sqlalchemy import Boolean, Column, Integer, String
+from tortoise import fields
+from tortoise.models import Model
 
-from app.db.session import Base
 
+class User(Model):
+    id = fields.IntField(pk=True)
+    email = fields.CharField(64, unique=True, description='邮箱地址')
+    name = fields.CharField(64, description='姓名')
+    password_hash = fields.CharField(128, description='密码哈希值')
+    avatar = fields.CharField(128, null=True, description='头像地址')
 
-class User(Base):
-    __tablename__ = "user"
-
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True, nullable=False)
-    first_name = Column(String)
-    last_name = Column(String)
-    hashed_password = Column(String, nullable=False)
-    is_active = Column(Boolean, default=True)
-    is_superuser = Column(Boolean, default=False)
+    class Meta:
+        table = 'user'
