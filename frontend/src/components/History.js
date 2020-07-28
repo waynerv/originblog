@@ -1,8 +1,9 @@
 import React from 'react';
-import { Menu, Table,  Space, Button} from 'antd';
+import { Table,  Space, Button, message} from 'antd';
 import styled from 'styled-components';
 import { useStores } from '../stores';
 import { observer } from 'mobx-react';
+import { useHistory } from "react-router-dom";
 
 const Form = styled.form`
   display: flex;
@@ -37,6 +38,8 @@ cursor: pointer;
 
 const Component = observer(() => {
   const { PostStore } = useStores()
+  const history = useHistory();
+
   function handSubmit(e){
     e.preventDefault()
     const $ = s => document.querySelector(s)
@@ -49,9 +52,35 @@ const Component = observer(() => {
       console.log(err)
       console.log('fabushibai')
     })
-    
-  }
-  
+  };
+
+
+  const handClick = key =>{ 
+    PostStore.setid(key)
+    let index = (PostStore.list).findIndex(arr => arr.id=== key)
+    PostStore.Delete().then(()=> {
+      //console.log(index)找不到index
+      PostStore.list.splice(index,1) 
+    message.success('删除成功')
+    }).catch((err)=>{
+      console.log(err)
+      message.error('删除失败')}
+      )
+  };
+  const handEdit = (key) =>{
+    PostStore.setid(key)
+    PostStore.Read().then((result)=> {  
+      console.log(result)
+      //console.log(index)找不到index
+      PostStore.setTitle(result.title)
+      PostStore.setSlug(result.slug)
+      PostStore.setSummary(result.summary)
+      PostStore.setContent(result.content)
+      history.push('/view/update')
+    }).catch((err)=>{
+      console.log(err)
+  })  
+};
   const columns = [
     {
       title: '标题',
@@ -85,8 +114,8 @@ const Component = observer(() => {
       key: 'action',
       render: (text, record) => (
         <Space size="middle">
-          <Button href='#'>编辑</Button>
-          <Button href='#'>删除</Button>
+          <Button onClick={()=>handEdit(record.key)}>编辑</Button>
+          <Button onClick={()=>handClick(record.key)}>删除</Button>
         </Space>
       ),
     },
@@ -111,7 +140,7 @@ const Component = observer(() => {
         <Input type="submit" value="查询" />
         <Input type="reset" />
       </Form>
-      <Table columns={columns} dataSource={PostStore.list}/>
+      <Table columns={columns} dataSource={PostStore.list} rowKey={record => record.id}/>  
     </div>
   )
 })

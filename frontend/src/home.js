@@ -10,6 +10,7 @@ import History from './components/History';
 const Editor = lazy(()=> import('./components/Editor'));
 const Information = lazy(()=> import('./components/Information'));
 const Categroy =lazy(()=> import('./components/Categroy'))
+const Update =lazy(()=> import('./components/Update'))
 
 function Home() {
   return (
@@ -21,6 +22,7 @@ function Home() {
             <Route path='/view/editor' component={Editor} />
             <Route path='/view/categroy' component={Categroy} />
             <Route path='/view/history' component={History} />
+            <Route path='/view/update' component={Update} />
             <Route path='/view/information' component={Information} />
             <Redirect from='/view' to='/view/history'/>
           </Switch>

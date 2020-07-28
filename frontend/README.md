@@ -133,3 +133,26 @@ return new Promise((resolve,reject) =>{
 解决办法：插入一个`<textarea name="content" value={PostStore.content} hidden readOnly />`,具体内容的控制是由`<Editor>`组件的`value`和`onChanag`事件控制。
 ### form表单提交未进入提交函数
 需要在函数第一行添加`e.preventDefault`
+
+### antd table 报错如下：
+> Warning: [antd: Table] Each record in dataSource of table should have a unique `key` prop, or set `rowKey` of Table to an unique primary key.
+
+- 解决办法一： 给datasouce中的每一项第一个添加一个key
+``` js
+const dataSource = [{
+  key: '1',
+  name: '胡彦斌',
+  age: 32,
+  address: '西湖区湖底公园1号'
+}, {
+  key: '2',
+  name: '胡彦祖',
+  age: 42,
+  address: '西湖区湖底公园1号'
+}];
+```
+
+- 解决办法二：设置rowKey,返回的是数据中的唯一值
+```jsx
+<Table columns={columns} dataSource={PostStore.list} rowKey={record => record.id}/> 
+```

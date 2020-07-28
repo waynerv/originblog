@@ -49,6 +49,7 @@ const Summary = styled.textarea`
   border-top: 1px solid #ddd;
 `
 const Component = observer(() => {
+  const [value, setValue] = React.useState("**Hello world!!!**")
   const { PostStore } = useStores()
   const [ form, setForm ] = useState({title:'', slug: '',summar:''})
   function Check() {
@@ -108,8 +109,8 @@ const Component = observer(() => {
       <MDEditor
         id="msg"
         name="content"
-        value={PostStore.content}
-        onChange={() => PostStore.setContent()}
+        value={value}
+        onChange={setValue}
         height='90vh'
       />
   
