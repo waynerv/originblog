@@ -3,12 +3,14 @@ import EditorStore from './editor';
 import UserStore from './User';
 import AuthStore from './Auth';
 import PostStore from './Post';
+import CategroyStory from './categroy';
 
 const context = createContext({
   EditorStore,
   UserStore,
   AuthStore,
-  PostStore
+  PostStore,
+  CategroyStory
 })
 
 export const useStores = () => useContext(context)

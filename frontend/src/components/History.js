@@ -55,9 +55,9 @@ const Component = observer(() => {
   };
 
 
-  const handClick = key =>{ 
-    PostStore.setid(key)
-    let index = (PostStore.list).findIndex(arr => arr.id=== key)
+  const handClick = item =>{ 
+    PostStore.setid(item.key)
+    let index = (PostStore.list).findIndex(arr => arr.id=== item.key)
     PostStore.Delete().then(()=> {
       //console.log(index)找不到index
       PostStore.list.splice(index,1) 
@@ -67,8 +67,8 @@ const Component = observer(() => {
       message.error('删除失败')}
       )
   };
-  const handEdit = (key) =>{
-    PostStore.setid(key)
+  const handEdit = (item) =>{
+    PostStore.setid(item.key)
     PostStore.Read().then((result)=> {  
       console.log(result)
       //console.log(index)找不到index
@@ -86,7 +86,7 @@ const Component = observer(() => {
       title: '标题',
       dataIndex: 'title',
       key: 'title',
-      render: text => <a href='#'>{text}</a>,
+      render: text => <a href='#' target='_blank'>{text}</a>,
     },
     
     {
@@ -114,8 +114,8 @@ const Component = observer(() => {
       key: 'action',
       render: (text, record) => (
         <Space size="middle">
-          <Button onClick={()=>handEdit(record.key)}>编辑</Button>
-          <Button onClick={()=>handClick(record.key)}>删除</Button>
+          <Button onClick={()=>handEdit()}>编辑</Button>
+          <Button onClick={()=>handClick()}>删除</Button>
         </Space>
       ),
     },
