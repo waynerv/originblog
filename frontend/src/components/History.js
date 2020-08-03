@@ -37,7 +37,7 @@ cursor: pointer;
 `
 
 const Component = observer(() => {
-  const { PostStore } = useStores()
+  const { PostStore, CategroyStory } = useStores()
   const history = useHistory();
 
   function handSubmit(e){
@@ -79,7 +79,21 @@ const Component = observer(() => {
       history.push('/view/update')
     }).catch((err)=>{
       console.log(err)
-  })  
+    })  
+  };
+
+  
+  
+  function handCategroy (){
+    let $Categroy = document.querySelector('#categroy_id')
+    $Categroy.length = 0
+    for (let i = 0; i < CategroyStory.list.length; i++) {
+      let $option = document.createElement("option")
+      $option.setAttribute = ('value',CategroyStory.list[i].id)
+      $option.key = CategroyStory.list[i].id
+      $option.innerText = CategroyStory.list[i].name
+      $Categroy.appendChild($option)
+  }
 };
   const columns = [
     {
@@ -127,10 +141,8 @@ const Component = observer(() => {
         标题:<Textarea placeholder="请输入标题" name="title"/>
         标签:<Textarea placeholder="请输入标签" name="tag"/> 
         文章分类:
-        <select name="categroy_id">
-          <option>文章</option>
-          <option>技术</option>
-          <option>记录</option>
+        <select name="categroy_id"  id="categroy_id" onClick={handCategroy}>
+          <option value="-1" disabled>请选择</option>
         </select>
         是否显示草稿：
         <select name="is_draft">
@@ -144,5 +156,6 @@ const Component = observer(() => {
     </div>
   )
 })
+
 
 export default Component;

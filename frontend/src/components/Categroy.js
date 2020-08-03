@@ -117,7 +117,9 @@ class Component extends React.Component {
     const dataSource = [...this.state.dataSource];
     const index = dataSource.findIndex(item => item.key === key);
     this.props.CategroyStory.setid(key)
-    this.props.CategroyStory.Delete().then(()=>{alert('删除成功')}).catch((err)=>{
+    this.props.CategroyStory.Delete().then(()=>{
+      dataSource.splice(index,1)
+      alert('删除成功')}).catch((err)=>{
       console.log(err)
       alert('删除失败')})
     this.setState({

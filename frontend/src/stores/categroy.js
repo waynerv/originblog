@@ -1,8 +1,9 @@
-import { observable, action } from 'mobx';
+import { observable, action, toJS } from 'mobx';
 import { Categroy } from '../models';
 
 class CategroyStore{
   @observable list =[]
+  //categroylist = toJS(this.list) 将观察对象数据转换成js数组
   @observable AddItem = ''
   @observable id = ''
   
@@ -19,11 +20,9 @@ class CategroyStore{
   @action Find() {
     return new Promise((resolve, reject) => {
       Categroy.Find().then(data => {
-        let newList = Object.entries(data)[0][1]
-        this.append(newList);
-        console.log(newList)
-        resolve(newList)
-        console.log('获取成功')
+        this.append(data);
+        console.log(toJS(this.list))
+        resolve(data)
       }).catch(err => {
         reject(err)
         console.log('获取失败')
