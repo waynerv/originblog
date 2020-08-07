@@ -26,6 +26,7 @@ const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpack
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 
 const postcssNormalize = require('postcss-normalize');
+const { SSL_OP_TLS_BLOCK_PADDING_BUG } = require('constants');
 
 const appPackageJson = require(paths.appPackageJson);
 
@@ -515,6 +516,7 @@ module.exports = function(webpackEnv) {
           {
             inject: true,
             template: paths.appHtml,
+            
           },
           isEnvProduction
             ? {

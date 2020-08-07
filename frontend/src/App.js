@@ -1,23 +1,27 @@
-import React from 'react';
+import React, {lazy , Suspense} from 'react';
+import Footer from './components/footer';
 import {
   Switch,
   Route
 } from 'react-router-dom';
-import Login from './pages/login';
-import Home from './home';
 
-
+const Home = lazy(() => import('./pages/home'));
+const History =lazy(() => import('./pages/history'));
+const About =lazy(() => import('./pages/about'));
 
 function App() {
   return (
     <>
+    <Suspense>
       <Switch>
-        <Route path='/' exact component={Login} />
-        <Route path='/view' component={Home} >
-        </Route>
+        <Route path='/' exact component={Home} />
+        <Route path='/history' exact component={History} />
+        <Route path='/about' exact component={About} />
       </Switch>
-</>
-  )
+    </Suspense>
+      <Footer />
+    </>
+  );
 }
 
 export default App;
