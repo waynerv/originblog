@@ -11,6 +11,7 @@ const Editor = lazy(()=> import('./components/Editor'));
 const Information = lazy(()=> import('./components/Information'));
 const Categroy =lazy(()=> import('./components/Categroy'))
 const Update =lazy(()=> import('./components/Update'))
+const Article =lazy(()=> import('./components/Article'))
 
 function Home() {
   return (
@@ -24,6 +25,7 @@ function Home() {
             <Route path='/view/history' component={History} />
             <Route path='/view/update' component={Update} />
             <Route path='/view/information' component={Information} />
+            <Route path='/view/article' component={Article} />
             <Redirect from='/view' to='/view/history'/>
           </Switch>
         </Suspense> 

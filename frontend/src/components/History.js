@@ -3,7 +3,7 @@ import { Table,  Space, Button, message} from 'antd';
 import styled from 'styled-components';
 import { useStores } from '../stores';
 import { observer } from 'mobx-react';
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 
 const Form = styled.form`
   display: flex;
@@ -67,8 +67,8 @@ const Component = observer(() => {
       message.error('删除失败')}
       )
   };
-  const handEdit = (item) =>{
-    PostStore.setid(item.key)
+  const handEdit = key =>{
+    PostStore.setid(key)
     PostStore.Read().then((result)=> {  
       console.log(result)
       //console.log(index)找不到index
@@ -100,7 +100,7 @@ const Component = observer(() => {
       title: '标题',
       dataIndex: 'title',
       key: 'title',
-      render: text => <a href='#' target='_blank'>{text}</a>,
+      render: text => <Link to='/view/article' target='_blank' onClick={handEdit}>{text}</Link>,
     },
     
     {
@@ -128,7 +128,7 @@ const Component = observer(() => {
       key: 'action',
       render: (text, record) => (
         <Space size="middle">
-          <Button onClick={()=>handEdit()}>编辑</Button>
+          <Button onClick={()=>handEdit(record.key)}>编辑</Button>
           <Button onClick={()=>handClick()}>删除</Button>
         </Space>
       ),
