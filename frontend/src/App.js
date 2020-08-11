@@ -12,11 +12,11 @@ const About =lazy(() => import('./pages/about'));
 function App() {
   return (
     <>
-    <Suspense>
+    <Suspense fallback={<p>Loading!</p>}>
       <Switch>
         <Route path='/' exact component={Home} />
-        <Route path='/history' exact component={History} />
-        <Route path='/about' exact component={About} />
+        <Route path='/history' component={History} />
+        <Route path='/about' component={About} />
       </Switch>
     </Suspense>
       <Footer />

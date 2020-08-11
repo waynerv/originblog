@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { List } from 'antd';
+import { useStores } from '../stores'
+import { observer } from 'mobx-react';
 
 const Lists = styled.div`
   display: flex;
@@ -8,38 +10,28 @@ const Lists = styled.div`
   justify-content: center;
 `
 
-const Component = () => {
-  const data = [
-    {
-      title: 'Ant Design Title 1',
-    },
-    {
-      title: 'Ant Design Title 2',
-    },
-    {
-      title: 'Ant Design Title 3',
-    },
-    {
-      title: 'Ant Design Title 4',
-    },
-  ];
+const Component = observer(() => {
+  const { ListStore } = useStores()
+  useEffect(() => {
+    return () => ListStore.Find();
+  },[])
 
   return (
     <Lists>
        <List
         itemLayout="horizontal"
-        dataSource={data}
+        dataSource={ListStore.List}
         renderItem={item => (
-          <List.Item>
+          <List.Item key={item.id}>
             <List.Item.Meta
-              title={<a href="https://ant.design">{item.title}</a>}
-              description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+              title= {item.title}
+              description={item.summary}
             />
           </List.Item>
         )}
       />
     </Lists>
   )
-}
+})
 
 export default Component;
