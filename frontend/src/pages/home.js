@@ -13,7 +13,7 @@ const Home = styled.div`
 const Component = () => {
   return (
     <Home>
-      <Header imgUrl={`${image1}`}>提交列表</Header>
+      <Header imgUrl={`${image1}`}>文章列表</Header>
       <List />
     </Home>
   )

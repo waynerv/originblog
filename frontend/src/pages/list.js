@@ -13,16 +13,18 @@ const Lists = styled.div`
 const Component = observer(() => {
   const { ListStore } = useStores()
   useEffect(() => {
-    return () => ListStore.Find();
-  },[])
+    ListStore.setQuery()
+    if(ListStore.hasMore) ListStore.Find()
+    //return ()=> ListStore.reset()
+  });
 
   return (
     <Lists>
        <List
         itemLayout="horizontal"
-        dataSource={ListStore.List}
+        dataSource={ListStore.list}
         renderItem={item => (
-          <List.Item key={item.id}>
+          <List.Item>
             <List.Item.Meta
               title= {item.title}
               description={item.summary}

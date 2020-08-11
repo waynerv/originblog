@@ -19,7 +19,7 @@ const Component = () => {
  
   return (
     <>
-      <Header imgUrl={`${image2}`}>提交历史</Header>
+      <Header imgUrl={`${image2}`}>我的历程</Header>
       <List>
       <Timeline>
         <Content>

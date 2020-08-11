@@ -34,9 +34,11 @@ class ListStore{
     this.formData = new FormData($dom)
    
   };
-  @action setQuery($dom){
-    this.query = new FormData($dom)
-    this.query.append(this.page, this.per_page)
+  @action setQuery(){
+    this.query = new FormData()
+    this.query.append('page', this.page)
+    this.query.append('per_page',this.per_page)
+
   };
   @action append(newList){
     this.list = this.list.concat(newList)
@@ -75,7 +77,6 @@ class ListStore{
         let newList = Object.entries(data)[0][1]
         this.append(newList);
         this.page++
-        console.log(newList)
         resolve(newList)
         if(newList.length < this.pre_page) {
           this.hasMore = false
