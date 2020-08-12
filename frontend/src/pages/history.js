@@ -1,62 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Header from '../components/header';
-import {
-  Timeline,
-  Content,
-  ContentYear,
-  ContentBody,
-  Description
-} from 'vertical-timeline-component-react';
 import image2 from '../images/history-bg.jpg';
+import { useStores } from '../stores';
+import { observer } from 'mobx-react';
+import Timeline from './timeline';
 
-const List = styled.div`
+const Lists = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
 `
-const Component = () => {
- 
+const Component = observer(() => {
+  const { ListStore } = useStores()
+  useEffect(() => {
+    ListStore.setQuery()
+    if(ListStore.hasMore) ListStore.Find()
+    //return ()=> ListStore.reset()
+  });
   return (
     <>
       <Header imgUrl={`${image2}`}>我的历程</Header>
-      <List>
-      <Timeline>
-        <Content>
-          <ContentYear
-            startMonth="07"
-            monthType="text"
-            startDay="03"
-            startYear="2020"
-            currentYear
-          />
-          <ContentBody title="垂直居中">
-            <Description
-              text="I'm an amazing event"
-              optional="I'm an amazing optional text"
-            />
-          </ContentBody>
-        </Content>
-        <Content>
-          <ContentYear
-            startMonth="07"
-            monthType="text"
-            startDay="04"
-            startYear="2020"
-            currentYear
-          />
-          <ContentBody title="原型链">
-            <Description
-              text="I'm an amazing event"
-              optional="I'm an amazing optional text"
-            />
-          </ContentBody>
-        </Content>
-        <Content>...</Content>
-      </Timeline>
-      </List>
+      <Lists>
+        <Timeline/>
+      </Lists>
     </>
   )
-}
+})
 
 export default Component;
