@@ -35,9 +35,8 @@ class ListStore{
    
   };
   @action setQuery(){
-    this.query = new FormData()
-    this.query.append('page', this.page)
-    this.query.append('per_page',this.per_page)
+    this.query.page = this.page
+    this.query.per_page = this.per_page
 
   };
   @action append(newList){

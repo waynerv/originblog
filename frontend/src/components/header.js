@@ -57,9 +57,9 @@ const Header = styled.div`
 const Component = observer(({ children , ...props}) =>{
   return (
     <Header {...props}> 
-      <h2>{children}</h2>
+      <h2 style={{color:'#fff'}}>{children}</h2>
       <div className="second">
-        <h4>Records Of Lainey</h4>
+        <h4 style={{color:'#fff'}}>Records Of Lainey</h4>
         <NavLink to='/' exact>首页</NavLink>
         <NavLink to='/history'>我的足迹</NavLink>
         <NavLink to='/about'>关于我</NavLink>

@@ -3,7 +3,7 @@ function Request(url, prams, onsucceed, onfaill) {
     url = url + '?' + Object.entries(prams).map(arr => arr[0] + '='+ arr[1]).join('&')
     let xhr = new XMLHttpRequest()
     xhr.open('GET', url, true)
-    xhr.setRequestHeader("Authorization", localStorage.getItem('token'));
+    // xhr.setRequestHeader("Authorization", localStorage.getItem('token'));
     xhr.onload = function() {
       if(xhr.status>=200 && xhr.status<300 || xhr.status===304){
         let result = JSON.parse(xhr.responseText)
