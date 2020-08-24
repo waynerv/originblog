@@ -24,7 +24,8 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     PROJECT_NAME: str = "originblog"
-    SQLALCHEMY_DATABASE_URI: str = os.getenv('DATABASE_URL')
+    DATABASE_URI: str = "mysql://root:changethis@db:3306/originblog"
+    SQLALCHEMY_DATABASE_URI: str = "mysql+pymysql://root:changethis@db:3306/originblog"
 
     SMTP_TLS: bool = True
     SMTP_PORT: Optional[int] = None
