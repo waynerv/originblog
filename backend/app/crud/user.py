@@ -1,10 +1,11 @@
+from typing import Optional, List
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-import typing as t
 
-from app.schemas.user import UserBase, UserOut, UserCreate, UserUpdate
-from app.models.user import User
 from app.core.security import get_password_hash
+from app.models.user import User
+from app.schemas.user import UserOut, UserCreate, UserUpdate
 
 
 def get_user(db: Session, user_id: int):
@@ -14,13 +15,14 @@ def get_user(db: Session, user_id: int):
     return user
 
 
-def get_user_by_email(db: Session, email: str) -> UserBase:
-    return db.query(User).filter(User.email == email).first()
+async def get_user_by_email(email: str) -> Optional[User]:
+    user = await User.filter(email=email).first()
+    return user
 
 
 def get_users(
         db: Session, skip: int = 0, limit: int = 100
-) -> t.List[UserOut]:
+) -> List[UserOut]:
     return db.query(User).offset(skip).limit(limit).all()
 
 
