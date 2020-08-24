@@ -1,26 +1,22 @@
-#!/usr/bin/env python3
+from tortoise import Tortoise, run_async
 
-from app.db.session import get_db
-from app.db.crud import create_user
-from app.db.schemas import UserCreate
-from app.db.session import SessionLocal
+from app.core.config import settings
+from app.core.security import get_password_hash
+from app.models.user import User
 
 
-def init() -> None:
-    db = SessionLocal()
+async def run():
+    await Tortoise.init(db_url=settings.DATABASE_URI, modules={"models": ["app.models.user"]})
+    await Tortoise.generate_schemas()
 
-    create_user(
-        db,
-        UserCreate(
-            email="admin@originblog.com",
-            password="password",
-            is_active=True,
-            is_superuser=True,
-        ),
+    await User.create(
+        email="admin@originblog.com",
+        name="Admin",
+        password_hash=get_password_hash("password"),
     )
 
 
 if __name__ == "__main__":
     print("Creating superuser admin@originblog.com")
-    init()
+    run_async(run())
     print("Superuser created")
