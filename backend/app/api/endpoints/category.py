@@ -27,6 +27,13 @@ async def create_category(
         current_user: User = Depends(get_current_user),
 ):
     """创建新分类"""
+    namesake_category = await crud.category.get_by_name(category_in.name)
+    if namesake_category:
+        raise HTTPException(
+            status_code=404,
+            detail='已存在相同名称分类'
+        )
+
     category = await crud.category.create(category_in=category_in)
 
     return category
@@ -62,6 +69,14 @@ async def update_category(
             status_code=404,
             detail='指定的分类不存在'
         )
+
+    if category_in.name != category.name:
+        namesake_category = await crud.category.get_by_name(category_in.name)
+        if namesake_category:
+            raise HTTPException(
+                status_code=404,
+                detail='已存在相同名称分类'
+            )
 
     await crud.category.update(category, category_in=category_in)
 

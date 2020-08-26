@@ -27,6 +27,13 @@ async def create_tag(
         current_user: User = Depends(get_current_user),
 ):
     """创建新标签"""
+    namesake_tag = await crud.tag.get_by_name(tag_in.name)
+    if namesake_tag:
+        raise HTTPException(
+            status_code=404,
+            detail='已存在相同名称标签'
+        )
+
     tag = await crud.tag.create(tag_in=tag_in)
 
     return tag
@@ -62,6 +69,14 @@ async def update_tag(
             status_code=404,
             detail='指定的标签不存在'
         )
+
+    if tag_in.name != tag.name:
+        namesake_tag = await crud.tag.get_by_name(tag_in.name)
+        if namesake_tag:
+            raise HTTPException(
+                status_code=404,
+                detail='已存在相同名称标签'
+            )
 
     await crud.tag.update(tag, tag_in=tag_in)
 

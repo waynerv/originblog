@@ -9,9 +9,14 @@ async def get(category_id: int) -> Optional[Category]:
     return await Category.get(id=category_id)
 
 
+async def get_by_name(name: str) -> Optional[Category]:
+    """通过名称能获取指定分类"""
+    return await Category.filter(name=name).first()
+
+
 async def get_all() -> List[Category]:
     """获取所有的分类"""
-    return await Category.all()
+    return await Category.all().order_by('-id')
 
 
 async def create(category_in: CategoryCreate) -> Category:

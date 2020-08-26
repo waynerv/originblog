@@ -9,6 +9,11 @@ async def get(tag_id: int) -> Optional[Tag]:
     return await Tag.get(id=tag_id)
 
 
+async def get_by_name(name: str) -> Optional[Tag]:
+    """通过名称能获取指定标签"""
+    return await Tag.filter(name=name).first()
+
+
 async def get_all() -> List[Tag]:
     """获取所有的标签"""
     return await Tag.all().order_by('-id')
