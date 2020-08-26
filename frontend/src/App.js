@@ -8,6 +8,7 @@ import {
 const Home = lazy(() => import('./pages/home'));
 const History =lazy(() => import('./pages/history'));
 const About =lazy(() => import('./pages/about'));
+const Content =lazy(() => import('./pages/content'));
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path='/' exact component={Home} />
         <Route path='/history' component={History} />
         <Route path='/about' component={About} />
+        <Route path='/content' component={Content} />
       </Switch>
     </Suspense>
       <Footer />

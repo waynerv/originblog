@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { List } from 'antd';
 import { useStores } from '../stores'
 import { observer } from 'mobx-react';
-import showdown from 'showdown';
+import { useHistory } from "react-router-dom";
 import 'antd/dist/antd.css';
 
 const Lists = styled.div`
@@ -11,29 +11,27 @@ padding: 0 50px;
 `
 
 const Component = observer(() => {
+  const history = useHistory();
   const { ListStore } = useStores()
   useEffect(() => {
     ListStore.setQuery()
-    if(ListStore.hasMore) ListStore.Find().then((data)=>{
+    if(ListStore.hasMore) ListStore.Find().then(()=>{
       let $$Titles = document.querySelectorAll('.title')
       $$Titles.forEach(($node)=>{
         let index = [...$$Titles].indexOf($node)
-        function TitleClick(){
-          ListStore.setid(data[index].id)
-          ListStore.Read().then((result)=>{
-            $$Titles[index].href = document.location + '/' + data[index].id
+        // $$Titles[index].href = document.location + ListStore.list[index].slug
+        $node.addEventListener('click', ()=>{
+          ListStore.setid(ListStore.list[index].id)
+          ListStore.Read().then((response)=>{
+            ListStore.setTitle(response.title)
+            ListStore.setContent(response.content)
+            history.push('/content')
           })
-         
-        }
-        $node.addEventListener('click', TitleClick )
-        $node.addEventListener('ready', ()=>{
-          let converter = new showdown.Converter()
-        document.body.innerHTML = converter.makeHtml(data[index].content)
         })
       })
+        
     })
-    //return ()=> ListStore.reset()
-  });
+  })
 
 
   return (
