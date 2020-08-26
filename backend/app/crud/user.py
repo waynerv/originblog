@@ -51,22 +51,15 @@ def delete_user(db: Session, user_id: int):
     return user
 
 
-def edit_user(
-        db: Session, user_id: int, user: UserUpdate
+async def edit_user(
+        user: User, user_in: UserUpdate
 ) -> User:
-    db_user = get_user(db, user_id)
-    if not db_user:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
-    update_data = user.dict(exclude_unset=True)
+    update_data = user_in.dict(exclude_unset=True)
 
     if "password" in update_data:
-        update_data["hashed_password"] = get_password_hash(user.password)
+        update_data["password_hash"] = get_password_hash(user_in.password)
         del update_data["password"]
 
-    for key, value in update_data.items():
-        setattr(db_user, key, value)
+    updated_user = await user.update_from_dict(update_data)
 
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    return updated_user

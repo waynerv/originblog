@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 class UserBase(BaseModel):
     email: str = Field(..., title='邮箱', max_length=64)
     name: str = Field(..., title='姓名', max_length=64)
-    avatar: str = Field(..., title='头像地址', max_length=128)
+    avatar: str = Field(None, title='头像地址', max_length=128)
 
 
 class UserUpdate(UserBase):
@@ -29,4 +29,3 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: str = None
-    permissions: str = "user"

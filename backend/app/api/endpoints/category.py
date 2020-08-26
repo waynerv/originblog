@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app import crud
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.db_helper import get_db
-from app.schemas.auth import UserProfile
+from app.models.user import User
 from app.schemas.category import CategoryOut, CategoryCreate, CategoryUpdate
 from app.utils.response import ERROR_404, ERROR_403, ERROR_400
 
@@ -32,7 +32,7 @@ async def create_category(
         *,
         db: Session = Depends(get_db),
         category_in: CategoryCreate,
-        current_user: UserProfile = Depends(get_current_user),
+        current_user: User = Depends(get_current_user),
 ):
     """创建新分类"""
     category = crud.category.create(db, category_in=category_in, creator_id=current_user.id)
@@ -47,7 +47,7 @@ async def update_category(
         *,
         db: Session = Depends(get_db),
         category_in: CategoryUpdate,
-        current_user: UserProfile = Depends(get_current_user),
+        current_user: User = Depends(get_current_user),
 ):
     """修改分类"""
     category = crud.category.get(db, id=category_id)
@@ -67,7 +67,7 @@ async def delete_category(
         *,
         db: Session = Depends(get_db),
         category_id: int,
-        current_user: UserProfile = Depends(get_current_user)
+        current_user: User = Depends(get_current_user)
 ):
     """删除分类"""
     category = crud.category.get(db, id=category_id)
