@@ -7,7 +7,7 @@ from app.schemas.post import PostType
 
 def get_post_conditions(
         title: str = Query(None, description='标题'),
-        type: PostType = Query(1, description='类型'),
+        type: PostType = Query(int(PostType.article), description='类型'),
         is_draft: bool = Query(False, description='是否为草稿'),
         category_id: int = Query(None, description='分类id'),
         tag_id: int = Query(None, description='标签id'),
