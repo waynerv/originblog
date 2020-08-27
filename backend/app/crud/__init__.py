@@ -1,1 +1,1 @@
-from . import user, category, tag
+from . import user, category, tag, post
