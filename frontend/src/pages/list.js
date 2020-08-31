@@ -23,8 +23,10 @@ const Component = observer(() => {
         $node.addEventListener('click', ()=>{
           ListStore.setid(ListStore.list[index].id)
           ListStore.Read().then((response)=>{
-            ListStore.setTitle(response.title)
-            ListStore.setContent(response.content)
+            // ListStore.setTitle(response.title)
+            // ListStore.setContent(response.content)
+            ListStore.setTitle('标题')
+            ListStore.setContent('内容有很多')
             history.push('/content')
           })
         })

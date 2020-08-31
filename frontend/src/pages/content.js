@@ -12,7 +12,8 @@ padding: 0 50px;
 const Component = observer(() => {
   const { ListStore } = useStores()
   let converter = new showdown.Converter()
-  document.querySelector('#text').innerHTML = converter.makeHtml(ListStore.content)
+  document.querySelector('body').innerHTML = converter.makeHtml(ListStore.content)
+  // document.querySelector('body').innerHTML = '<h2>这是文章内容</h2>'
 
   return (
   <>
