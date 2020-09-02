@@ -6,7 +6,7 @@ from app.schemas.tag import TagCreate, TagUpdate
 
 async def get(tag_id: int) -> Optional[Tag]:
     """通过id获取指定标签"""
-    return await Tag.get(id=tag_id)
+    return await Tag.get_or_none(id=tag_id)
 
 
 async def get_by_name(name: str) -> Optional[Tag]:

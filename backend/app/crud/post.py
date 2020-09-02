@@ -12,7 +12,7 @@ from app.utils.pagination import CollectionResponse, paginate
 
 async def get(post_id: int) -> Optional[Post]:
     """通过id获取指定文章"""
-    return await Post.get(id=post_id)
+    return await Post.get_or_none(id=post_id)
 
 
 async def get_by_title(title: str) -> Optional[Post]:
@@ -73,7 +73,26 @@ async def create(post_in: PostCreate, current_user: User) -> Post:
 
 
 async def update(post: Post, post_in: PostUpdate) -> Post:
-    """创建新的文章"""
+    """修改文章"""
+    category = await Category.get(id=post_in.category_id)
+    if not category:
+        raise HTTPException(
+            status_code=404,
+            detail='指定的分类不存在'
+        )
+
+    tags = []
+    for tag_id in post_in.tag_ids:
+        tag = await Tag.get(id=tag_id)
+        if not tag:
+            raise HTTPException(
+                status_code=404,
+                detail='指定的标签不存在'
+            )
+        tags.append(tag)
+    await post.tags.clear()
+    await post.tags.add(*tags)
+
     updated_post = post.update_from_dict(post_in.dict())
     await post.save()
 

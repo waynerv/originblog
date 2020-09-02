@@ -4,8 +4,12 @@ from typing import List
 
 from pydantic import Field
 from pydantic.main import BaseModel
+from tortoise.contrib.pydantic import PydanticModel
 
+from app.schemas.category import CategoryOut
 from app.schemas.common import CollectionOut
+from app.schemas.tag import TagOut
+from app.schemas.user import UserOut
 
 
 class PostType(IntEnum):
@@ -35,7 +39,7 @@ class PostUpdate(PostCreate):
     pass
 
 
-class PostBaseOut(PostBase):
+class PostBaseOut(PostBase, PydanticModel):
     id: int
     created_at: datetime = Field(..., title='创建时间')
     updated_at: datetime = Field(..., title='最后更新时间')
@@ -45,7 +49,9 @@ class PostBaseOut(PostBase):
 
 
 class PostOut(PostBaseOut):
-    pass
+    author: UserOut = Field(..., title='作者')
+    category: CategoryOut = Field(..., title='类别')
+    tags: List[TagOut] = Field(..., title='标签集合')
 
 
 class PostPageOut(PostBaseOut):

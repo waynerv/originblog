@@ -6,7 +6,7 @@ from app.schemas.category import CategoryCreate, CategoryUpdate
 
 async def get(category_id: int) -> Optional[Category]:
     """通过id获取指定分类"""
-    return await Category.get(id=category_id)
+    return await Category.get_or_none(id=category_id)
 
 
 async def get_by_name(name: str) -> Optional[Category]:
