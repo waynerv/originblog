@@ -31,7 +31,8 @@ async def get_all() -> List[Post]:
 
 
 async def get_multi(page: int, per_page: int, conditions: dict) -> CollectionResponse:
-    query = Post
+    """分页查询文章"""
+    query = Post.filter().order_by('-id')
     if conditions.get('title'):
         query = query.filter(title__contains=conditions['title'])
     if conditions.get('type'):

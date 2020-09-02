@@ -15,13 +15,13 @@ router = APIRouter()
 # -----------------------Post Collection API-----------------------
 
 @router.get('/posts', response_model=PostPage, responses={**ERROR_404})
-def read_posts(
+async def read_posts(
         page: int,
         per_page: int,
         conditions: dict = Depends(get_post_conditions),
 ):
     """获取文章列表"""
-    posts = crud.post.get_multi(page=page, per_page=per_page)
+    posts = await crud.post.get_multi(page=page, per_page=per_page, conditions=conditions)
 
     return posts
 
