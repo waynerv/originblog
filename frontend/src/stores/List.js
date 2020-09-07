@@ -2,7 +2,7 @@ import { observable, action } from 'mobx';
 import { Blog } from '../models';
 
 class ListStore{
-  @observable page = 0;
+  @observable page = 1;
   pre_page = 20;
   @observable content = '# Hello'
   @observable formData = {}
