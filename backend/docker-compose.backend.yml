@@ -18,6 +18,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: backend_app
     command: python app/main.py
     tty: true
     ports:

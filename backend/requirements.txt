@@ -1,14 +1,13 @@
-alembic==1.4.2
 Authlib==0.14.3
 fastapi==0.60.1
 pydantic[email]==1.5.1
 celery==4.4.6
 redis==3.5.3
 httpx==0.13.3
-ipython==7.16.1
 itsdangerous==1.1.0
 Jinja2==2.11.2
 pytest==5.4.3
+python-dotenv==0.14.0
 requests==2.24.0
 SQLAlchemy==1.3.18
 starlette==0.13.6
