@@ -1,42 +1,44 @@
 import { observable, action } from 'mobx';
 import { Blog } from '../models';
+import { Find, Publish } from '../models/api';
 
 class PostStore{
   @observable page = 0;
   pre_page = 20;
-  @observable content = '# Hello'
   @observable formData = {}
   @observable list =[]
   @observable query = {}
   @observable hasMore = true
   @observable id = ''
-  @observable title=''
-  @observable slug=''
-  @observable summary=''
-
-
-
+  @observable values = {
+    title:'',
+    slug:'',
+    summary:'',
+    content:'# Hello'
+  }
 
   @action setContent(newContent){
-    this.content = newContent
+    this.values.content = newContent
   };
   @action setTitle(newTitle){
-    this.title = newTitle
+    this.values.title = newTitle
   };
   @action setSlug(newSlug){
-    this.slug = newSlug
+    this.values.slug = newSlug
   };
   @action setSummary(newSummary){
-    this.summary = newSummary
+    this.values.summary = newSummary
   };
 
-  @action setFormData($dom){
-    this.formData = new FormData($dom)
-   
+  @action setFormData(newFormData){
+    this.formData = newFormData
+ 
   };
+
   @action setQuery($dom){
     this.query = new FormData($dom)
     this.query.append(this.page, this.per_page)
+    this.query.serialize()
   };
   @action append(newList){
     this.list = this.list.concat(newList)
@@ -45,9 +47,9 @@ class PostStore{
     this.id = newId
   }
 
-  @action Publish() {
+  @action publish(data) {
     return new Promise((resolve, reject) => {
-      Blog.Publish(this.formData).then(date => {
+      Publish(data).then(date => {
         resolve(date)
         console.log('发布成功')
       }).catch(err => {
@@ -68,22 +70,23 @@ class PostStore{
     })
   }
 
-  @action Find() {
+  //JSON.parse(JSON.stringify(res.data))
+  @action find() {
     this.hasMore = true;
     return new Promise((resolve, reject) => {
-      Blog.Find(this.query).then(data => {
+      Find(this.formData).then(data => {
         let newList = Object.entries(data)[0][1]
         this.append(newList);
         this.page++
-        console.log(newList)
-        resolve(newList)
+        //console.log(newList)
+        resolve(data)
         if(newList.length < this.pre_page) {
           this.hasMore = false
         }
         console.log('获取成功')
       }).catch(err => {
         reject(err)
-        console.log('获取失败')
+        console.log(err)
       })
     })
   }

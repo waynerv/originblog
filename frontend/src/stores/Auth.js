@@ -1,30 +1,21 @@
 import { observable, action} from 'mobx';
-import { Auth } from '../models/index';
+import { Login } from '../models/api.js';
 import UserStore from './User';
 import PostStore from './Post';
 import CategroyStory from './categroy';
 
 class AuthStore{
-  @observable values = {
-    username: '',
-    password: ''
-  };
- 
-  @action setUsername(username) {
-    this.values.username = username
-  }
 
-  @action setPassword(password) {
-    this.values.password = password
-  }
-
-  @action login(){
+  @action login(data){
     return new Promise((resolve, reject) =>{
-      Auth.login(this.values.username, this.values.password).then(user=>{
-        UserStore.pullUser();
-        PostStore.Find();
+      Login(data).then(res=>{
+        console.log(res)
+        window.localStorage.setItem('token', res.data.access_token)
+        console.log( res.data.access_token)
+        //UserStore.pullUser();
+        PostStore.find();
         CategroyStory.Find();
-        resolve(user);
+        resolve(res);
       }).catch(err=>{
         UserStore.resetUser();
         console.log(err)
@@ -34,7 +25,7 @@ class AuthStore{
   };
 
   @action logout() {
-    Auth.logout();
+    //Auth.logout();
     UserStore.resetUser();
   }
 }

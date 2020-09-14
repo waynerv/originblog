@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// import MarkdownIt from 'markdown-it';
 import MDEditor from '@uiw/react-md-editor';
 import styled from 'styled-components';
 import { useStores } from '../stores';
@@ -64,11 +63,13 @@ const Component = observer(() => {
   function handSubmit(e){
     e.preventDefault()
     const $ = s => document.querySelector(s)
-    const $form = $('#editor')
     const $msg = $('#msg')
-    PostStore.setFormData($form)
+    let formData = new FormData($('#editor'))
+    let jsonData = {}
+    formData.forEach((value, key) => jsonData[key] = value)
+    PostStore.setFormData(jsonData)
     if(Check()){
-      PostStore.Publish().then((data)=> {
+      PostStore.publish().then((data)=> {
         console.log(data)
         $msg.innerText = data.msg
       })
@@ -82,38 +83,69 @@ const Component = observer(() => {
   
 
   return (
-    <form id="editor" action='http://127.0.0.1:4523/mock/349959/api/posts'  method='POST' onSubmit={handSubmit}>
-      <Textarea 
-      name="title" 
-      value={form.title} 
-      onChange={e => setForm({...form, title:e.target.value})} placeholder="请输入标题(最多30个字)"
-      />
-      <Summary 
-      name="slug" 
-      value={form.slug} 
-      onChange={e => setForm({...form, slug:e.target.value})} placeholder="请输入英文标题" 
-      required
-      />
-      <Summary 
-      name="summary" 
-      value={form.summary} 
-      onChange={e => setForm({...form, summary:e.target.value})} 
-      placeholder="请输入摘要"
-      />
-      <textarea 
-      name="content"  
-      value={PostStore.content} 
-      hidden readOnly
-      />
+    // <form id="editor" action='http://127.0.0.1:4523/mock/349959/api/posts'  method='POST' onSubmit={handSubmit}>
+    //   <Textarea 
+    //   name="title" 
+    //   value={form.title} 
+    //   onChange={e => setForm({...form, title:e.target.value})} placeholder="请输入标题(最多30个字)"
+    //   />
+    //   <Summary 
+    //   name="slug" 
+    //   value={form.slug} 
+    //   onChange={e => setForm({...form, slug:e.target.value})} placeholder="请输入英文标题" 
+    //   required
+    //   />
+    //   <Summary 
+    //   name="summary" 
+    //   value={form.summary} 
+    //   onChange={e => setForm({...form, summary:e.target.value})} 
+    //   placeholder="请输入摘要"
+    //   />
+    //   <textarea 
+    //   name="content"  
+    //   value={PostStore.content} 
+    //   hidden readOnly
+    //   />
 
-      <MDEditor
-        id="msg"
-        name="content"
-        value={value}
-        onChange={setValue}
-        height='90vh'
-      />
+    //   <MDEditor
+    //     id="msg"
+    //     name="content"
+    //     value={value}
+    //     onChange={setValue}
+    //     height='90vh'
+    //   />
   
+    <form id="editor"  onSubmit={handSubmit}>
+    <Textarea 
+    name="title" 
+    value={form.title} 
+    onChange={e => setForm({...form, title:e.target.value})} placeholder="请输入标题(最多30个字)"
+    />
+    <Summary 
+    name="slug" 
+    value={form.slug} 
+    onChange={e => setForm({...form, slug:e.target.value})} placeholder="请输入英文标题" 
+    required
+    />
+    <Summary 
+    name="summary" 
+    value={form.summary} 
+    onChange={e => setForm({...form, summary:e.target.value})} 
+    placeholder="请输入摘要"
+    />
+    <textarea 
+    name="content"  
+    value={PostStore.content} 
+    hidden readOnly
+    />
+
+    <MDEditor
+      id="msg"
+      name="content"
+      value={value}
+      onChange={setValue}
+      height='90vh'
+    />
       
       {/* <MDEditor.Markdown source={value} /> */}
       <ButtonGloup className="button">

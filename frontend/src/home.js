@@ -11,7 +11,7 @@ const Editor = lazy(()=> import('./components/Editor'));
 const Information = lazy(()=> import('./components/Information'));
 const Categroy =lazy(()=> import('./components/Categroy'))
 const Update =lazy(()=> import('./components/Update'))
-const Article =lazy(()=> import('./components/Article'))
+const Article =lazy(()=> import('./components/View'))
 
 function Home() {
   return (

@@ -4,6 +4,7 @@ function Request(url, prams, onsucceed, onfaill) {
     let xhr = new XMLHttpRequest()
     xhr.open('GET', url, true)
     xhr.setRequestHeader("Authorization", localStorage.getItem('token'));
+     xhr.setRequestHeader("Content-Type", "application/json")
     xhr.onload = function() {
       if(xhr.status>=200 && xhr.status<300 || xhr.status===304){
         let result = JSON.parse(xhr.responseText)
@@ -64,17 +65,17 @@ function Post (url, data, onsucceed, onfaill) {
   return new Promise((resolve,reject) =>{
     let xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.onload = function() {
-      if(xhr.status>=200 && xhr.status<300 || xhr.status===304){
-        let result = JSON.parse(xhr.responseText)
+      if(xhr.status>=200 || xhr.status===304){
+           let result = JSON.parse(xhr.responseText)
         resolve(result)
         onsucceed()
       }else {
         onfaill(err=>reject(err))
      }
    }
-   xhr.send(JSON.stringify(data));
+   xhr.send(data);
   })
   
 };

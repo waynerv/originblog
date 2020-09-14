@@ -6,8 +6,9 @@ import styled from 'styled-components'
 import {useStores} from '../stores';
 import { useHistory } from "react-router-dom";
 import { observer } from 'mobx-react'
+import { Login } from '../models/api.js'
 
-const Login = styled.div`
+const XLogin = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -15,6 +16,7 @@ const Login = styled.div`
   bottom: 0;
   background: #001529;
 `
+
 const StyledForm = styled(Form)`
   max-width: 600px;
   margin: 70px auto;
@@ -25,11 +27,13 @@ const StyledForm = styled(Form)`
 const Component = observer(() => {
   const history = useHistory();
   const { AuthStore } = useStores();
-  const onFinish = values => {
-    AuthStore.setUsername(values.username);
-    AuthStore.setPassword(values.password);
-    AuthStore.login().then((result)=>{
-      localStorage.setItem('token', result.access_token)
+  
+  const onFinish = (value) => {
+    let formData = new FormData()
+    formData.append("username", value.username)
+    formData.append("password", value.password)
+    //AuthStore.setValues(formData);
+    AuthStore.login(formData).then((result)=>{
       history.push('/view');
     }).catch((err)=> {
       console.log(err)
@@ -42,8 +46,9 @@ const Component = observer(() => {
   };
   
   return (
-    <Login>
+    <XLogin>
       <StyledForm
+      id = "formData"
       name="normal_login"
       className="login-form"
       initialValues={{ remember: true }}
@@ -78,7 +83,8 @@ const Component = observer(() => {
         </a>
       </Form.Item>
     </StyledForm>
-  </Login>
+  </XLogin>
+
   )
 });
 

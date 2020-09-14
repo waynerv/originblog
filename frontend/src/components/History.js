@@ -45,12 +45,12 @@ const Component = observer(() => {
     const $ = s => document.querySelector(s)
     const $form = $('.operation')
     PostStore.setQuery($form)
-    PostStore.Find().then((data)=> {
-      console.log(data)
+    PostStore.find().then((data)=> {
+      console.log("获取成功")
     })
     .catch((err)=>{
       console.log(err)
-      console.log('fabushibai')
+      console.log('获取失败')
     })
   };
 

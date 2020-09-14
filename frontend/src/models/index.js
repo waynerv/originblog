@@ -2,9 +2,9 @@ import {Post, Request,Delete, Update} from './ajax';
 import UserStore from '../stores/User';
 
 const Auth = {
-  login(username, password) {
+  login(dom) {
     return new Promise((resolve, reject) => {
-      Post('http://127.0.0.1:4523/mock/349959/api/access-token',{username, password}, (data)=>{}, ()=>{console.log('接口异常')})
+      Post('http://81.68.174.36:8080/api/auth/access-token', {dom}, (data)=>{}, ()=>{console.log('接口异常')})
       .then(loginedUser=>{
         resolve(loginedUser)},error=> {
           reject(error)
@@ -16,26 +16,26 @@ const Auth = {
     localStorage.removeItem('token')
   }, 
 
-  getCurrentUser() {
-      return Request("http://127.0.0.1:4523/mock/349959/api/users/me", {}, ()=>{}, (err)=>{alert('端口异常')})
-        .then(response =>{
-        UserStore.currentUser = response.name
-    })
-  },
+  // getCurrentUser() {
+  //     return Request("http://81.68.174.36:8080/api/users/me", {}, ()=>{}, (err)=>{alert('端口异常')})
+  //       .then(response =>{
+  //       UserStore.currentUser = response.name
+  //   })
+  //},
 
 }
 
 const Blog = {
   Publish(formData){
     return new Promise((resolve,reject) =>{
-      Post('http://127.0.0.1:4523/mock/349959/api/posts', {formData}, (data)=>{console.log(data)}, (err)=>{console.log(err)})
+      Post('http://81.68.174.36:8080/api/posts', {formData}, (data)=>{console.log(data)}, (err)=>{console.log(err)})
       .then(data=> resolve(data))
        .catch(err=> reject(err))
      })
   },
   Update(post_id,formData){
     return new Promise((resolve,reject) =>{
-      Update("http://127.0.0.1:4523/mock/349959/api/posts/%253Cpost_id%253E", post_id, formData, (data)=>{console.log(data)}, (err)=>{console.log(err)})
+      Update("http://81.68.174.36:8080/api/posts", post_id, formData, (data)=>{console.log(data)}, (err)=>{console.log(err)})
       .then(data=> resolve(data))
        .catch(err=> reject(err))
      })
@@ -43,7 +43,7 @@ const Blog = {
 
   Find(query) {
     return new Promise((resolve, reject) =>{
-      Request('http://127.0.0.1:4523/mock/349959/api/posts',{query}, ()=>{}, (err)=>{console.log(err)})
+      Request('http://81.68.174.36:8080/api/posts',{query}, ()=>{}, (err)=>{console.log(err)})
       .then(data=>{
         console.log(Object.entries(data)[0][1])
         resolve(data)} )
@@ -53,7 +53,7 @@ const Blog = {
 
   Delete(post_id) {
     return new Promise((resolve, reject) =>{
-      Delete('http://127.0.0.1:4523/mock/349959/api/posts',{post_id}, ()=>{}, (err)=>{console.log(err)})
+      Delete('http://81.68.174.36:8080/api/posts',{post_id}, ()=>{}, (err)=>{console.log(err)})
       .then(data=>{
         console.log(data)
         resolve(data)} )
@@ -65,7 +65,7 @@ const Blog = {
 
   Read(post_id) {
     return new Promise((resolve, reject) =>{
-      Request("http://127.0.0.1:4523/mock/349959/api/posts/%253Cpost_id%253E",{post_id}, ()=>{}, (err)=>{console.log(err)})
+      Request("http://81.68.174.36:8080/api/posts",{post_id}, ()=>{}, (err)=>{console.log(err)})
       .then(data=>{
         console.log('查看成功')
         resolve(data)} )
@@ -79,7 +79,7 @@ const Blog = {
 const Categroy = {
   Find() {
     return new Promise((resolve,reject) => {
-      Request("http://127.0.0.1:4523/mock/349959/api/categories",{},()=>{}, (err)=>{console.log(err)})
+      Request("http://81.68.174.36:8080/api/categories",{},()=>{}, (err)=>{console.log(err)})
       .then(data=>{
         console.log(data)
         resolve(data)} )
@@ -89,7 +89,7 @@ const Categroy = {
 
   Create(data) {
     return new Promise ((resolve,reject) => {
-      Post('http://127.0.0.1:4523/mock/349959/api/categories', data, ()=>{}, ()=>{})
+      Post('http://81.68.174.36:8080/api/categories', data, ()=>{}, ()=>{})
       .then(result => resolve(result))
       .catch(err => reject(err))
     })
@@ -97,7 +97,7 @@ const Categroy = {
 
   Update(id, data) {
     return new Promise ((resolve,reject) => {
-      Update('http://127.0.0.1:4523/mock/349959', id, data, ()=>{}, ()=>{})
+      Update('http://81.68.174.36:8080/api/categories', id, data, ()=>{}, ()=>{})
       .then(result => resolve(result))
       .catch(err => reject(err))
     })
@@ -105,7 +105,7 @@ const Categroy = {
 
   Delete(id) {
     return new Promise((resolve, reject) =>{
-      Delete('http://127.0.0.1:4523/mock/349959/api/categories',id, ()=>{}, (err)=>{console.log(err)})
+      Delete('http://81.68.174.36:8080/api/categories',id, ()=>{}, (err)=>{console.log(err)})
       .then(data=>{
         console.log(data)
         resolve(data)} )
